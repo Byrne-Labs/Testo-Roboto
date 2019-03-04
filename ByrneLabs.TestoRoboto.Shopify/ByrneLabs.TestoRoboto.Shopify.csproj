@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ByrneLabs.TestoRoboto.Common\ByrneLabs.TestoRoboto.Common.csproj" />
     <ProjectReference Include="..\ByrneLabs.TestoRoboto.Json\ByrneLabs.TestoRoboto.Json.csproj" />
     <ProjectReference Include="..\ByrneLabs.TestoRoboto\ByrneLabs.TestoRoboto.csproj" />
   </ItemGroup>

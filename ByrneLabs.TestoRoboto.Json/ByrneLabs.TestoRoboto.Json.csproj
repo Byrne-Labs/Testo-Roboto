@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ByrneLabs.TestoRoboto.Common\ByrneLabs.TestoRoboto.Common.csproj" />
+    <ProjectReference Include="..\ByrneLabs.TestoRoboto.HttpServices\ByrneLabs.TestoRoboto.HttpServices.csproj" />
   </ItemGroup>
 
 </Project>

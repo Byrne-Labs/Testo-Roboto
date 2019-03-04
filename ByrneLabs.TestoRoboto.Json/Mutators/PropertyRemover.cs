@@ -4,9 +4,9 @@ using Newtonsoft.Json.Linq;
 
 namespace ByrneLabs.TestoRoboto.Json.Mutators
 {
-    public class PropertyRemover : Mutator
+    public class PropertyRemover : JsonMutator
     {
-        public override IEnumerable<JObject> MutateMessage(JObject message)
+        public override IEnumerable<JObject> MutateJsonMessage(JObject message)
         {
             var mutatedMessages = new List<JObject>();
             foreach (var property in message.Descendants().OfType<JProperty>().Where(p => p.HasValues))

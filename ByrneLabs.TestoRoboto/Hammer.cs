@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using ByrneLabs.TestoRoboto.Json;
 
 namespace ByrneLabs.TestoRoboto
@@ -17,20 +18,21 @@ namespace ByrneLabs.TestoRoboto
                 var byteArray = Encoding.ASCII.GetBytes(userName + ":" + password);
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
 
+                var a = new HttpRequestMessage();
+
                 var response = httpClient.PostAsync(url, new StringContent(message, Encoding.UTF8, "application/json")).Result;
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    System.Diagnostics.Debug.WriteLine("Unfuzzed message was rejected.");
+                    Debug.WriteLine("Unfuzzed message was rejected.");
                 }
             }
-
 
             var fuzzer = new JsonFuzzer();
 
             var fuzzedMessages = fuzzer.Fuzz(message);
 
-            Parallel.ForEach(fuzzedMessages, fuzzedMessage =>
+            foreach (var fuzzedMessage in fuzzedMessages)
             {
                 using (var httpClient = new HttpClient())
                 {
@@ -39,12 +41,14 @@ namespace ByrneLabs.TestoRoboto
 
                     var response = httpClient.PostAsync(url, new StringContent(fuzzedMessage, Encoding.UTF8, "application/json")).Result;
 
-                    if ((int)response.StatusCode >= 500 && (int)response.StatusCode < 600)
+                    if ((int) response.StatusCode >= 500 && (int) response.StatusCode < 600)
                     {
                         File.WriteAllText(Path.Combine(failureDirectory, DateTime.Now.Ticks.ToString()) + ".json", fuzzedMessage);
                     }
                 }
-            });
+
+                Thread.Sleep(500);
+            }
         }
     }
 }

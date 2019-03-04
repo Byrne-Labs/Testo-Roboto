@@ -6,9 +6,9 @@ using Newtonsoft.Json.Linq;
 
 namespace ByrneLabs.TestoRoboto.Json.Mutators
 {
-    public class PropertyAdder : Mutator
+    public class PropertyAdder : JsonMutator
     {
-        public override IEnumerable<JObject> MutateMessage(JObject message)
+        public override IEnumerable<JObject> MutateJsonMessage(JObject message)
         {
             var mutatedMessages = new List<JObject>();
             foreach (var jObject in message.Descendants().OfType<JObject>())

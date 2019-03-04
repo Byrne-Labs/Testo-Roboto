@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 
 namespace ByrneLabs.TestoRoboto.Json.Mutators
 {
-    public class ArrayGrower : Mutator
+    public class ArrayGrower : JsonMutator
     {
         private static JObject AddDuplicate(JArray originalArray, int duplicateCount)
         {
@@ -27,7 +27,7 @@ namespace ByrneLabs.TestoRoboto.Json.Mutators
             return (JObject) clonedMessage;
         }
 
-        public override IEnumerable<JObject> MutateMessage(JObject message)
+        public override IEnumerable<JObject> MutateJsonMessage(JObject message)
         {
             var mutatedMessages = new List<JObject>();
             foreach (var array in message.Descendants().OfType<JArray>())

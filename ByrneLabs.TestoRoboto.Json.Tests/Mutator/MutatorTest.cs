@@ -7,7 +7,7 @@ namespace ByrneLabs.TestoRoboto.Json.Tests
 {
     public class MutatorTest
     {
-        protected void TestMessageCountReturned<T>(int expectedMessageCount) where T : Mutator, new()
+        protected void TestMessageCountReturned<T>(int expectedMessageCount) where T : JsonMutator, new()
         {
             const string message = @"
                 {
@@ -42,7 +42,7 @@ namespace ByrneLabs.TestoRoboto.Json.Tests
 
             var mutator = new T();
 
-            var mutatedMessages = mutator.MutateMessage(jsonObject);
+            var mutatedMessages = mutator.MutateJsonMessage(jsonObject);
 
             Assert.NotNull(mutatedMessages);
             Assert.NotEmpty(mutatedMessages);
