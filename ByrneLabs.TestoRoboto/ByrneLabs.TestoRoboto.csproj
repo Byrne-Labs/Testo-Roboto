@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ByrneLabs.TestoRoboto.Common\ByrneLabs.TestoRoboto.Common.csproj" />
+    <ProjectReference Include="..\ByrneLabs.TestoRoboto.Json\ByrneLabs.TestoRoboto.Json.csproj" />
+  </ItemGroup>
+
+</Project>
