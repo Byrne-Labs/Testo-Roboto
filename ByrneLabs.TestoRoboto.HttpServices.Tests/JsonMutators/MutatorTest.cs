@@ -1,12 +1,13 @@
-﻿using System.Linq;
+using System.Linq;
+using ByrneLabs.TestoRoboto.HttpServices.JsonMutators;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
-namespace ByrneLabs.TestoRoboto.Json.Tests
+namespace ByrneLabs.TestoRoboto.HttpServices.Tests.JsonMutators
 {
-    public class JsonFuzzerTest
+    public class MutatorTest
     {
-        [Fact]
-        public void TestJsonFuzzerTest()
+        protected void TestMessageCountReturned<T>(int expectedMessageCount) where T : JsonMutator, new()
         {
             const string message = @"
                 {
@@ -37,17 +38,19 @@ namespace ByrneLabs.TestoRoboto.Json.Tests
                     }
                 }
             ";
-            var fuzzer = new JsonFuzzer();
+            var jsonObject = JObject.Parse(message);
 
-            var mutatedMessages = fuzzer.Fuzz(message);
+            var mutator = new T();
+
+            var mutatedMessages = mutator.MutateJsonMessage(jsonObject);
 
             Assert.NotNull(mutatedMessages);
             Assert.NotEmpty(mutatedMessages);
-            Assert.Equal(6134, mutatedMessages.Count());
+            Assert.Equal(expectedMessageCount, mutatedMessages.Count());
 
             foreach (var mutatedMessage in mutatedMessages)
             {
-                Assert.NotEqual(message, mutatedMessage);
+                Assert.NotEqual(jsonObject.ToString(), mutatedMessage.ToString());
             }
         }
     }

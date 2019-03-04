@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ByrneLabs.TestoRoboto.HttpServices;
 using Newtonsoft.Json.Linq;
 
-namespace ByrneLabs.TestoRoboto.Json.Mutators
+namespace ByrneLabs.TestoRoboto.HttpServices.JsonMutators
 {
     public abstract class JsonMutator : Mutator
     {

@@ -1,7 +1,7 @@
-﻿using ByrneLabs.TestoRoboto.Json.Mutators;
+﻿using ByrneLabs.TestoRoboto.HttpServices.JsonMutators;
 using Xunit;
 
-namespace ByrneLabs.TestoRoboto.Json.Tests
+namespace ByrneLabs.TestoRoboto.HttpServices.Tests.JsonMutators
 {
     public class RandomValueChangerTest : MutatorTest
     {

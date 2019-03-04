@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ByrneLabs.TestoRoboto.Json.Mutators
+namespace ByrneLabs.TestoRoboto.HttpServices.JsonMutators
 {
     public class XmlInjector : ValueChanger
     {

@@ -1,32 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
+using System.Text;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     public class TestRequest
     {
-        private readonly IList<KeyValuePair<string, IEnumerable<string>>> _headers = new List<KeyValuePair<string, IEnumerable<string>>>();
-
-        public int DelayBetweenMessages { get; set; }
-
-        public Fuzzer Fuzzer { get; set; }
-
-        public IEnumerable<KeyValuePair<string, IEnumerable<string>>> Headers => _headers;
-
-        public HttpMethod HttpMethod { get; set; }
-
-        public string Message { get; set; }
+        public Encoding Encoding { get; set; } = Encoding.UTF8;
 
         public IList<Mutator> Mutators { get; set; } = new List<Mutator>();
 
-        public void AddHeader(string name, string value)
-        {
-            _headers.Add(new KeyValuePair<string, IEnumerable<string>>(name, new[] { value }));
-        }
+        public HttpRequestMessage RequestMessage { get; set; } = new HttpRequestMessage();
 
-        public void AddHeader(string name, IEnumerable<string> values)
-        {
-            _headers.Add(new KeyValuePair<string, IEnumerable<string>>(name, values));
-        }
+        public int TimeBetweenRequests { get; set; }
     }
 }
