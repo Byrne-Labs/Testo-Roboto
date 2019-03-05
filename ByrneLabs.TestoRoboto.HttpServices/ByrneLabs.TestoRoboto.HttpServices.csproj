@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="ByrneLabs.Commons" Version="1.0.0.96-alpha" />
+    <PackageReference Include="ByrneLabs.Commons.Domain" Version="1.0.0.96-alpha" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
   </ItemGroup>
 

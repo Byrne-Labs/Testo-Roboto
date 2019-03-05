@@ -9,6 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ByrneLabs.TestoRoboto.HttpS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ByrneLabs.TestoRoboto.HttpServices.Tests", "ByrneLabs.TestoRoboto.HttpServices.Tests\ByrneLabs.TestoRoboto.HttpServices.Tests.csproj", "{8200C138-2E28-4051-B40C-30A81EED9B7C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByrneLabs.TestoRoboto.Desktop", "ByrneLabs.TestoRoboto.Desktop\ByrneLabs.TestoRoboto.Desktop.csproj", "{0C714CE9-AD7D-4DE3-8737-9AB9F83EFF4C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ByrneLabs.TestoRoboto.FuzzDb", "ByrneLabs.TestoRoboto.FuzzDb\ByrneLabs.TestoRoboto.FuzzDb.csproj", "{2685C68A-8B67-4E3E-B880-53543E98FDBC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ByrneLabs.TestoRoboto.Postman", "ByrneLabs.TestoRoboto.Postman\ByrneLabs.TestoRoboto.Postman.csproj", "{F753BB3B-95A4-4299-8DE0-35C7DE3627B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +33,18 @@ Global
 		{8200C138-2E28-4051-B40C-30A81EED9B7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8200C138-2E28-4051-B40C-30A81EED9B7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8200C138-2E28-4051-B40C-30A81EED9B7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C714CE9-AD7D-4DE3-8737-9AB9F83EFF4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C714CE9-AD7D-4DE3-8737-9AB9F83EFF4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C714CE9-AD7D-4DE3-8737-9AB9F83EFF4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C714CE9-AD7D-4DE3-8737-9AB9F83EFF4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2685C68A-8B67-4E3E-B880-53543E98FDBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2685C68A-8B67-4E3E-B880-53543E98FDBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2685C68A-8B67-4E3E-B880-53543E98FDBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2685C68A-8B67-4E3E-B880-53543E98FDBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F753BB3B-95A4-4299-8DE0-35C7DE3627B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F753BB3B-95A4-4299-8DE0-35C7DE3627B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F753BB3B-95A4-4299-8DE0-35C7DE3627B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F753BB3B-95A4-4299-8DE0-35C7DE3627B6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

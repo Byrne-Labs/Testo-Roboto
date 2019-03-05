@@ -1,6 +1,4 @@
 using System.Linq;
-using ByrneLabs.TestoRoboto.HttpServices.JsonMutators;
-using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace ByrneLabs.TestoRoboto.HttpServices.Tests.JsonMutators

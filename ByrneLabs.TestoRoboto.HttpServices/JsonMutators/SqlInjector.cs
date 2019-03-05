@@ -34,7 +34,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.JsonMutators
             @"or%201=1",
             @"or%201=1 --",
             @"' or 2 > 1",
-            @"' or 2 between 1 and 3",
+            @"' or 2 between 1 and 3"
         };
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -19,27 +20,14 @@ namespace ByrneLabs.TestoRoboto.Shopify
                     ""product_type"": ""Snowboard"",
                     ""variants"": [
                       {
-                        ""option1"": ""Blue"",
-                        ""option2"": ""155""
-                      },
-                      {
-                        ""option1"": ""Black"",
-                        ""option2"": ""159""
+                        ""option1"": ""Blue""
                       }
                     ],
                     ""options"": [
                       {
                         ""name"": ""Color"",
                         ""values"": [
-                          ""Blue"",
-                          ""Black""
-                        ]
-                      },
-                      {
-                        ""name"": ""Size"",
-                        ""values"": [
-                          ""155"",
-                          ""159""
+                          ""Blue""
                         ]
                       }
                     ]
@@ -65,6 +53,8 @@ namespace ByrneLabs.TestoRoboto.Shopify
 
             var dispatcher = new Dispatcher();
             var responses = dispatcher.Dispatch(testRequest);
+
+            var failures = responses.Where(response => (int) response.StatusCode >= 500 && (int) response.StatusCode < 600).ToList();
         }
     }
 }
