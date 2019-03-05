@@ -6,20 +6,21 @@ using Newtonsoft.Json.Linq;
 
 namespace ByrneLabs.TestoRoboto.HttpServices.JsonMutators
 {
-    public class PropertyAdder : JsonMutator
+    public class PropertyAdder : Mutator
     {
-        public override IEnumerable<JObject> MutateJsonMessage(JObject message)
+        public override IEnumerable<string> MutateMessage(string message)
         {
+            var jObject = JObject.Parse(message);
             var mutatedMessages = new List<JObject>();
-            foreach (var jObject in message.Descendants().OfType<JObject>())
+            foreach (var descendent in jObject.Descendants().OfType<JObject>())
             {
-                var clonedMessage = message.DeepClone();
-                var clonedObject = clonedMessage.SelectToken(jObject.Path);
+                var clonedMessage = jObject.DeepClone();
+                var clonedObject = clonedMessage.SelectToken(descendent.Path);
                 clonedObject[BetterRandom.NextString(20, 20, BetterRandom.CharacterGroup.Alpha)] = Guid.NewGuid();
                 mutatedMessages.Add((JObject) clonedMessage);
             }
 
-            return mutatedMessages;
+            return mutatedMessages.Select(mutatedMessage => mutatedMessage.ToString()).ToArray();
         }
     }
 }

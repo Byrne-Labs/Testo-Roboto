@@ -5,7 +5,7 @@ using Newtonsoft.Json.Linq;
 
 namespace ByrneLabs.TestoRoboto.HttpServices.JsonMutators
 {
-    public class ArrayShrinker : JsonMutator
+    public class ArrayShrinker : Mutator
     {
         private static JObject ShrinkArray(JArray originalArray, int countToRemove)
         {
@@ -19,10 +19,11 @@ namespace ByrneLabs.TestoRoboto.HttpServices.JsonMutators
             return (JObject) clonedMessage;
         }
 
-        public override IEnumerable<JObject> MutateJsonMessage(JObject message)
+        public override IEnumerable<string> MutateMessage(string message)
         {
+            var jObject = JObject.Parse(message);
             var mutatedMessages = new List<JObject>();
-            foreach (var array in message.Descendants().OfType<JArray>())
+            foreach (var array in jObject.Descendants().OfType<JArray>())
             {
                 mutatedMessages.Add(ShrinkArray(array, 1));
                 if (array.Count > 1)
@@ -31,7 +32,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.JsonMutators
                 }
             }
 
-            return mutatedMessages.Distinct();
+            return mutatedMessages.Select(mutatedMessage => mutatedMessage.ToString()).ToArray();
         }
     }
 }

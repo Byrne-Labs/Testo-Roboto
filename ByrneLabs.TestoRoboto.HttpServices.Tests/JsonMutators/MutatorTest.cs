@@ -7,7 +7,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests.JsonMutators
 {
     public class MutatorTest
     {
-        protected void TestMessageCountReturned<T>(int expectedMessageCount) where T : JsonMutator, new()
+        protected void TestMessageCountReturned<T>(int expectedMessageCount) where T : Mutator, new()
         {
             const string message = @"
                 {
@@ -38,11 +38,10 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests.JsonMutators
                     }
                 }
             ";
-            var jsonObject = JObject.Parse(message);
 
             var mutator = new T();
 
-            var mutatedMessages = mutator.MutateJsonMessage(jsonObject);
+            var mutatedMessages = mutator.MutateMessage(message);
 
             Assert.NotNull(mutatedMessages);
             Assert.NotEmpty(mutatedMessages);
@@ -50,7 +49,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests.JsonMutators
 
             foreach (var mutatedMessage in mutatedMessages)
             {
-                Assert.NotEqual(jsonObject.ToString(), mutatedMessage.ToString());
+                Assert.NotEqual(message, mutatedMessage);
             }
         }
     }

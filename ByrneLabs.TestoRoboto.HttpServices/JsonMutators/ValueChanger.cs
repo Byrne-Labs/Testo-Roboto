@@ -5,19 +5,20 @@ using Newtonsoft.Json.Linq;
 
 namespace ByrneLabs.TestoRoboto.HttpServices.JsonMutators
 {
-    public abstract class ValueChanger : JsonMutator
+    public abstract class ValueChanger : Mutator
     {
         protected abstract IEnumerable<object> TestValues { get; }
 
-        public override IEnumerable<JObject> MutateJsonMessage(JObject message)
+        public override IEnumerable<string> MutateMessage(string message)
         {
+            var jObject = JObject.Parse(message);
             var mutatedMessages = new List<JObject>();
-            foreach (var property in message.Descendants().OfType<JProperty>().Where(p => p.HasValues))
+            foreach (var property in jObject.Descendants().OfType<JProperty>().Where(p => p.HasValues))
             {
                 mutatedMessages.AddRange(ChangeValues(property));
             }
 
-            return mutatedMessages;
+            return mutatedMessages.Select(mutatedMessage => mutatedMessage.ToString()).ToArray();
         }
 
         private IEnumerable<JObject> ChangeValues(JProperty property)
