@@ -13,7 +13,7 @@ namespace ByrneLabs.TestoRoboto.Shopify
         {
             var message = @"
                 {
-                  ""product"": {
+                    ""product"": {
                     ""title"": ""Burton Custom Freestyle 151"",
                     ""vendor"": ""Burton"",
                     ""product_type"": ""Snowboard"",
@@ -48,7 +48,7 @@ namespace ByrneLabs.TestoRoboto.Shopify
 
             var testRequest = new TestRequest();
 
-            testRequest.RequestMessage.RequestUri=new Uri("https://testoroboto.myshopify.com/admin/products.json");
+            testRequest.RequestMessage.RequestUri = new Uri("https://testoroboto.myshopify.com/admin/products.json");
             var byteArray = Encoding.ASCII.GetBytes("36e0780065f769830b0c2cb8dc18fd89:9e54820bab53b90fa12f1ddfd1528bb1");
             testRequest.RequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
             testRequest.RequestMessage.Content = new StringContent(message, Encoding.UTF8, "application/json");

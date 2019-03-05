@@ -57,21 +57,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.JsonMutators
             @"<?xml version=""1.0"" encoding=""ISO-8859-1""?><foo><![CDATA[' or 1=1 or ''=']]></foof>",
             @"<?xml version=""1.0"" encoding=""ISO-8859-1""?><foo><![CDATA[<]]>SCRIPT<![CDATA[>]]>alert('gotcha');<![CDATA[<]]>/SCRIPT<![CDATA[>]]></foo>",
             @"<name>','')); phpinfo(); exit;/*</name>",
-            @"0",
-            @"0.00005",
-            @"0.1",
-            @"0.9",
-            @"1",
-            @"-1",
-            @"1.7976931348623157e+308",
-            @"5e-10",
-            @"5e-324",
-            @"count(/child::node())",
-            @"false",
-            @"null",
-            @"true",
             @"x' or 1=1 or 'x'='y",
-            @"x' or name()='username' or 'x'='y"
         };
     }
 }
