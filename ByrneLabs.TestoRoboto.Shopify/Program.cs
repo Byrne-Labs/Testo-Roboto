@@ -58,6 +58,7 @@ namespace ByrneLabs.TestoRoboto.Shopify
             testRequest.Mutators.Add(new ArrayShrinker());
             testRequest.Mutators.Add(new PropertyAdder());
             testRequest.Mutators.Add(new PropertyRemover());
+            testRequest.Mutators.Add(new JavaScriptInjector());
             testRequest.Mutators.Add(new RandomValueChanger());
             testRequest.Mutators.Add(new SqlInjector());
             testRequest.Mutators.Add(new XmlInjector());
