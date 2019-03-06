@@ -8,6 +8,6 @@ namespace ByrneLabs.TestoRoboto.HttpServices
     {
         public IList<KeyValue> FormData { get; } = new List<KeyValue>();
 
-        public new UrlEncodedBody Clone(CloneDepth depth = CloneDepth.Deep) => (UrlEncodedBody)base.Clone(depth);
+        public new UrlEncodedBody Clone(CloneDepth depth = CloneDepth.Deep) => (UrlEncodedBody) base.Clone(depth);
     }
 }

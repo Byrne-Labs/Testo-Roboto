@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using Xunit;
 
 namespace ByrneLabs.TestoRoboto.HttpServices.Tests
@@ -487,6 +488,500 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             Assert.Equal("myTimestamp", authentication.Timestamp);
             Assert.Equal("myUser", authentication.User);
             Assert.Empty(collection.Items);
+        }
+
+        [Fact]
+        public void TestImportFromPostmanMessageFormData()
+        {
+            var json = @"
+                {
+	                ""info"": {
+		                ""_postman_id"": ""6f02b4ed-5230-43d8-9a32-62a4500fc7c2"",
+		                ""name"": ""Some Messages"",
+		                ""schema"": ""https://schema.getpostman.com/json/collection/v2.1.0/collection.json""
+	                },
+	                ""item"": [
+		                {
+			                ""name"": ""Some Message"",
+			                ""request"": {
+				                ""method"": ""DELETE"",
+				                ""header"": [
+					                {
+						                ""key"": ""Key1"",
+						                ""value"": ""Value1"",
+						                ""description"": ""Description 1"",
+						                ""type"": ""text""
+					                },
+					                {
+						                ""key"": ""Key2"",
+						                ""value"": ""Value2"",
+						                ""description"": ""Description 2"",
+						                ""type"": ""text""
+					                },
+					                {
+						                ""key"": ""Key2"",
+						                ""value"": ""Value3"",
+						                ""description"": ""Description 3"",
+						                ""type"": ""text""
+					                }
+				                ],
+				                ""body"": {
+					                ""mode"": ""formdata"",
+					                ""formdata"": [
+						                {
+							                ""key"": ""Key1"",
+							                ""value"": ""Value1"",
+							                ""description"": ""Description 1"",
+							                ""type"": ""text""
+						                },
+						                {
+							                ""key"": ""Key2"",
+							                ""value"": ""Value2"",
+							                ""description"": ""Description 2"",
+							                ""type"": ""text""
+						                },
+						                {
+							                ""key"": ""Key2"",
+							                ""value"": ""Value3"",
+							                ""description"": ""Description 3"",
+							                ""type"": ""text""
+						                }
+					                ]
+				                },
+				                ""url"": {
+					                ""raw"": ""https://some.domain/path1/path2/resource?Key1=Value1&Key2=Value2&Key2=Value3"",
+					                ""protocol"": ""https"",
+					                ""host"": [
+						                ""some"",
+						                ""domain""
+					                ],
+					                ""path"": [
+						                ""path1"",
+						                ""path2"",
+						                ""resource""
+					                ],
+					                ""query"": [
+						                {
+							                ""key"": ""Key1"",
+							                ""value"": ""Value1"",
+							                ""description"": ""Description 1""
+						                },
+						                {
+							                ""key"": ""Key2"",
+							                ""value"": ""Value2"",
+							                ""description"": ""Description 2""
+						                },
+						                {
+							                ""key"": ""Key2"",
+							                ""value"": ""Value3"",
+							                ""description"": ""Description 3""
+						                }
+					                ]
+				                }
+			                }
+		                }
+	                ]
+                }";
+
+            var collection = Collection.ImportFromPostmanJson(json);
+            Assert.NotNull(collection);
+            Assert.Equal("Some Messages", collection.Name);
+            Assert.Equal(1, collection.Items.Count);
+            Assert.IsType<RequestMessage>(collection.Items[0]);
+            var requestMessage = collection.Items[0] as RequestMessage;
+            Assert.Equal("Some Message", requestMessage.Name);
+            Assert.Null(collection.Items[0].Description);
+            Assert.IsType<NoAuthentication>(requestMessage.AuthenticationMethod);
+            Assert.IsType<FormDataBody>(requestMessage.Body);
+            var body = requestMessage.Body as FormDataBody;
+            Assert.Equal(3, body.FormData.Count);
+            Assert.Equal("Key1", body.FormData[0].Key);
+            Assert.Equal("Value1", body.FormData[0].Value);
+            Assert.Equal("Description 1", body.FormData[0].Description);
+            Assert.Equal("Key2", body.FormData[1].Key);
+            Assert.Equal("Value2", body.FormData[1].Value);
+            Assert.Equal("Description 2", body.FormData[1].Description);
+            Assert.Equal("Key2", body.FormData[2].Key);
+            Assert.Equal("Value3", body.FormData[2].Value);
+            Assert.Equal("Description 3", body.FormData[2].Description);
+            Assert.Equal(3, requestMessage.Headers.Count);
+            Assert.Equal("Key1", requestMessage.Headers[0].Key);
+            Assert.Equal("Value1", requestMessage.Headers[0].Value);
+            Assert.Equal("Description 1", requestMessage.Headers[0].Description);
+            Assert.Equal("Key2", requestMessage.Headers[1].Key);
+            Assert.Equal("Value2", requestMessage.Headers[1].Value);
+            Assert.Equal("Description 2", requestMessage.Headers[1].Description);
+            Assert.Equal("Key2", requestMessage.Headers[2].Key);
+            Assert.Equal("Value3", requestMessage.Headers[2].Value);
+            Assert.Equal("Description 3", requestMessage.Headers[2].Description);
+            Assert.Equal(HttpMethod.Delete, requestMessage.HttpMethod);
+            Assert.Equal(3, requestMessage.QueryStringParameters.Count);
+            Assert.Equal("Key1", requestMessage.QueryStringParameters[0].Key);
+            Assert.Equal("Value1", requestMessage.QueryStringParameters[0].Value);
+            Assert.Equal("Description 1", requestMessage.QueryStringParameters[0].Description);
+            Assert.Equal("Key2", requestMessage.QueryStringParameters[1].Key);
+            Assert.Equal("Value2", requestMessage.QueryStringParameters[1].Value);
+            Assert.Equal("Description 2", requestMessage.QueryStringParameters[1].Description);
+            Assert.Equal("Key2", requestMessage.QueryStringParameters[2].Key);
+            Assert.Equal("Value3", requestMessage.QueryStringParameters[2].Value);
+            Assert.Equal("Description 3", requestMessage.QueryStringParameters[2].Description);
+            Assert.Equal(new Uri("https://some.domain/path1/path2/resource?Key1=Value1&Key2=Value2&Key2=Value3"), requestMessage.Uri);
+        }
+
+        [Fact]
+        public void TestImportFromPostmanMessageNoBody()
+        {
+            var json = @"
+                {
+	                ""info"": {
+		                ""_postman_id"": ""6f02b4ed-5230-43d8-9a32-62a4500fc7c2"",
+		                ""name"": ""Some Messages"",
+		                ""schema"": ""https://schema.getpostman.com/json/collection/v2.1.0/collection.json""
+	                },
+	                ""item"": [
+		                {
+			                ""name"": ""Some Message"",
+			                ""request"": {
+				                ""method"": ""DELETE"",
+				                ""header"": [
+					                {
+						                ""key"": ""Key1"",
+						                ""value"": ""Value1"",
+						                ""description"": ""Description 1"",
+						                ""type"": ""text""
+					                },
+					                {
+						                ""key"": ""Key2"",
+						                ""value"": ""Value2"",
+						                ""description"": ""Description 2"",
+						                ""type"": ""text""
+					                },
+					                {
+						                ""key"": ""Key2"",
+						                ""value"": ""Value3"",
+						                ""description"": ""Description 3"",
+						                ""type"": ""text""
+					                }
+				                ],
+				                ""body"": {
+					                ""mode"": ""raw"",
+					                ""raw"": """"
+				                },
+				                ""url"": {
+					                ""raw"": ""https://some.domain/path1/path2/resource?Key1=Value1&Key2=Value2&Key2=Value3"",
+					                ""protocol"": ""https"",
+					                ""host"": [
+						                ""some"",
+						                ""domain""
+					                ],
+					                ""path"": [
+						                ""path1"",
+						                ""path2"",
+						                ""resource""
+					                ],
+					                ""query"": [
+						                {
+							                ""key"": ""Key1"",
+							                ""value"": ""Value1"",
+							                ""description"": ""Description 1""
+						                },
+						                {
+							                ""key"": ""Key2"",
+							                ""value"": ""Value2"",
+							                ""description"": ""Description 2""
+						                },
+						                {
+							                ""key"": ""Key2"",
+							                ""value"": ""Value3"",
+							                ""description"": ""Description 3""
+						                }
+					                ]
+				                }
+			                }
+		                }
+	                ]
+                }";
+
+            var collection = Collection.ImportFromPostmanJson(json);
+            Assert.NotNull(collection);
+            Assert.Equal("Some Messages", collection.Name);
+            Assert.Equal(1, collection.Items.Count);
+            Assert.IsType<RequestMessage>(collection.Items[0]);
+            var requestMessage = collection.Items[0] as RequestMessage;
+            Assert.Equal("Some Message", requestMessage.Name);
+            Assert.Null(collection.Items[0].Description);
+            Assert.IsType<NoAuthentication>(requestMessage.AuthenticationMethod);
+            Assert.IsType<NoBody>(requestMessage.Body);
+            Assert.Equal(3, requestMessage.Headers.Count);
+            Assert.Equal("Key1", requestMessage.Headers[0].Key);
+            Assert.Equal("Value1", requestMessage.Headers[0].Value);
+            Assert.Equal("Description 1", requestMessage.Headers[0].Description);
+            Assert.Equal("Key2", requestMessage.Headers[1].Key);
+            Assert.Equal("Value2", requestMessage.Headers[1].Value);
+            Assert.Equal("Description 2", requestMessage.Headers[1].Description);
+            Assert.Equal("Key2", requestMessage.Headers[2].Key);
+            Assert.Equal("Value3", requestMessage.Headers[2].Value);
+            Assert.Equal("Description 3", requestMessage.Headers[2].Description);
+            Assert.Equal(HttpMethod.Delete, requestMessage.HttpMethod);
+            Assert.Equal(3, requestMessage.QueryStringParameters.Count);
+            Assert.Equal("Key1", requestMessage.QueryStringParameters[0].Key);
+            Assert.Equal("Value1", requestMessage.QueryStringParameters[0].Value);
+            Assert.Equal("Description 1", requestMessage.QueryStringParameters[0].Description);
+            Assert.Equal("Key2", requestMessage.QueryStringParameters[1].Key);
+            Assert.Equal("Value2", requestMessage.QueryStringParameters[1].Value);
+            Assert.Equal("Description 2", requestMessage.QueryStringParameters[1].Description);
+            Assert.Equal("Key2", requestMessage.QueryStringParameters[2].Key);
+            Assert.Equal("Value3", requestMessage.QueryStringParameters[2].Value);
+            Assert.Equal("Description 3", requestMessage.QueryStringParameters[2].Description);
+            Assert.Equal(new Uri("https://some.domain/path1/path2/resource?Key1=Value1&Key2=Value2&Key2=Value3"), requestMessage.Uri);
+        }
+
+        [Fact]
+        public void TestImportFromPostmanMessageRaw()
+        {
+            var json = @"
+                {
+	                ""info"": {
+		                ""_postman_id"": ""6f02b4ed-5230-43d8-9a32-62a4500fc7c2"",
+		                ""name"": ""Some Messages"",
+		                ""schema"": ""https://schema.getpostman.com/json/collection/v2.1.0/collection.json""
+	                },
+	                ""item"": [
+		                {
+			                ""name"": ""Some Message"",
+			                ""request"": {
+				                ""method"": ""DELETE"",
+				                ""header"": [
+					                {
+						                ""key"": ""Key1"",
+						                ""value"": ""Value1"",
+						                ""description"": ""Description 1"",
+						                ""type"": ""text""
+					                },
+					                {
+						                ""key"": ""Key2"",
+						                ""value"": ""Value2"",
+						                ""description"": ""Description 2"",
+						                ""type"": ""text""
+					                },
+					                {
+						                ""key"": ""Key2"",
+						                ""value"": ""Value3"",
+						                ""description"": ""Description 3"",
+						                ""type"": ""text""
+					                }
+				                ],
+				                ""body"": {
+					                ""mode"": ""raw"",
+					                ""raw"": ""{ \""asdf\"": 123, \""fdsa\"": \""asdf\""}""
+				                },
+				                ""url"": {
+					                ""raw"": ""https://some.domain/path1/path2/resource?Key1=Value1&Key2=Value2&Key2=Value3"",
+					                ""protocol"": ""https"",
+					                ""host"": [
+						                ""some"",
+						                ""domain""
+					                ],
+					                ""path"": [
+						                ""path1"",
+						                ""path2"",
+						                ""resource""
+					                ],
+					                ""query"": [
+						                {
+							                ""key"": ""Key1"",
+							                ""value"": ""Value1"",
+							                ""description"": ""Description 1""
+						                },
+						                {
+							                ""key"": ""Key2"",
+							                ""value"": ""Value2"",
+							                ""description"": ""Description 2""
+						                },
+						                {
+							                ""key"": ""Key2"",
+							                ""value"": ""Value3"",
+							                ""description"": ""Description 3""
+						                }
+					                ]
+				                }
+			                }
+		                }
+	                ]
+                }";
+
+            var collection = Collection.ImportFromPostmanJson(json);
+            Assert.NotNull(collection);
+            Assert.Equal("Some Messages", collection.Name);
+            Assert.Equal(1, collection.Items.Count);
+            Assert.IsType<RequestMessage>(collection.Items[0]);
+            var requestMessage = collection.Items[0] as RequestMessage;
+            Assert.Equal("Some Message", requestMessage.Name);
+            Assert.Null(collection.Items[0].Description);
+            Assert.IsType<NoAuthentication>(requestMessage.AuthenticationMethod);
+            Assert.IsType<RawBody>(requestMessage.Body);
+            var body = requestMessage.Body as RawBody;
+            Assert.Equal(@"{ ""asdf"": 123, ""fdsa"": ""asdf""}", body.Text);
+            Assert.Equal(3, requestMessage.Headers.Count);
+            Assert.Equal("Key1", requestMessage.Headers[0].Key);
+            Assert.Equal("Value1", requestMessage.Headers[0].Value);
+            Assert.Equal("Description 1", requestMessage.Headers[0].Description);
+            Assert.Equal("Key2", requestMessage.Headers[1].Key);
+            Assert.Equal("Value2", requestMessage.Headers[1].Value);
+            Assert.Equal("Description 2", requestMessage.Headers[1].Description);
+            Assert.Equal("Key2", requestMessage.Headers[2].Key);
+            Assert.Equal("Value3", requestMessage.Headers[2].Value);
+            Assert.Equal("Description 3", requestMessage.Headers[2].Description);
+            Assert.Equal(HttpMethod.Delete, requestMessage.HttpMethod);
+            Assert.Equal(3, requestMessage.QueryStringParameters.Count);
+            Assert.Equal("Key1", requestMessage.QueryStringParameters[0].Key);
+            Assert.Equal("Value1", requestMessage.QueryStringParameters[0].Value);
+            Assert.Equal("Description 1", requestMessage.QueryStringParameters[0].Description);
+            Assert.Equal("Key2", requestMessage.QueryStringParameters[1].Key);
+            Assert.Equal("Value2", requestMessage.QueryStringParameters[1].Value);
+            Assert.Equal("Description 2", requestMessage.QueryStringParameters[1].Description);
+            Assert.Equal("Key2", requestMessage.QueryStringParameters[2].Key);
+            Assert.Equal("Value3", requestMessage.QueryStringParameters[2].Value);
+            Assert.Equal("Description 3", requestMessage.QueryStringParameters[2].Description);
+            Assert.Equal(new Uri("https://some.domain/path1/path2/resource?Key1=Value1&Key2=Value2&Key2=Value3"), requestMessage.Uri);
+        }
+
+        [Fact]
+        public void TestImportFromPostmanMessageUrlEncoded()
+        {
+            var json = @"
+                {
+	                ""info"": {
+		                ""_postman_id"": ""6f02b4ed-5230-43d8-9a32-62a4500fc7c2"",
+		                ""name"": ""Some Messages"",
+		                ""schema"": ""https://schema.getpostman.com/json/collection/v2.1.0/collection.json""
+	                },
+	                ""item"": [
+		                {
+			                ""name"": ""Some Message"",
+			                ""request"": {
+				                ""method"": ""DELETE"",
+				                ""header"": [
+					                {
+						                ""key"": ""Key1"",
+						                ""value"": ""Value1"",
+						                ""description"": ""Description 1"",
+						                ""type"": ""text""
+					                },
+					                {
+						                ""key"": ""Key2"",
+						                ""value"": ""Value2"",
+						                ""description"": ""Description 2"",
+						                ""type"": ""text""
+					                },
+					                {
+						                ""key"": ""Key2"",
+						                ""value"": ""Value3"",
+						                ""description"": ""Description 3"",
+						                ""type"": ""text""
+					                }
+				                ],
+				                ""body"": {
+					                ""mode"": ""urlencoded"",
+					                ""urlencoded"": [
+						                {
+							                ""key"": ""Key1"",
+							                ""value"": ""Value1"",
+							                ""description"": ""Description 1"",
+							                ""type"": ""text""
+						                },
+						                {
+							                ""key"": ""Key2"",
+							                ""value"": ""Value2"",
+							                ""description"": ""Description 2"",
+							                ""type"": ""text""
+						                },
+						                {
+							                ""key"": ""Key2"",
+							                ""value"": ""Value3"",
+							                ""description"": ""Description 3"",
+							                ""type"": ""text""
+						                }
+					                ]
+				                },
+				                ""url"": {
+					                ""raw"": ""https://some.domain/path1/path2/resource?Key1=Value1&Key2=Value2&Key2=Value3"",
+					                ""protocol"": ""https"",
+					                ""host"": [
+						                ""some"",
+						                ""domain""
+					                ],
+					                ""path"": [
+						                ""path1"",
+						                ""path2"",
+						                ""resource""
+					                ],
+					                ""query"": [
+						                {
+							                ""key"": ""Key1"",
+							                ""value"": ""Value1"",
+							                ""description"": ""Description 1""
+						                },
+						                {
+							                ""key"": ""Key2"",
+							                ""value"": ""Value2"",
+							                ""description"": ""Description 2""
+						                },
+						                {
+							                ""key"": ""Key2"",
+							                ""value"": ""Value3"",
+							                ""description"": ""Description 3""
+						                }
+					                ]
+				                }
+			                }
+		                }
+	                ]
+                }";
+
+            var collection = Collection.ImportFromPostmanJson(json);
+            Assert.NotNull(collection);
+            Assert.Equal("Some Messages", collection.Name);
+            Assert.Equal(1, collection.Items.Count);
+            Assert.IsType<RequestMessage>(collection.Items[0]);
+            var requestMessage = collection.Items[0] as RequestMessage;
+            Assert.Equal("Some Message", requestMessage.Name);
+            Assert.Null(collection.Items[0].Description);
+            Assert.IsType<NoAuthentication>(requestMessage.AuthenticationMethod);
+            Assert.IsType<UrlEncodedBody>(requestMessage.Body);
+            var body = requestMessage.Body as UrlEncodedBody;
+            Assert.Equal(3, body.FormData.Count);
+            Assert.Equal("Key1", body.FormData[0].Key);
+            Assert.Equal("Value1", body.FormData[0].Value);
+            Assert.Equal("Description 1", body.FormData[0].Description);
+            Assert.Equal("Key2", body.FormData[1].Key);
+            Assert.Equal("Value2", body.FormData[1].Value);
+            Assert.Equal("Description 2", body.FormData[1].Description);
+            Assert.Equal("Key2", body.FormData[2].Key);
+            Assert.Equal("Value3", body.FormData[2].Value);
+            Assert.Equal("Description 3", body.FormData[2].Description);
+            Assert.Equal(3, requestMessage.Headers.Count);
+            Assert.Equal("Key1", requestMessage.Headers[0].Key);
+            Assert.Equal("Value1", requestMessage.Headers[0].Value);
+            Assert.Equal("Description 1", requestMessage.Headers[0].Description);
+            Assert.Equal("Key2", requestMessage.Headers[1].Key);
+            Assert.Equal("Value2", requestMessage.Headers[1].Value);
+            Assert.Equal("Description 2", requestMessage.Headers[1].Description);
+            Assert.Equal("Key2", requestMessage.Headers[2].Key);
+            Assert.Equal("Value3", requestMessage.Headers[2].Value);
+            Assert.Equal("Description 3", requestMessage.Headers[2].Description);
+            Assert.Equal(HttpMethod.Delete, requestMessage.HttpMethod);
+            Assert.Equal(3, requestMessage.QueryStringParameters.Count);
+            Assert.Equal("Key1", requestMessage.QueryStringParameters[0].Key);
+            Assert.Equal("Value1", requestMessage.QueryStringParameters[0].Value);
+            Assert.Equal("Description 1", requestMessage.QueryStringParameters[0].Description);
+            Assert.Equal("Key2", requestMessage.QueryStringParameters[1].Key);
+            Assert.Equal("Value2", requestMessage.QueryStringParameters[1].Value);
+            Assert.Equal("Description 2", requestMessage.QueryStringParameters[1].Description);
+            Assert.Equal("Key2", requestMessage.QueryStringParameters[2].Key);
+            Assert.Equal("Value3", requestMessage.QueryStringParameters[2].Value);
+            Assert.Equal("Description 3", requestMessage.QueryStringParameters[2].Description);
+            Assert.Equal(new Uri("https://some.domain/path1/path2/resource?Key1=Value1&Key2=Value2&Key2=Value3"), requestMessage.Uri);
         }
 
         [Fact]

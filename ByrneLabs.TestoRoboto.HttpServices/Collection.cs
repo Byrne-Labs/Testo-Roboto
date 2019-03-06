@@ -15,6 +15,8 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
         public IList<Item> Items { get; } = new List<Item>();
 
+        public static Collection ImportFromPostmanFile(string filePath) => ImportFromPostmanJson(File.ReadAllText(filePath));
+
         public static Collection ImportFromPostmanJson(string collectionJson)
         {
             var json = JObject.Parse(collectionJson);
@@ -32,8 +34,6 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             return collection;
         }
 
-        public static Collection ImportFromPostmanFile(string filePath) => ImportFromPostmanJson(File.ReadAllText(filePath));
-
         private static AuthenticationMethod GetAuthenticationMethod(JObject postmanItem)
         {
             AuthenticationMethod authenticationMethod;
@@ -44,7 +44,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             else
             {
                 var authenticationType = postmanItem["auth"]["type"].ToString();
-                var properties = (JArray)postmanItem["auth"][authenticationType];
+                var properties = (JArray) postmanItem["auth"][authenticationType];
                 switch (authenticationType)
                 {
                     case "noauth":
@@ -195,12 +195,12 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             return authenticationMethod;
         }
 
-        private static T GetPostmanKeyValue<T>(JArray properties, string key) => (T)((JValue)properties.SingleOrDefault(property => property["key"].ToString() == key)?["value"])?.Value;
+        private static T GetPostmanKeyValue<T>(JArray properties, string key) => (T) ((JValue) properties.SingleOrDefault(property => property["key"].ToString() == key)?["value"])?.Value;
 
         private static Collection LoadCollection(JObject jsonCollection)
         {
             var collection = new Collection();
-            collection.Name = ((JProperty)jsonCollection["name"]).Value.ToObject<string>();
+            collection.Name = ((JProperty) jsonCollection["name"]).Value.ToObject<string>();
             collection.AuthenticationMethod = GetAuthenticationMethod(jsonCollection);
             foreach (var item in LoadItems(jsonCollection["item"] as JArray))
             {
@@ -232,9 +232,9 @@ namespace ByrneLabs.TestoRoboto.HttpServices
         private static RequestMessage LoadRequestItem(JObject jsonRequest)
         {
             var request = new RequestMessage();
-            request.Name = ((JProperty)jsonRequest["name"]).Value.ToObject<string>();
+            request.Name = jsonRequest["name"].ToString();
             request.AuthenticationMethod = GetAuthenticationMethod(jsonRequest);
-            var httpMethod = ((JProperty)jsonRequest["request"]["method"]).Value.ToObject<string>();
+            var httpMethod = jsonRequest["request"]["method"].ToString();
             switch (httpMethod)
             {
                 case "GET":
@@ -255,51 +255,44 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                 case "OPTIONS":
                     request.HttpMethod = HttpMethod.Options;
                     break;
-                case "PATCH":
-                case "COPY":
-                case "LINK":
-                case "UNLINK":
-                case "PURGE":
-                case "LOCK":
-                case "UNLOCK":
-                case "PROPFIND":
-                case "VIEW":
-                    request.HttpMethod = new HttpMethod(httpMethod);
+                case "TRACE":
+                    request.HttpMethod = HttpMethod.Trace;
                     break;
                 default:
-                    throw new ArgumentException($"Unexpected http method {httpMethod}");
+                    request.HttpMethod = new HttpMethod(httpMethod);
+                    break;
             }
 
-            if (jsonRequest.ContainsKey("header") && jsonRequest["header"] is JArray)
+            if (jsonRequest["request"]["header"] is JArray)
             {
-                foreach (var jsonHeader in ((JArray)jsonRequest["header"]).OfType<JObject>())
+                foreach (var jsonHeader in ((JArray) jsonRequest["request"]["header"]).OfType<JObject>())
                 {
                     var header = new Header();
-                    header.Key = ((JProperty)jsonHeader["key"]).Value.ToObject<string>();
-                    header.Value = ((JProperty)jsonHeader["value"]).Value.ToObject<string>();
-                    header.Description = ((JProperty)jsonHeader["description"]).Value.ToObject<string>();
+                    header.Key = jsonHeader["key"].ToString();
+                    header.Value = jsonHeader["value"].ToString();
+                    header.Description = jsonHeader["description"].ToString();
                     request.Headers.Add(header);
                 }
             }
 
-            var bodyType = ((JProperty)jsonRequest["body"]["request"]).Value.ToObject<string>();
+            var bodyType = jsonRequest["request"]["body"]["mode"].ToString();
             switch (bodyType)
             {
                 case "formdata":
                     var formDataBody = new FormDataBody();
-                    foreach (var jsonParameter in ((JArray)jsonRequest["body"]["formdata"]).OfType<JObject>())
+                    foreach (var jsonParameter in ((JArray) jsonRequest["request"]["body"]["formdata"]).OfType<JObject>())
                     {
                         var parameter = new KeyValue();
-                        parameter.Key = ((JProperty)jsonParameter["key"]).Value.ToObject<string>();
-                        parameter.Value = ((JProperty)jsonParameter["value"]).Value.ToObject<string>();
-                        parameter.Description = ((JProperty)jsonParameter["description"]).Value.ToObject<string>();
+                        parameter.Key = jsonParameter["key"].ToString();
+                        parameter.Value = jsonParameter["value"].ToString();
+                        parameter.Description = jsonParameter["description"].ToString();
                         formDataBody.FormData.Add(parameter);
                     }
 
                     request.Body = formDataBody;
                     break;
                 case "raw":
-                    var bodyContent = ((JProperty)jsonRequest["body"]["raw"]).Value.ToObject<string>();
+                    var bodyContent = jsonRequest["request"]["body"]["raw"].ToString();
                     if (bodyContent == string.Empty)
                     {
                         request.Body = new NoBody();
@@ -312,12 +305,12 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                     break;
                 case "urlencoded":
                     var urlEncodedBody = new UrlEncodedBody();
-                    foreach (var jsonParameter in ((JArray)jsonRequest["body"]["urlencoded"]).OfType<JObject>())
+                    foreach (var jsonParameter in ((JArray) jsonRequest["request"]["body"]["urlencoded"]).OfType<JObject>())
                     {
                         var parameter = new KeyValue();
-                        parameter.Key = ((JProperty)jsonParameter["key"]).Value.ToObject<string>();
-                        parameter.Value = ((JProperty)jsonParameter["value"]).Value.ToObject<string>();
-                        parameter.Description = ((JProperty)jsonParameter["description"]).Value.ToObject<string>();
+                        parameter.Key = jsonParameter["key"].ToString();
+                        parameter.Value = jsonParameter["value"].ToString();
+                        parameter.Description = jsonParameter["description"].ToString();
                         urlEncodedBody.FormData.Add(parameter);
                     }
 
@@ -327,7 +320,17 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                     throw new ArgumentException($"Unexpected body type {bodyType}");
             }
 
-            request.Uri = new Uri(((JProperty)jsonRequest["url"]["raw"]).Value.ToObject<string>(), UriKind.Absolute);
+            request.Uri = new Uri(jsonRequest["request"]["url"]["raw"].ToString());
+            request.QueryStringParameters.Clear();
+            foreach (var jsonQueryParameter in (JArray) jsonRequest["request"]["url"]["query"])
+            {
+                var queryStringParameter = new QueryStringParameter();
+                queryStringParameter.Key = jsonQueryParameter["key"].ToString();
+                queryStringParameter.Value = jsonQueryParameter["value"].ToString();
+                queryStringParameter.Description = jsonQueryParameter["description"].ToString();
+                request.QueryStringParameters.Add(queryStringParameter);
+            }
+
             return request;
         }
 
@@ -351,7 +354,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                     {
                         foreach (var mutator in mutators)
                         {
-                            foreach (var mutatedMessageContent in mutator.MutateMessage(((RawBody)nonFuzzedMessage.Body).Text))
+                            foreach (var mutatedMessageContent in mutator.MutateMessage(((RawBody) nonFuzzedMessage.Body).Text))
                             {
                                 var fuzzedMessage = nonFuzzedMessage.Clone();
                                 fuzzedMessage.FuzzedMessage = true;
@@ -364,7 +367,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             }
         }
 
-        public new Collection Clone(CloneDepth depth = CloneDepth.Deep) => (Collection)base.Clone(depth);
+        public new Collection Clone(CloneDepth depth = CloneDepth.Deep) => (Collection) base.Clone(depth);
 
         public void ExportToPostman(FileInfo file) => throw new NotImplementedException();
     }
