@@ -9,15 +9,15 @@ namespace ByrneLabs.TestoRoboto.HttpServices
     {
         public HawkAuthenticationAlgorithm Algorithm { get; set; }
 
-        public string App { get; set; }
+        public string ApplicationId { get; set; }
 
-        public string Dlg { get; set; }
+        public string AuthenticationId { get; set; }
 
-        public string Ext { get; set; }
+        public string AuthenticationKey { get; set; }
 
-        public string HawkAuthenticationId { get; set; }
+        public string Delegation { get; set; }
 
-        public string HawkAuthenticationKey { get; set; }
+        public string ExtraData { get; set; }
 
         public string Nonce { get; set; }
 

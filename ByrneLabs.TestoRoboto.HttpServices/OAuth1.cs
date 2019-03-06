@@ -23,6 +23,8 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
         public string Timestamp { get; set; }
 
+        public OAuth1TokenLocation TokenLocation { get; set; }
+
         public string TokenSecret { get; set; }
 
         public string Version { get; set; }

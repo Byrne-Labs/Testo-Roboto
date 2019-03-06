@@ -9,7 +9,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
     {
         public string AccessKey { get; set; }
 
-        public string AwsRegion { get; set; }
+        public string Region { get; set; }
 
         public string SecretKey { get; set; }
 

@@ -3,6 +3,6 @@
     public enum OAuth2TokenLocation
     {
         Headers,
-        Url
+        QueryParameters
     }
 }
