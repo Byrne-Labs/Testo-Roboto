@@ -200,7 +200,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
         private static Collection LoadCollection(JObject jsonCollection)
         {
             var collection = new Collection();
-            collection.Name = ((JProperty) jsonCollection["name"]).Value.ToObject<string>();
+            collection.Name = jsonCollection["name"].ToString();
             collection.AuthenticationMethod = GetAuthenticationMethod(jsonCollection);
             foreach (var item in LoadItems(jsonCollection["item"] as JArray))
             {
@@ -322,19 +322,22 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
             request.Uri = new Uri(jsonRequest["request"]["url"]["raw"].ToString());
             request.QueryStringParameters.Clear();
-            foreach (var jsonQueryParameter in (JArray) jsonRequest["request"]["url"]["query"])
+            if (jsonRequest["request"]["url"]["query"] != null)
             {
-                var queryStringParameter = new QueryStringParameter();
-                queryStringParameter.Key = jsonQueryParameter["key"].ToString();
-                queryStringParameter.Value = jsonQueryParameter["value"].ToString();
-                queryStringParameter.Description = jsonQueryParameter["description"].ToString();
-                request.QueryStringParameters.Add(queryStringParameter);
+                foreach (var jsonQueryParameter in (JArray) jsonRequest["request"]["url"]["query"])
+                {
+                    var queryStringParameter = new QueryStringParameter();
+                    queryStringParameter.Key = jsonQueryParameter["key"].ToString();
+                    queryStringParameter.Value = jsonQueryParameter["value"].ToString();
+                    queryStringParameter.Description = jsonQueryParameter["description"].ToString();
+                    request.QueryStringParameters.Add(queryStringParameter);
+                }
             }
 
             return request;
         }
 
-        public void AddFuzzedMessages(IEnumerable<Mutator> mutators)
+        public void AddFuzzedMessages(IEnumerable<Mutator> mutators, bool includeSubCollections)
         {
             if (Items.OfType<RequestMessage>().Any())
             {
@@ -352,22 +355,40 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                 {
                     if (nonFuzzedMessage.Body is RawBody)
                     {
-                        foreach (var mutator in mutators)
+                        if (!string.IsNullOrWhiteSpace(((RawBody) nonFuzzedMessage.Body).Text))
                         {
-                            foreach (var mutatedMessageContent in mutator.MutateMessage(((RawBody) nonFuzzedMessage.Body).Text))
+                            foreach (var mutator in mutators)
                             {
-                                var fuzzedMessage = nonFuzzedMessage.Clone();
-                                fuzzedMessage.FuzzedMessage = true;
-                                fuzzedMessage.Body = new RawBody { Text = mutatedMessageContent };
-                                fuzzedMessages.Items.Add(fuzzedMessage);
+                                foreach (var mutatedMessageContent in mutator.MutateMessage(((RawBody) nonFuzzedMessage.Body).Text))
+                                {
+                                    var fuzzedMessage = nonFuzzedMessage.Clone();
+                                    fuzzedMessage.FuzzedMessage = true;
+                                    fuzzedMessage.ExpectedStatusCode = null;
+                                    fuzzedMessage.Body = new RawBody { Text = mutatedMessageContent };
+                                    fuzzedMessages.Items.Add(fuzzedMessage);
+                                }
                             }
                         }
+                    }
+                    else
+                    {
+                        throw new NotSupportedException("Only raw body is currently supported for fuzzing");
+                    }
+                }
+
+                if (includeSubCollections)
+                {
+                    foreach (var subcollection in Items.OfType<Collection>().Where(c => c.Name != _fuzzedMessageCollectionName))
+                    {
+                        subcollection.AddFuzzedMessages(mutators, true);
                     }
                 }
             }
         }
 
         public new Collection Clone(CloneDepth depth = CloneDepth.Deep) => (Collection) base.Clone(depth);
+
+        public IEnumerable<RequestMessage> DescendentRequestMessages() => Items.OfType<RequestMessage>().Union(Items.OfType<Collection>().SelectMany(collection => collection.DescendentRequestMessages()));
 
         public void ExportToPostman(FileInfo file) => throw new NotImplementedException();
     }

@@ -1,11 +1,59 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
+using Moq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Xunit;
 
 namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 {
     public class CollectionTest
     {
+        [Fact]
+        public void TestCreateCollectionFuzzedMessages()
+        {
+            var collection = new Collection();
+            var requestMessage = new RequestMessage();
+            requestMessage.Body = new RawBody { Text = "{ \"asdf\": 123 }" };
+            requestMessage.HttpMethod = HttpMethod.Post;
+            requestMessage.Uri = new Uri("http://some.domain/path/resource?key=value");
+            collection.Items.Add(requestMessage);
+            collection.Items.Add(new Collection { Name = "Fuzzed Messages" });
+            var subCollection = new Collection { Name = "Sub-collection" };
+            collection.Items.Add(subCollection);
+            subCollection.Items.Add(new RequestMessage { Body = new RawBody { Text = "{ \"xyz\": 456 }" } });
+
+            var mutator = new Mock<Mutator>();
+            mutator.Setup(m => m.MutateMessage(It.IsAny<string>())).Returns((string message) =>
+            {
+                var jObject = JObject.Parse(message);
+                foreach (var value in jObject.Descendants().OfType<JValue>())
+                {
+                    value.Value = "asdf";
+                }
+
+                return new[] { jObject.ToString(Formatting.None) };
+            });
+            collection.AddFuzzedMessages(new[] { mutator.Object }, true);
+
+            Assert.Equal(3, collection.Items.Count);
+            Assert.Single(collection.Items.OfType<RequestMessage>());
+            Assert.False(((RequestMessage) collection.Items[0]).FuzzedMessage);
+            Assert.Equal(2, collection.Items.OfType<Collection>().Count());
+            Assert.Single(collection.Items.OfType<Collection>().First().Items.OfType<RequestMessage>());
+            Assert.True(collection.Items.OfType<Collection>().First().Items.OfType<RequestMessage>().Single().FuzzedMessage);
+            Assert.Equal("{\"asdf\":\"asdf\"}", ((RawBody) collection.Items.OfType<Collection>().First().Items.OfType<RequestMessage>().Single().Body).Text);
+
+            Assert.Equal(2, subCollection.Items.Count);
+            Assert.Single(subCollection.Items.OfType<RequestMessage>());
+            Assert.False(((RequestMessage) subCollection.Items[0]).FuzzedMessage);
+            Assert.Single(subCollection.Items.OfType<Collection>());
+            Assert.Single(subCollection.Items.OfType<Collection>().First().Items.OfType<RequestMessage>());
+            Assert.True(subCollection.Items.OfType<Collection>().Single().Items.OfType<RequestMessage>().Single().FuzzedMessage);
+            Assert.Equal("{\"xyz\":\"asdf\"}", ((RawBody) subCollection.Items.OfType<Collection>().Single().Items.OfType<RequestMessage>().Single().Body).Text);
+        }
+
         [Fact]
         public void TestImportFromPostmanAwsSignature()
         {
@@ -504,7 +552,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 		                {
 			                ""name"": ""Some Message"",
 			                ""request"": {
-				                ""method"": ""DELETE"",
+				                ""method"": ""POST"",
 				                ""header"": [
 					                {
 						                ""key"": ""Key1"",
@@ -614,7 +662,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             Assert.Equal("Key2", requestMessage.Headers[2].Key);
             Assert.Equal("Value3", requestMessage.Headers[2].Value);
             Assert.Equal("Description 3", requestMessage.Headers[2].Description);
-            Assert.Equal(HttpMethod.Delete, requestMessage.HttpMethod);
+            Assert.Equal(HttpMethod.Post, requestMessage.HttpMethod);
             Assert.Equal(3, requestMessage.QueryStringParameters.Count);
             Assert.Equal("Key1", requestMessage.QueryStringParameters[0].Key);
             Assert.Equal("Value1", requestMessage.QueryStringParameters[0].Value);
@@ -642,7 +690,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 		                {
 			                ""name"": ""Some Message"",
 			                ""request"": {
-				                ""method"": ""DELETE"",
+				                ""method"": ""PUT"",
 				                ""header"": [
 					                {
 						                ""key"": ""Key1"",
@@ -722,7 +770,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             Assert.Equal("Key2", requestMessage.Headers[2].Key);
             Assert.Equal("Value3", requestMessage.Headers[2].Value);
             Assert.Equal("Description 3", requestMessage.Headers[2].Description);
-            Assert.Equal(HttpMethod.Delete, requestMessage.HttpMethod);
+            Assert.Equal(HttpMethod.Put, requestMessage.HttpMethod);
             Assert.Equal(3, requestMessage.QueryStringParameters.Count);
             Assert.Equal("Key1", requestMessage.QueryStringParameters[0].Key);
             Assert.Equal("Value1", requestMessage.QueryStringParameters[0].Value);
@@ -860,7 +908,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 		                {
 			                ""name"": ""Some Message"",
 			                ""request"": {
-				                ""method"": ""DELETE"",
+				                ""method"": ""HEAD"",
 				                ""header"": [
 					                {
 						                ""key"": ""Key1"",
@@ -970,7 +1018,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             Assert.Equal("Key2", requestMessage.Headers[2].Key);
             Assert.Equal("Value3", requestMessage.Headers[2].Value);
             Assert.Equal("Description 3", requestMessage.Headers[2].Description);
-            Assert.Equal(HttpMethod.Delete, requestMessage.HttpMethod);
+            Assert.Equal(HttpMethod.Head, requestMessage.HttpMethod);
             Assert.Equal(3, requestMessage.QueryStringParameters.Count);
             Assert.Equal("Key1", requestMessage.QueryStringParameters[0].Key);
             Assert.Equal("Value1", requestMessage.QueryStringParameters[0].Value);
@@ -1463,6 +1511,58 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             Assert.Equal("myAccessToken", authentication.AccessToken);
             Assert.Equal(OAuth2TokenLocation.QueryParameters, authentication.TokenLocation);
             Assert.Empty(collection.Items);
+        }
+
+        [Fact]
+        public void TestImportFromPostmanSubCollection()
+        {
+            var json = @"
+                {
+	                ""info"": {
+		                ""_postman_id"": ""6f02b4ed-5230-43d8-9a32-62a4500fc7c2"",
+		                ""name"": ""Some Messages"",
+		                ""schema"": ""https://schema.getpostman.com/json/collection/v2.1.0/collection.json""
+	                },
+	                ""item"": [
+		                {
+			                ""name"": ""Folder"",
+			                ""item"": [
+				                {
+					                ""name"": ""SomeMessage"",
+					                ""request"": {
+						                ""method"": ""GET"",
+						                ""header"": [],
+						                ""body"": {
+							                ""mode"": ""raw"",
+							                ""raw"": """"
+						                },
+						                ""url"": {
+							                ""raw"": ""https://some.domain/path1/path2/resource"",
+							                ""protocol"": ""https"",
+							                ""host"": [
+								                ""some"",
+								                ""domain""
+							                ],
+							                ""path"": [
+								                ""path1"",
+								                ""path2"",
+								                ""resource""
+							                ]
+						                },
+						                ""description"": ""Description""
+					                },
+					                ""response"": []
+				                }
+			                ]
+		                }
+	                ]
+                }";
+
+            var collection = Collection.ImportFromPostmanJson(json);
+            Assert.Single(collection.Items);
+            Assert.IsType<Collection>(collection.Items[0]);
+            Assert.Single(collection.Items.OfType<Collection>().Single().Items);
+            Assert.IsType<RequestMessage>(collection.Items.OfType<Collection>().Single().Items.Single());
         }
     }
 }

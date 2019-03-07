@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using ByrneLabs.Commons;
@@ -23,6 +24,10 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
         public IList<Cookie> Cookies { get; set; } = new List<Cookie>();
 
+        public Encoding Encoding { get; set; } = Encoding.UTF8;
+
+        public HttpStatusCode? ExpectedStatusCode { get; set; } = HttpStatusCode.OK;
+
         public bool FuzzedMessage { get; set; }
 
         public IList<Header> Headers { get; set; } = new List<Header>();
@@ -31,6 +36,8 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
         public IList<QueryStringParameter> QueryStringParameters => _queryStringParameters;
 
+        public IList<HttpResponseMessage> ResponseMessages { get; set; } = new List<HttpResponseMessage>();
+
         public Uri Uri
         {
             get => _uri;
@@ -38,12 +45,15 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             {
                 var queryStringParameters = new List<QueryStringParameter>();
                 _uri = value;
-                foreach (var parameter in _uri.Query.SubstringAfterLast("?").Split('&').Where(p => p != string.Empty))
+                if (_uri.Query != string.Empty)
                 {
-                    var queryStringParameter = new QueryStringParameter();
-                    queryStringParameter.Key = parameter.SubstringBeforeLast("=");
-                    queryStringParameter.Value = parameter.SubstringAfterLast("=");
-                    queryStringParameters.Add(queryStringParameter);
+                    foreach (var parameter in _uri.Query.SubstringAfterLast("?").Split('&').Where(p => p != string.Empty))
+                    {
+                        var queryStringParameter = new QueryStringParameter();
+                        queryStringParameter.Key = parameter.SubstringBeforeLast("=");
+                        queryStringParameter.Value = parameter.SubstringAfterLast("=");
+                        queryStringParameters.Add(queryStringParameter);
+                    }
                 }
 
                 InitializeQueryStringParameters(queryStringParameters);

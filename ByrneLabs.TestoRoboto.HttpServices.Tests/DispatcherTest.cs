@@ -1,19 +1,23 @@
 ﻿using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
-using ByrneLabs.TestoRoboto.HttpServices;
-using ByrneLabs.TestoRoboto.HttpServices.JsonMutators;
+using Moq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Xunit;
 
-namespace ByrneLabs.TestoRoboto.Shopify
+namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 {
-    internal class Program
+    public class DispatcherTest
     {
-        private static void Main(string[] args)
+        [Fact]
+        public void IntegrationTestDispatch()
         {
             var message = @"
                 {
-                    ""product"": {
-                    ""title"": ""Burton Custom Freestyle 151"",
+                  ""product"": {
+                    ""title"": ""something"",
                     ""vendor"": ""Burton"",
                     ""product_type"": ""Snowboard"",
                     ""variants"": [
@@ -38,28 +42,35 @@ namespace ByrneLabs.TestoRoboto.Shopify
             requestMessage.Headers.Add(new Header { Key = "Content-Type", Value = "application/json" });
             requestMessage.Body = new RawBody { Text = message };
             requestMessage.HttpMethod = HttpMethod.Post;
+            requestMessage.ExpectedStatusCode = HttpStatusCode.Created;
 
             var collection = new Collection();
             collection.Items.Add(requestMessage);
-            collection.AddFuzzedMessages(new Mutator[]
+
+            var mutator = new Mock<Mutator>();
+            mutator.Setup(m => m.MutateMessage(It.IsAny<string>())).Returns((string unfuzzedMessage) =>
             {
-                new ArrayGrower(),
-                new ArrayShrinker(),
-                new PropertyAdder(),
-                new PropertyRemover(),
-                new JavaScriptInjector(),
-                new RandomValueChanger(),
-                new SqlInjector(),
-                new XmlInjector()
-            }, true);
+                var jObject = JObject.Parse(unfuzzedMessage);
+                jObject["product"] = null;
+
+                return new[] { jObject.ToString(Formatting.None) };
+            });
+            collection.AddFuzzedMessages(new[] { mutator.Object }, true);
 
             var testRequest = new TestRequest();
             testRequest.TimeBetweenRequests = 500;
+            testRequest.Items.Add(collection);
 
             var dispatcher = new Dispatcher();
             dispatcher.Dispatch(testRequest);
 
-            var failures = collection.DescendentRequestMessages().Where(request => (int) request.ResponseMessages.First().StatusCode >= 500 && (int) request.ResponseMessages.First().StatusCode < 600).ToList();
+            Assert.Single(requestMessage.ResponseMessages);
+            Assert.Equal(HttpStatusCode.Created, requestMessage.ResponseMessages.Single().StatusCode);
+
+            var fuzzedRequest = collection.Items.OfType<Collection>().Single().Items.OfType<RequestMessage>().Single();
+
+            Assert.Single(fuzzedRequest.ResponseMessages);
+            Assert.Equal(HttpStatusCode.BadRequest, fuzzedRequest.ResponseMessages.Single().StatusCode);
         }
     }
 }
