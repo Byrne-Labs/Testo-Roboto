@@ -62,6 +62,8 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
         public new RequestMessage Clone(CloneDepth depth = CloneDepth.Deep) => (RequestMessage) base.Clone(depth);
 
+        public override bool Validate() => base.Validate() && HttpMethod != null;
+
         private void InitializeQueryStringParameters(IEnumerable<QueryStringParameter> queryStringParameters)
         {
             _queryStringParameters = new ObservableCollection<QueryStringParameter>(queryStringParameters);

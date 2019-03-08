@@ -3,13 +3,67 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     public static class PostmanImporterExporter
     {
-        public static void ExportToPostman(FileInfo file) => throw new NotImplementedException();
+        public static void ExportToPostman(Collection collection, FileInfo file)
+        {
+            var jsonText = ExportToPostman(collection);
+            File.WriteAllText(file.ToString(), jsonText);
+        }
+
+        public static string ExportToPostman(Collection collection)
+        {
+            if (!collection.Validate())
+            {
+                throw new ArgumentException("One of the items in the collection is invalid");
+            }
+
+            var jsonCollection = new JObject();
+            var jsonCollectionInfo = new JObject
+            {
+                { "_postman_id", collection.EntityId },
+                { "name", collection.Name },
+                { "schema", "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" }
+            };
+            jsonCollection.Add("info", jsonCollectionInfo);
+
+            var jsonCollectionItems = new JArray();
+            foreach (var childItem in collection.Items.OfType<Collection>())
+            {
+                jsonCollectionItems.Add(ExportToPostman((Item) childItem));
+            }
+
+            foreach (var childItem in collection.Items.OfType<RequestMessage>())
+            {
+                jsonCollectionItems.Add(ExportToPostman((Item) childItem));
+            }
+
+            jsonCollection.Add("item", jsonCollectionItems);
+
+            if (collection.AuthenticationMethod != null && !(collection.AuthenticationMethod is NoAuthentication))
+            {
+                jsonCollection.Add("auth", ExportToPostman(collection.AuthenticationMethod));
+            }
+
+            var stringBuilder = new StringBuilder();
+            using (var stringWriter = new StringWriter(stringBuilder))
+            using (var jsonWriter = new JsonTextWriter(stringWriter)
+            {
+                Formatting = Formatting.Indented,
+                Indentation = 4
+            })
+            {
+                jsonCollection.WriteTo(jsonWriter);
+            }
+
+            return stringBuilder.ToString();
+        }
 
         public static Collection ImportFromPostmanFile(string filePath) => ImportFromPostmanJson(File.ReadAllText(filePath));
 
@@ -17,6 +71,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
         {
             var json = JObject.Parse(collectionJson);
             var collection = new Collection();
+            collection.EntityId = json["_postman_id"] != null ? Guid.Parse(json["_postman_id"].ToString()) : Guid.NewGuid();
             collection.Name = json["info"]["name"].ToString();
             collection.AuthenticationMethod = GetAuthenticationMethod(json);
             if (json.ContainsKey("item") && json["item"] is JArray)
@@ -28,6 +83,163 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             }
 
             return collection;
+        }
+
+        private static JObject CreateAuthenticationParameter(string key, string value)
+        {
+            var jsonParameter = new JObject();
+            jsonParameter.Add("key", "password");
+            jsonParameter.Add("value", value);
+            jsonParameter.Add("type", "string");
+
+            return jsonParameter;
+        }
+
+        private static JObject ExportToPostman(Item item)
+        {
+            var jsonItem = new JObject();
+            jsonItem.Add("name", item.Name);
+            if (item is Collection collection)
+            {
+                var jsonItems = new JArray();
+                foreach (var childItem in collection.Items.OfType<Collection>())
+                {
+                    jsonItems.Add(ExportToPostman((Item) childItem));
+                }
+
+                foreach (var childItem in collection.Items.OfType<RequestMessage>())
+                {
+                    jsonItems.Add(ExportToPostman((Item) childItem));
+                }
+
+                jsonItem.Add("item", jsonItems);
+
+                if (item.AuthenticationMethod != null && !(item.AuthenticationMethod is NoAuthentication))
+                {
+                    jsonItem.Add("auth", ExportToPostman(item.AuthenticationMethod));
+                }
+            }
+            else if (item is RequestMessage message)
+            {
+                jsonItem.Add("request", ExportToPostman(message));
+            }
+
+            return jsonItem;
+        }
+
+        private static JObject ExportToPostman(AuthenticationMethod authentication)
+        {
+            var jsonAuthentication = new JObject();
+            var jsonAuthenticationParameters = new JArray();
+            string authenticationTypeName;
+
+            if (authentication is BasicAuthentication basicAuthentication)
+            {
+                authenticationTypeName = "basic";
+                jsonAuthenticationParameters.Add(CreateAuthenticationParameter("password", basicAuthentication.Password));
+                jsonAuthenticationParameters.Add(CreateAuthenticationParameter("username", basicAuthentication.Username));
+            }
+            else
+            {
+                throw new NotSupportedException("Only basic authentication is currently supported");
+            }
+
+            jsonAuthentication.Add("type", authenticationTypeName);
+            jsonAuthentication.Add(authenticationTypeName, jsonAuthenticationParameters);
+
+            return jsonAuthentication;
+        }
+
+        private static JObject ExportToPostman(RequestMessage requestMessage)
+        {
+            var jsonRequestMessage = new JObject();
+
+            if (requestMessage.AuthenticationMethod != null && !(requestMessage.AuthenticationMethod is NoAuthentication))
+            {
+                jsonRequestMessage.Add("auth", ExportToPostman(requestMessage.AuthenticationMethod));
+            }
+
+            if (requestMessage.HttpMethod != null)
+            {
+                jsonRequestMessage.Add("method", requestMessage.HttpMethod.ToString());
+            }
+
+            var jsonHeaders = new JArray();
+            foreach (var header in requestMessage.Headers)
+            {
+                var jsonHeader = new JObject
+                {
+                    { "key", header.Key },
+                    { "name", header.Key },
+                    { "value", header.Value },
+                    { "description", header.Description },
+                    { "type", "text" }
+                };
+                jsonHeaders.Add(jsonHeader);
+            }
+
+            jsonRequestMessage.Add("header", jsonHeaders);
+
+            if (requestMessage.Body is RawBody body)
+            {
+                var jsonBody = new JObject
+                {
+                    { "mode", "raw" },
+                    { "raw", body.Text }
+                };
+                jsonRequestMessage.Add("body", jsonBody);
+            }
+            else
+            {
+                throw new NotSupportedException("Only raw body is currently supported");
+            }
+
+            if (requestMessage.Uri != null)
+            {
+                var jsonUriHost = new JArray();
+                foreach (var host in requestMessage.Uri.Host.Split('.'))
+                {
+                    jsonUriHost.Add(host);
+                }
+
+                var jsonUriPath = new JArray();
+                foreach (var host in requestMessage.Uri.LocalPath.Split('/'))
+                {
+                    jsonUriPath.Add(host);
+                }
+
+                var jsonUriQuery = new JArray();
+                foreach (var queryParameter in requestMessage.QueryStringParameters)
+                {
+                    var jsonQueryParameter = new JObject();
+                    jsonQueryParameter.Add("key", queryParameter.Key);
+                    jsonQueryParameter.Add("value", queryParameter.UriEncodedValue);
+                    jsonQueryParameter.Add("description", queryParameter.Description);
+                    jsonUriQuery.Add(jsonQueryParameter);
+                }
+
+                var jsonUri = new JObject
+                {
+                    { "raw", requestMessage.Uri.ToString() },
+                    { "protocol", requestMessage.Uri.Scheme },
+                    { "host", jsonUriHost },
+                    { "path", jsonUriPath },
+                    { "query", jsonUriQuery }
+                };
+
+                jsonRequestMessage.Add("url", jsonUri);
+            }
+            else
+            {
+                var jsonUri = new JObject
+                {
+                    { "raw", string.Empty }
+                };
+
+                jsonRequestMessage.Add("url", jsonUri);
+            }
+
+            return jsonRequestMessage;
         }
 
         private static AuthenticationMethod GetAuthenticationMethod(JObject postmanItem)
