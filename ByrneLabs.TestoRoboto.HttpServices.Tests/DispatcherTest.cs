@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using ByrneLabs.TestoRoboto.HttpServices.Mutators;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -48,12 +49,17 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             collection.Items.Add(requestMessage);
 
             var mutator = new Mock<Mutator>();
-            mutator.Setup(m => m.MutateMessage(It.IsAny<string>())).Returns((string unfuzzedMessage) =>
+            mutator.Setup(m => m.MutateMessage(It.IsAny<RequestMessage>())).Returns((RequestMessage requestMessageToFuzz) =>
             {
-                var jObject = JObject.Parse(unfuzzedMessage);
+                var fuzzedRequestMessage = requestMessageToFuzz.Clone();
+                fuzzedRequestMessage.FuzzedMessage = true;
+
+                var jObject = JObject.Parse(((RawBody) fuzzedRequestMessage.Body).Text);
                 jObject["product"] = null;
 
-                return new[] { jObject.ToString(Formatting.None) };
+                ((RawBody) fuzzedRequestMessage.Body).Text = jObject.ToString(Formatting.None);
+
+                return new[] { fuzzedRequestMessage };
             });
             collection.AddFuzzedMessages(new[] { mutator.Object }, true);
 

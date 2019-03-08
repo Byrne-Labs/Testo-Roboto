@@ -3,9 +3,9 @@ using System.Linq;
 using ByrneLabs.Commons;
 using Newtonsoft.Json.Linq;
 
-namespace ByrneLabs.TestoRoboto.HttpServices.JsonMutators
+namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.JsonMutators
 {
-    public class ArrayGrower : Mutator
+    public class ArrayGrower : JsonMutator
     {
         private static JObject AddDuplicate(JArray originalArray, int duplicateCount)
         {
@@ -27,7 +27,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.JsonMutators
             return (JObject) clonedMessage;
         }
 
-        public override IEnumerable<string> MutateMessage(string message)
+        protected override IEnumerable<string> MutateMessage(string message)
         {
             var jObject = JObject.Parse(message);
             var mutatedMessages = new List<JObject>();

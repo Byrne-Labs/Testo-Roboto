@@ -613,7 +613,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             var collection = PostmanImporterExporter.ImportFromPostmanJson(json);
             Assert.NotNull(collection);
             Assert.Equal("Some Messages", collection.Name);
-            Assert.Equal(1, collection.Items.Count);
+            Assert.Single(collection.Items);
             Assert.IsType<RequestMessage>(collection.Items[0]);
             var requestMessage = collection.Items[0] as RequestMessage;
             Assert.Equal("Some Message", requestMessage.Name);
@@ -732,7 +732,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             var collection = PostmanImporterExporter.ImportFromPostmanJson(json);
             Assert.NotNull(collection);
             Assert.Equal("Some Messages", collection.Name);
-            Assert.Equal(1, collection.Items.Count);
+            Assert.Single(collection.Items);
             Assert.IsType<RequestMessage>(collection.Items[0]);
             var requestMessage = collection.Items[0] as RequestMessage;
             Assert.Equal("Some Message", requestMessage.Name);
@@ -840,7 +840,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             var collection = PostmanImporterExporter.ImportFromPostmanJson(json);
             Assert.NotNull(collection);
             Assert.Equal("Some Messages", collection.Name);
-            Assert.Equal(1, collection.Items.Count);
+            Assert.Single(collection.Items);
             Assert.IsType<RequestMessage>(collection.Items[0]);
             var requestMessage = collection.Items[0] as RequestMessage;
             Assert.Equal("Some Message", requestMessage.Name);
@@ -969,7 +969,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             var collection = PostmanImporterExporter.ImportFromPostmanJson(json);
             Assert.NotNull(collection);
             Assert.Equal("Some Messages", collection.Name);
-            Assert.Equal(1, collection.Items.Count);
+            Assert.Single(collection.Items);
             Assert.IsType<RequestMessage>(collection.Items[0]);
             var requestMessage = collection.Items[0] as RequestMessage;
             Assert.Equal("Some Message", requestMessage.Name);

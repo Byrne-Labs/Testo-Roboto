@@ -2,11 +2,11 @@
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
-namespace ByrneLabs.TestoRoboto.HttpServices.JsonMutators
+namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.JsonMutators
 {
-    public class PropertyRemover : Mutator
+    public class PropertyRemover : JsonMutator
     {
-        public override IEnumerable<string> MutateMessage(string message)
+        protected override IEnumerable<string> MutateMessage(string message)
         {
             var jObject = JObject.Parse(message);
             var mutatedMessages = new List<JObject>();

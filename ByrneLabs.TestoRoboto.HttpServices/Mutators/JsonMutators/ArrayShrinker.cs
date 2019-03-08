@@ -3,9 +3,9 @@ using System.Linq;
 using ByrneLabs.Commons;
 using Newtonsoft.Json.Linq;
 
-namespace ByrneLabs.TestoRoboto.HttpServices.JsonMutators
+namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.JsonMutators
 {
-    public class ArrayShrinker : Mutator
+    public class ArrayShrinker : JsonMutator
     {
         private static JObject ShrinkArray(JArray originalArray, int countToRemove)
         {
@@ -19,7 +19,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.JsonMutators
             return (JObject) clonedMessage;
         }
 
-        public override IEnumerable<string> MutateMessage(string message)
+        protected override IEnumerable<string> MutateMessage(string message)
         {
             var jObject = JObject.Parse(message);
             var mutatedMessages = new List<JObject>();

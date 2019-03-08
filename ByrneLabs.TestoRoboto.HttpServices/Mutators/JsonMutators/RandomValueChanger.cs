@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using ByrneLabs.Commons;
 
-namespace ByrneLabs.TestoRoboto.HttpServices.JsonMutators
+namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.JsonMutators
 {
     public class RandomValueChanger : ValueChanger
     {

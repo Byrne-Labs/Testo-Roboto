@@ -1,7 +1,8 @@
 using System.Linq;
+using ByrneLabs.TestoRoboto.HttpServices.Mutators;
 using Xunit;
 
-namespace ByrneLabs.TestoRoboto.HttpServices.Tests.JsonMutators
+namespace ByrneLabs.TestoRoboto.HttpServices.Tests.Mutators.JsonMutators
 {
     public class MutatorTest
     {
@@ -38,8 +39,8 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests.JsonMutators
             ";
 
             var mutator = new T();
-
-            var mutatedMessages = mutator.MutateMessage(message);
+            var requestMessage = new RequestMessage { Body = new RawBody { Text = message } };
+            var mutatedMessages = mutator.MutateMessage(requestMessage);
 
             Assert.NotNull(mutatedMessages);
             Assert.NotEmpty(mutatedMessages);
@@ -47,7 +48,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests.JsonMutators
 
             foreach (var mutatedMessage in mutatedMessages)
             {
-                Assert.NotEqual(message, mutatedMessage);
+                Assert.NotEqual(message, ((RawBody) mutatedMessage.Body).Text);
             }
         }
     }

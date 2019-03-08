@@ -4,9 +4,9 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace ByrneLabs.TestoRoboto.HttpServices.JsonMutators
+namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.JsonMutators
 {
-    public class JavaScriptInjector : Mutator
+    public class JavaScriptInjector : JsonMutator
     {
         private readonly string[] _testValues =
         {
@@ -102,7 +102,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.JsonMutators
             @"null"
         };
 
-        public override IEnumerable<string> MutateMessage(string message)
+        protected override IEnumerable<string> MutateMessage(string message)
         {
             var jObject = JObject.Parse(message);
             var unformattedMessage = jObject.ToString(Formatting.None);

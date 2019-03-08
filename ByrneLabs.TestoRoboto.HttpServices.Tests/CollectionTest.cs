@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
+using ByrneLabs.TestoRoboto.HttpServices.Mutators;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -25,15 +26,19 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             subCollection.Items.Add(new RequestMessage { Body = new RawBody { Text = "{ \"xyz\": 456 }" } });
 
             var mutator = new Mock<Mutator>();
-            mutator.Setup(m => m.MutateMessage(It.IsAny<string>())).Returns((string message) =>
+            mutator.Setup(m => m.MutateMessage(It.IsAny<RequestMessage>())).Returns((RequestMessage requestMessageToFuzz) =>
             {
-                var jObject = JObject.Parse(message);
+                var fuzzedRequestMessage = requestMessageToFuzz.Clone();
+                fuzzedRequestMessage.FuzzedMessage = true;
+                var jObject = JObject.Parse(((RawBody) fuzzedRequestMessage.Body).Text);
                 foreach (var value in jObject.Descendants().OfType<JValue>())
                 {
                     value.Value = "asdf";
                 }
 
-                return new[] { jObject.ToString(Formatting.None) };
+                ((RawBody) fuzzedRequestMessage.Body).Text = jObject.ToString(Formatting.None);
+
+                return new[] { fuzzedRequestMessage };
             });
             collection.AddFuzzedMessages(new[] { mutator.Object }, true);
 

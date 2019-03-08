@@ -1,7 +1,7 @@
-﻿using ByrneLabs.TestoRoboto.HttpServices.JsonMutators;
+﻿using ByrneLabs.TestoRoboto.HttpServices.Mutators.JsonMutators;
 using Xunit;
 
-namespace ByrneLabs.TestoRoboto.HttpServices.Tests.JsonMutators
+namespace ByrneLabs.TestoRoboto.HttpServices.Tests.Mutators.JsonMutators
 {
     public class SqlInjectorTest : MutatorTest
     {

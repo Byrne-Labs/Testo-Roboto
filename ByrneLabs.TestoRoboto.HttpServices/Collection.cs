@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using ByrneLabs.Commons;
 using ByrneLabs.Commons.Domain;
+using ByrneLabs.TestoRoboto.HttpServices.Mutators;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
@@ -10,7 +10,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
     {
         private const string _fuzzedMessageCollectionName = "Fuzzed Messages";
 
-        public IList<Item> Items { get; } = new List<Item>();
+        public List<Item> Items { get; } = new List<Item>();
 
         public void AddFuzzedMessages(IEnumerable<Mutator> mutators, bool includeSubCollections)
         {
@@ -28,26 +28,9 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
                 foreach (var nonFuzzedMessage in Items.OfType<RequestMessage>().Where(message => !message.FuzzedMessage))
                 {
-                    if (nonFuzzedMessage.Body is RawBody)
+                    foreach (var mutator in mutators)
                     {
-                        if (!string.IsNullOrWhiteSpace(((RawBody) nonFuzzedMessage.Body).Text))
-                        {
-                            foreach (var mutator in mutators)
-                            {
-                                foreach (var mutatedMessageContent in mutator.MutateMessage(((RawBody) nonFuzzedMessage.Body).Text))
-                                {
-                                    var fuzzedMessage = nonFuzzedMessage.Clone();
-                                    fuzzedMessage.FuzzedMessage = true;
-                                    fuzzedMessage.ExpectedStatusCode = null;
-                                    fuzzedMessage.Body = new RawBody { Text = mutatedMessageContent };
-                                    fuzzedMessages.Items.Add(fuzzedMessage);
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        throw new NotSupportedException("Only raw body is currently supported for fuzzing");
+                        fuzzedMessages.Items.AddRange(mutator.MutateMessage(nonFuzzedMessage));
                     }
                 }
 

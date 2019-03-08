@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
-namespace ByrneLabs.TestoRoboto.HttpServices.JsonMutators
+namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.JsonMutators
 {
-    public abstract class ValueChanger : Mutator
+    public abstract class ValueChanger : JsonMutator
     {
         protected abstract IEnumerable<object> TestValues { get; }
 
-        public override IEnumerable<string> MutateMessage(string message)
+        protected override IEnumerable<string> MutateMessage(string message)
         {
             var jObject = JObject.Parse(message);
             var mutatedMessages = new List<JObject>();
