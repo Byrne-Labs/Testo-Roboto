@@ -6,7 +6,7 @@ using Xunit;
 
 namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 {
-    public class PostmanFileSerializerTest
+    public class PostmanSerializerTest
     {
         [Fact]
         public void TestExportToPostmanBasicAuthentication()
@@ -28,7 +28,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             subCollection.Items.Add(new RequestMessage { HttpMethod = HttpMethod.Post, Name = "Some Message", Body = new RawBody { Text = "{ \"xyz\": 456 }" } });
             collection.Items.Add(new Collection { Name = "Fuzzed Messages" });
 
-            var json = new PostmanFileSerializer().WriteToString(collection);
+            var json = new PostmanSerializer().WriteToString(collection);
 
             Debug.WriteLine(json);
         }
@@ -76,7 +76,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                }
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.IsType<AwsSignature>(collection.AuthenticationMethod);
             var authentication = collection.AuthenticationMethod as AwsSignature;
             Assert.Equal("myAccessKey", authentication.AccessKey);
@@ -115,7 +115,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                }
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.IsType<BasicAuthentication>(collection.AuthenticationMethod);
             var authentication = collection.AuthenticationMethod as BasicAuthentication;
             Assert.Equal("myPassword", authentication.Password);
@@ -146,7 +146,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                }
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.IsType<BearerToken>(collection.AuthenticationMethod);
             var authentication = collection.AuthenticationMethod as BearerToken;
             Assert.Equal("myToken", authentication.Token);
@@ -176,7 +176,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                }
                 }";
 
-            Assert.Throws<ArgumentException>(() => new PostmanFileSerializer().ReadFromString(json));
+            Assert.Throws<ArgumentException>(() => new PostmanSerializer().ReadFromString(json));
         }
 
         [Fact]
@@ -242,7 +242,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                }
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.IsType<DigestAuthentication>(collection.AuthenticationMethod);
             var authentication = collection.AuthenticationMethod as DigestAuthentication;
             Assert.Equal(DigestAuthenticationAlgorithm.Md5, authentication.Algorithm);
@@ -320,7 +320,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                }
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.IsType<DigestAuthentication>(collection.AuthenticationMethod);
             var authentication = collection.AuthenticationMethod as DigestAuthentication;
             Assert.Equal(DigestAuthenticationAlgorithm.Md5Sess, authentication.Algorithm);
@@ -358,7 +358,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                }
                 }";
 
-            Assert.Throws<ArgumentException>(() => new PostmanFileSerializer().ReadFromString(json));
+            Assert.Throws<ArgumentException>(() => new PostmanSerializer().ReadFromString(json));
         }
 
         [Fact]
@@ -424,7 +424,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                }
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.IsType<HawkAuthentication>(collection.AuthenticationMethod);
             var authentication = collection.AuthenticationMethod as HawkAuthentication;
             Assert.Equal(HawkAuthenticationAlgorithm.Sha1, authentication.Algorithm);
@@ -502,7 +502,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                }
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.IsType<HawkAuthentication>(collection.AuthenticationMethod);
             var authentication = collection.AuthenticationMethod as HawkAuthentication;
             Assert.Equal(HawkAuthenticationAlgorithm.Sha256, authentication.Algorithm);
@@ -610,7 +610,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                ]
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.NotNull(collection);
             Assert.Equal("Some Messages", collection.Name);
             Assert.Single(collection.Items);
@@ -729,7 +729,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                ]
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.NotNull(collection);
             Assert.Equal("Some Messages", collection.Name);
             Assert.Single(collection.Items);
@@ -837,7 +837,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                ]
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.NotNull(collection);
             Assert.Equal("Some Messages", collection.Name);
             Assert.Single(collection.Items);
@@ -966,7 +966,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                ]
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.NotNull(collection);
             Assert.Equal("Some Messages", collection.Name);
             Assert.Single(collection.Items);
@@ -1024,7 +1024,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                ""item"": []
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.IsType<NoAuthentication>(collection.AuthenticationMethod);
             Assert.Empty(collection.Items);
         }
@@ -1045,7 +1045,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 					}
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.IsType<NoAuthentication>(collection.AuthenticationMethod);
             Assert.Empty(collection.Items);
         }
@@ -1088,7 +1088,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                }
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.IsType<NtlmAuthentication>(collection.AuthenticationMethod);
             var authentication = collection.AuthenticationMethod as NtlmAuthentication;
             Assert.Equal("myDomain", authentication.Domain);
@@ -1121,7 +1121,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                }
                 }";
 
-            Assert.Throws<ArgumentException>(() => new PostmanFileSerializer().ReadFromString(json));
+            Assert.Throws<ArgumentException>(() => new PostmanSerializer().ReadFromString(json));
         }
 
         [Fact]
@@ -1197,7 +1197,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                }
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.IsType<OAuth1>(collection.AuthenticationMethod);
             var authentication = collection.AuthenticationMethod as OAuth1;
             Assert.Equal("myToken", authentication.AccessToken);
@@ -1287,7 +1287,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                }
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.IsType<OAuth1>(collection.AuthenticationMethod);
             var authentication = collection.AuthenticationMethod as OAuth1;
             Assert.Equal("myToken", authentication.AccessToken);
@@ -1377,7 +1377,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                }
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.IsType<OAuth1>(collection.AuthenticationMethod);
             var authentication = collection.AuthenticationMethod as OAuth1;
             Assert.Equal("myToken", authentication.AccessToken);
@@ -1422,7 +1422,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                }
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.IsType<OAuth2>(collection.AuthenticationMethod);
             var authentication = collection.AuthenticationMethod as OAuth2;
             Assert.Equal("myAccessToken", authentication.AccessToken);
@@ -1453,7 +1453,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                }
                 }";
 
-            Assert.Throws<ArgumentException>(() => new PostmanFileSerializer().ReadFromString(json));
+            Assert.Throws<ArgumentException>(() => new PostmanSerializer().ReadFromString(json));
         }
 
         [Fact]
@@ -1484,7 +1484,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                }
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.IsType<OAuth2>(collection.AuthenticationMethod);
             var authentication = collection.AuthenticationMethod as OAuth2;
             Assert.Equal("myAccessToken", authentication.AccessToken);
@@ -1537,7 +1537,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 	                ]
                 }";
 
-            var collection = new PostmanFileSerializer().ReadFromString(json);
+            var collection = new PostmanSerializer().ReadFromString(json);
             Assert.Single(collection.Items);
             Assert.IsType<Collection>(collection.Items[0]);
             Assert.Single(collection.Items.OfType<Collection>().Single().Items);

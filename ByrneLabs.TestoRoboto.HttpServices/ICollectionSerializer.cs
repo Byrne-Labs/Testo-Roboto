@@ -1,6 +1,6 @@
 ﻿namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public interface ICollectionFileSerializer
+    public interface ICollectionSerializer
     {
         bool BinaryOnly { get; }
 

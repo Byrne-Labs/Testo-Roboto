@@ -56,7 +56,7 @@ namespace ByrneLabs.TestoRoboto.Shopify
                 new XmlInjector()
             }, true);
 
-            new PostmanFileSerializer().WriteToFile(collection, "Shopify Fuzzed.postman_collection.json");
+            new PostmanSerializer().WriteToFile(collection, "Shopify Fuzzed.postman_collection.json");
 
             var testRequest = new TestRequest();
             testRequest.TimeBetweenRequests = 500;

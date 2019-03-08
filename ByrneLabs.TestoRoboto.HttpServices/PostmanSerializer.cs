@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public class PostmanFileSerializer : ICollectionFileSerializer
+    public class PostmanSerializer : ICollectionSerializer
     {
         public bool BinaryOnly => false;
 
