@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using ByrneLabs.TestoRoboto.HttpServices;
@@ -57,7 +56,7 @@ namespace ByrneLabs.TestoRoboto.Shopify
                 new XmlInjector()
             }, true);
 
-            PostmanImporterExporter.ExportToPostman(collection, new FileInfo("Shopify Fuzzed.postman_collection.json"));
+            new PostmanFileSerializer().WriteToFile(collection, "Shopify Fuzzed.postman_collection.json");
 
             var testRequest = new TestRequest();
             testRequest.TimeBetweenRequests = 500;
@@ -65,7 +64,7 @@ namespace ByrneLabs.TestoRoboto.Shopify
             var dispatcher = new Dispatcher();
             dispatcher.Dispatch(testRequest);
 
-            var failures = collection.DescendentRequestMessages().Where(request => (int)request.ResponseMessages.First().StatusCode >= 500 && (int)request.ResponseMessages.First().StatusCode < 600).ToList();
+            var failures = collection.DescendentRequestMessages().Where(request => (int) request.ResponseMessages.First().StatusCode >= 500 && (int) request.ResponseMessages.First().StatusCode < 600).ToList();
         }
     }
 }

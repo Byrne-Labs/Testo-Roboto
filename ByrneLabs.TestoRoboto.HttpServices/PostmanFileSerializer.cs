@@ -9,78 +9,9 @@ using Newtonsoft.Json.Linq;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public static class PostmanImporterExporter
+    public class PostmanFileSerializer : ICollectionFileSerializer
     {
-        public static void ExportToPostman(Collection collection, FileInfo file)
-        {
-            var jsonText = ExportToPostman(collection);
-            File.WriteAllText(file.ToString(), jsonText, Encoding.Unicode);
-        }
-
-        public static string ExportToPostman(Collection collection)
-        {
-            collection.AssertValid();
-
-            var jsonCollection = new JObject();
-            var jsonCollectionInfo = new JObject
-            {
-                { "_postman_id", collection.EntityId },
-                { "name", collection.Name },
-                { "schema", "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" }
-            };
-            jsonCollection.Add("info", jsonCollectionInfo);
-
-            var jsonCollectionItems = new JArray();
-            foreach (var childItem in collection.Items.OfType<Collection>())
-            {
-                jsonCollectionItems.Add(ExportToPostman((Item) childItem));
-            }
-
-            foreach (var childItem in collection.Items.OfType<RequestMessage>())
-            {
-                jsonCollectionItems.Add(ExportToPostman((Item) childItem));
-            }
-
-            jsonCollection.Add("item", jsonCollectionItems);
-
-            if (collection.AuthenticationMethod != null && !(collection.AuthenticationMethod is NoAuthentication))
-            {
-                jsonCollection.Add("auth", ExportToPostman(collection.AuthenticationMethod));
-            }
-
-            var stringBuilder = new StringBuilder();
-            using (var stringWriter = new StringWriter(stringBuilder))
-            using (var jsonWriter = new JsonTextWriter(stringWriter)
-            {
-                Formatting = Formatting.Indented,
-                Indentation = 4
-            })
-            {
-                jsonCollection.WriteTo(jsonWriter);
-            }
-
-            return stringBuilder.ToString();
-        }
-
-        public static Collection ImportFromPostmanFile(string filePath) => ImportFromPostmanJson(File.ReadAllText(filePath));
-
-        public static Collection ImportFromPostmanJson(string collectionJson)
-        {
-            var json = JObject.Parse(collectionJson);
-            var collection = new Collection();
-            collection.EntityId = json["_postman_id"] != null ? Guid.Parse(json["_postman_id"].ToString()) : Guid.NewGuid();
-            collection.Name = json["info"]["name"].ToString();
-            collection.AuthenticationMethod = GetAuthenticationMethod(json);
-            if (json.ContainsKey("item") && json["item"] is JArray)
-            {
-                foreach (var item in LoadItems(json["item"] as JArray))
-                {
-                    collection.Items.Add(item);
-                }
-            }
-
-            return collection;
-        }
+        public bool BinaryOnly => false;
 
         private static JObject CreateAuthenticationParameter(string key, string value)
         {
@@ -101,7 +32,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                 var jsonItems = new JArray();
                 foreach (var childItem in collection.Items.OfType<Collection>())
                 {
-                    jsonItems.Add(ExportToPostman((Item) childItem));
+                    jsonItems.Add(ExportToPostman(childItem));
                 }
 
                 foreach (var childItem in collection.Items.OfType<RequestMessage>())
@@ -540,6 +471,77 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             }
 
             return request;
+        }
+
+        public Collection Read(byte[] bytes) => ReadFromString(Encoding.Unicode.GetString(bytes));
+
+        public Collection ReadFromFile(string fileName) => ReadFromString(File.ReadAllText(fileName));
+
+        public Collection ReadFromString(string collectionText)
+        {
+            var json = JObject.Parse(collectionText);
+            var collection = new Collection();
+            collection.EntityId = json["_postman_id"] != null ? Guid.Parse(json["_postman_id"].ToString()) : Guid.NewGuid();
+            collection.Name = json["info"]["name"].ToString();
+            collection.AuthenticationMethod = GetAuthenticationMethod(json);
+            if (json.ContainsKey("item") && json["item"] is JArray)
+            {
+                foreach (var item in LoadItems(json["item"] as JArray))
+                {
+                    collection.Items.Add(item);
+                }
+            }
+
+            return collection;
+        }
+
+        public byte[] Write(Collection collection) => Encoding.Unicode.GetBytes(WriteToString(collection));
+
+        public void WriteToFile(Collection collection, string fileName) => File.WriteAllText(fileName, WriteToString(collection), Encoding.Unicode);
+
+        public string WriteToString(Collection collection)
+        {
+            collection.AssertValid();
+
+            var jsonCollection = new JObject();
+            var jsonCollectionInfo = new JObject
+            {
+                { "_postman_id", collection.EntityId },
+                { "name", collection.Name },
+                { "schema", "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" }
+            };
+            jsonCollection.Add("info", jsonCollectionInfo);
+
+            var jsonCollectionItems = new JArray();
+            foreach (var childItem in collection.Items.OfType<Collection>())
+            {
+                jsonCollectionItems.Add(ExportToPostman(childItem));
+            }
+
+            foreach (var childItem in collection.Items.OfType<RequestMessage>())
+            {
+                jsonCollectionItems.Add(ExportToPostman((Item) childItem));
+            }
+
+            jsonCollection.Add("item", jsonCollectionItems);
+
+            if (collection.AuthenticationMethod != null && !(collection.AuthenticationMethod is NoAuthentication))
+            {
+                jsonCollection.Add("auth", ExportToPostman(collection.AuthenticationMethod));
+            }
+
+            var stringBuilder = new StringBuilder();
+            using (var stringWriter = new StringWriter(stringBuilder))
+            using (var jsonWriter = new JsonTextWriter(stringWriter)
+            {
+                Formatting = Formatting.Indented,
+                Indentation = 4
+            })
+            {
+                jsonCollection.WriteTo(jsonWriter);
+            }
+
+            return stringBuilder.ToString();
         }
     }
 }
