@@ -61,14 +61,17 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                     RequestUri = requestMessage.Uri
                 };
 
-                if (requestMessage.AuthenticationMethod is BasicAuthentication authentication)
+                if (requestMessage.AuthenticationMethod != null && !(requestMessage.AuthenticationMethod is NoAuthentication))
                 {
-                    var byteArray = Encoding.ASCII.GetBytes(authentication.Username + ":" + authentication.Password);
-                    httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-                }
-                else
-                {
-                    throw new NotSupportedException("Only basic authentication is currently supported");
+                    if (requestMessage.AuthenticationMethod is BasicAuthentication authentication)
+                    {
+                        var byteArray = Encoding.ASCII.GetBytes(authentication.Username + ":" + authentication.Password);
+                        httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+                    }
+                    else
+                    {
+                        throw new NotSupportedException("Only basic authentication is currently supported");
+                    }
                 }
 
                 foreach (var header in requestMessage.Headers)
