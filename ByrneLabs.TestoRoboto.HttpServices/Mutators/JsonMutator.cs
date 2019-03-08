@@ -15,6 +15,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Mutators
                 foreach (var mutatedMessage in mutateMessages)
                 {
                     var mutatedRequestMessage = requestMessage.Clone();
+                    mutatedRequestMessage.Name = mutatedRequestMessage.Name + " -- Fuzzed";
                     mutatedRequestMessage.ExpectedStatusCode = null;
                     ((RawBody) mutatedRequestMessage.Body).Text = mutatedMessage;
                     mutatedRequestMessages.Add(mutatedRequestMessage);

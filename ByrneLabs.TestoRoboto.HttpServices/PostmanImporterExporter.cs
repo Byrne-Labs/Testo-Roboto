@@ -14,15 +14,12 @@ namespace ByrneLabs.TestoRoboto.HttpServices
         public static void ExportToPostman(Collection collection, FileInfo file)
         {
             var jsonText = ExportToPostman(collection);
-            File.WriteAllText(file.ToString(), jsonText);
+            File.WriteAllText(file.ToString(), jsonText, Encoding.Unicode);
         }
 
         public static string ExportToPostman(Collection collection)
         {
-            if (!collection.Validate())
-            {
-                throw new ArgumentException("One of the items in the collection is invalid");
-            }
+            collection.AssertValid();
 
             var jsonCollection = new JObject();
             var jsonCollectionInfo = new JObject
@@ -88,7 +85,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
         private static JObject CreateAuthenticationParameter(string key, string value)
         {
             var jsonParameter = new JObject();
-            jsonParameter.Add("key", "password");
+            jsonParameter.Add("key", key);
             jsonParameter.Add("value", value);
             jsonParameter.Add("type", "string");
 

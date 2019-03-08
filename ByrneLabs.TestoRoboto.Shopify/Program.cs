@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using ByrneLabs.TestoRoboto.HttpServices;
@@ -34,6 +35,7 @@ namespace ByrneLabs.TestoRoboto.Shopify
                 }";
 
             var requestMessage = new RequestMessage();
+            requestMessage.Name = "Create New Product";
             requestMessage.Uri = new Uri("https://testoroboto.myshopify.com/admin/products.json");
             requestMessage.AuthenticationMethod = new BasicAuthentication { Username = "36e0780065f769830b0c2cb8dc18fd89", Password = "9e54820bab53b90fa12f1ddfd1528bb1" };
             requestMessage.Headers.Add(new Header { Key = "Content-Type", Value = "application/json" });
@@ -41,6 +43,7 @@ namespace ByrneLabs.TestoRoboto.Shopify
             requestMessage.HttpMethod = HttpMethod.Post;
 
             var collection = new Collection();
+            collection.Name = "Shopify";
             collection.Items.Add(requestMessage);
             collection.AddFuzzedMessages(new Mutator[]
             {
@@ -54,13 +57,15 @@ namespace ByrneLabs.TestoRoboto.Shopify
                 new XmlInjector()
             }, true);
 
+            PostmanImporterExporter.ExportToPostman(collection, new FileInfo("Shopify Fuzzed.postman_collection.json"));
+
             var testRequest = new TestRequest();
             testRequest.TimeBetweenRequests = 500;
 
             var dispatcher = new Dispatcher();
             dispatcher.Dispatch(testRequest);
 
-            var failures = collection.DescendentRequestMessages().Where(request => (int) request.ResponseMessages.First().StatusCode >= 500 && (int) request.ResponseMessages.First().StatusCode < 600).ToList();
+            var failures = collection.DescendentRequestMessages().Where(request => (int)request.ResponseMessages.First().StatusCode >= 500 && (int)request.ResponseMessages.First().StatusCode < 600).ToList();
         }
     }
 }

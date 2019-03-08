@@ -44,6 +44,15 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             }
         }
 
+        public override void AssertValid()
+        {
+            base.AssertValid();
+            foreach (var item in Items)
+            {
+                item.AssertValid();
+            }
+        }
+
         public new Collection Clone(CloneDepth depth = CloneDepth.Deep) => (Collection) base.Clone(depth);
 
         public IEnumerable<RequestMessage> DescendentRequestMessages() => Items.OfType<RequestMessage>().Union(Items.OfType<Collection>().SelectMany(collection => collection.DescendentRequestMessages()));

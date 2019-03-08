@@ -1,4 +1,5 @@
-﻿using ByrneLabs.Commons.Domain;
+﻿using System;
+using ByrneLabs.Commons.Domain;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
@@ -9,6 +10,14 @@ namespace ByrneLabs.TestoRoboto.HttpServices
         public string Description { get; set; }
 
         public string Name { get; set; }
+
+        public virtual void AssertValid()
+        {
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                throw new InvalidOperationException($"The {nameof(Name)} property cannot be null or whitespace");
+            }
+        }
 
         public virtual bool Validate() => !string.IsNullOrWhiteSpace(Name);
     }

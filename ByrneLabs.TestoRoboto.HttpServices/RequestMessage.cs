@@ -60,6 +60,15 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             }
         }
 
+        public override void AssertValid()
+        {
+            base.AssertValid();
+            if (HttpMethod == null)
+            {
+                throw new InvalidOperationException($"The {nameof(HttpMethod)} cannot be null");
+            }
+        }
+
         public new RequestMessage Clone(CloneDepth depth = CloneDepth.Deep) => (RequestMessage) base.Clone(depth);
 
         public override bool Validate() => base.Validate() && HttpMethod != null;
