@@ -22,7 +22,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
         public Body Body { get; set; }
 
-        public IList<Cookie> Cookies { get; set; } = new List<Cookie>();
+        public IList<Cookie> Cookies { get; } = new List<Cookie>();
 
         public Encoding Encoding { get; set; } = Encoding.UTF8;
 
@@ -30,13 +30,13 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
         public bool FuzzedMessage { get; set; }
 
-        public IList<Header> Headers { get; set; } = new List<Header>();
+        public IList<Header> Headers { get; } = new List<Header>();
 
         public HttpMethod HttpMethod { get; set; }
 
         public IList<QueryStringParameter> QueryStringParameters => _queryStringParameters;
 
-        public IList<HttpResponseMessage> ResponseMessages { get; set; } = new List<HttpResponseMessage>();
+        public IList<ResponseMessage> ResponseMessages { get; } = new List<ResponseMessage>();
 
         public Uri Uri
         {

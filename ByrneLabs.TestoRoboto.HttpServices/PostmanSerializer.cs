@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -371,34 +370,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             request.Name = jsonRequest["name"].ToString();
             request.AuthenticationMethod = GetAuthenticationMethod(jsonRequest);
             var httpMethod = jsonRequest["request"]["method"].ToString();
-            switch (httpMethod)
-            {
-                case "GET":
-                    request.HttpMethod = HttpMethod.Get;
-                    break;
-                case "POST":
-                    request.HttpMethod = HttpMethod.Post;
-                    break;
-                case "PUT":
-                    request.HttpMethod = HttpMethod.Put;
-                    break;
-                case "DELETE":
-                    request.HttpMethod = HttpMethod.Delete;
-                    break;
-                case "HEAD":
-                    request.HttpMethod = HttpMethod.Head;
-                    break;
-                case "OPTIONS":
-                    request.HttpMethod = HttpMethod.Options;
-                    break;
-                case "TRACE":
-                    request.HttpMethod = HttpMethod.Trace;
-                    break;
-                default:
-                    request.HttpMethod = new HttpMethod(httpMethod);
-                    break;
-            }
-
+            request.HttpMethod = HttpTools.HttpMethodFromString(httpMethod);
             if (jsonRequest["request"]["header"] is JArray)
             {
                 foreach (var jsonHeader in ((JArray) jsonRequest["request"]["header"]).OfType<JObject>())
@@ -440,7 +412,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
                     break;
                 case "urlencoded":
-                    var urlEncodedBody = new UrlEncodedBody();
+                    var urlEncodedBody = new FormUrlEncodedBody();
                     foreach (var jsonParameter in ((JArray) jsonRequest["request"]["body"]["urlencoded"]).OfType<JObject>())
                     {
                         var parameter = new KeyValue();

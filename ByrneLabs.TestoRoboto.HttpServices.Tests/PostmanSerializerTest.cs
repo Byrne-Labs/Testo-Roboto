@@ -975,8 +975,8 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             Assert.Equal("Some Message", requestMessage.Name);
             Assert.Null(collection.Items[0].Description);
             Assert.IsType<NoAuthentication>(requestMessage.AuthenticationMethod);
-            Assert.IsType<UrlEncodedBody>(requestMessage.Body);
-            var body = requestMessage.Body as UrlEncodedBody;
+            Assert.IsType<FormUrlEncodedBody>(requestMessage.Body);
+            var body = requestMessage.Body as FormUrlEncodedBody;
             Assert.Equal(3, body.FormData.Count);
             Assert.Equal("Key1", body.FormData[0].Key);
             Assert.Equal("Value1", body.FormData[0].Value);

@@ -79,7 +79,32 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                     httpRequestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value);
                 }
 
-                requestMessage.ResponseMessages.Add(httpClient.SendAsync(httpRequestMessage).Result);
+                var responseMessage = new ResponseMessage();
+                responseMessage.RequestSent = DateTime.Now;
+
+                var httpResult = httpClient.SendAsync(httpRequestMessage).Result;
+
+                responseMessage.Received = DateTime.Now;
+                responseMessage.Content = httpResult.Content.ReadAsStringAsync().Result;
+                foreach (var httpHeader in httpResult.Headers)
+                {
+                    var header = new Header();
+                    header.Key = httpHeader.Key;
+                    header.Value = string.Join(", ", httpHeader.Value);
+                    responseMessage.Headers.Add(header);
+                }
+
+                foreach (var httpCookie in cookieContainer.GetCookies(requestMessage.Uri).Cast<Cookie>())
+                {
+                    var cookie = new Cookie();
+                    cookie.Name = httpCookie.Name;
+                    cookie.Value = httpCookie.Value;
+                    cookie.Domain = httpCookie.Domain;
+                    cookie.Path = httpCookie.Path;
+                    responseMessage.Cookies.Add(cookie);
+                }
+
+                requestMessage.ResponseMessages.Add(responseMessage);
             }
         }
     }
