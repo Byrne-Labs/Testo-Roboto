@@ -94,7 +94,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                     responseMessage.Headers.Add(header);
                 }
 
-                foreach (var httpCookie in cookieContainer.GetCookies(requestMessage.Uri).Cast<Cookie>())
+                foreach (var httpCookie in cookieContainer.GetCookies(requestMessage.Uri).Cast<System.Net.Cookie>())
                 {
                     var cookie = new Cookie();
                     cookie.Name = httpCookie.Name;
