@@ -1,7 +1,7 @@
-﻿using ByrneLabs.TestoRoboto.HttpServices.Mutators.JsonMutators;
+﻿using ByrneLabs.TestoRoboto.HttpServices.Mutators.Json;
 using Xunit;
 
-namespace ByrneLabs.TestoRoboto.HttpServices.Tests.Mutators.JsonMutators
+namespace ByrneLabs.TestoRoboto.HttpServices.Tests.Mutators.Json
 {
     public class PropertyRemoverTest : MutatorTest
     {

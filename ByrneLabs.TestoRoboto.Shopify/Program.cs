@@ -3,7 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using ByrneLabs.TestoRoboto.HttpServices;
 using ByrneLabs.TestoRoboto.HttpServices.Mutators;
-using ByrneLabs.TestoRoboto.HttpServices.Mutators.JsonMutators;
+using ByrneLabs.TestoRoboto.HttpServices.Mutators.Json;
 
 namespace ByrneLabs.TestoRoboto.Shopify
 {

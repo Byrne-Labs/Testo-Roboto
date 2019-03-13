@@ -3,7 +3,7 @@ using System.Linq;
 using ByrneLabs.Commons;
 using Newtonsoft.Json.Linq;
 
-namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.JsonMutators
+namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.Json
 {
     public class ArrayShrinker : JsonMutator
     {

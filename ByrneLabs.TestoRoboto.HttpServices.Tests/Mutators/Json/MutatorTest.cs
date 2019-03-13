@@ -2,7 +2,7 @@ using System.Linq;
 using ByrneLabs.TestoRoboto.HttpServices.Mutators;
 using Xunit;
 
-namespace ByrneLabs.TestoRoboto.HttpServices.Tests.Mutators.JsonMutators
+namespace ByrneLabs.TestoRoboto.HttpServices.Tests.Mutators.Json
 {
     public class MutatorTest
     {

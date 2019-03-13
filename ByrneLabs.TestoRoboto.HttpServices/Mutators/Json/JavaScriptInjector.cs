@@ -4,7 +4,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.JsonMutators
+namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.Json
 {
     public class JavaScriptInjector : JsonMutator
     {
