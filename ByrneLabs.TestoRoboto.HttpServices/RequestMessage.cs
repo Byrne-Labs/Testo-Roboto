@@ -197,7 +197,13 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
         public new RequestMessage Clone(CloneDepth depth = CloneDepth.Deep) => (RequestMessage) base.Clone(depth);
 
-        public FuzzedRequestMessage CloneIntoFuzzedRequestMessage() => DeepCloner.CloneInto<FuzzedRequestMessage, RequestMessage>(this);
+        public FuzzedRequestMessage CloneIntoFuzzedRequestMessage()
+        {
+            var fuzzedRequestMessage = DeepCloner.CloneInto<FuzzedRequestMessage, RequestMessage>(this);
+            fuzzedRequestMessage.SourceRequestMessage = this;
+
+            return fuzzedRequestMessage;
+        }
 
         public override bool Validate() => base.Validate() && HttpMethod != null;
 

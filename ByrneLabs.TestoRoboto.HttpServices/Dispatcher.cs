@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public class Dispatcher
+    public static class Dispatcher
     {
         public static void Dispatch(TestRequest testRequest)
         {
@@ -18,6 +18,11 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             if (testRequest.ExcludeDuplicateFingerprintRequests)
             {
                 RemoveDuplicateFingerprints(requestMessages);
+            }
+
+            if (testRequest.ExcludeUnfuzzableRequests)
+            {
+                RemoveUnfuzzableRequestMessages(requestMessages);
             }
 
             foreach (var requestMessage in requestMessages.Where(r => !(r is FuzzedRequestMessage)))
@@ -133,6 +138,15 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             foreach (var duplicateRequestMessage in duplicateRequestMessages)
             {
                 requestMessages.Remove(duplicateRequestMessage);
+            }
+        }
+
+        private static void RemoveUnfuzzableRequestMessages(ICollection<RequestMessage> requestMessages)
+        {
+            var requestMessagesToRemove = requestMessages.Where(requestMessage => !(requestMessage is FuzzedRequestMessage) && !requestMessages.OfType<FuzzedRequestMessage>().Any(fuzzedRequestMessage => fuzzedRequestMessage.SourceRequestMessage == requestMessage));
+            foreach (var requestMessageToRemove in requestMessagesToRemove)
+            {
+                requestMessages.Remove(requestMessageToRemove);
             }
         }
     }
