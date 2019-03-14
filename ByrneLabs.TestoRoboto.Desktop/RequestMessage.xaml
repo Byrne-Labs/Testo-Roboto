@@ -9,31 +9,21 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height = "Auto" />
-            <RowDefinition Height = "Auto" />
-            <RowDefinition Height = "*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="1" >
-            <xctk:WatermarkTextBox Margin="5" MinWidth="200" Watermark="Name" KeepWatermarkOnGotFocus="False"/>
+        <StackPanel Grid.Row="1">
+            <xctk:WatermarkTextBox Margin="5" MinWidth="200" Watermark="Name" KeepWatermarkOnGotFocus="False" />
 
 
         </StackPanel>
         <TabControl Grid.Row="3">
-            <TabItem Header="Parameters">
-                 
-            </TabItem>
-            <TabItem Header="Authentication">
-
-            </TabItem>
-            <TabItem Header="Headers">
-
-            </TabItem>
-            <TabItem Header="Cookies">
-
-            </TabItem>
-            <TabItem Header="Body">
-
-            </TabItem>
+            <TabItem Header="Parameters" />
+            <TabItem Header="Authentication" />
+            <TabItem Header="Headers" />
+            <TabItem Header="Cookies" />
+            <TabItem Header="Body" />
         </TabControl>
 
     </Grid>

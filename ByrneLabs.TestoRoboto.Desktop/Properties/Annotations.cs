@@ -453,10 +453,10 @@ namespace ByrneLabs.TestoRoboto.Desktop.Properties
         }
 
         [UsedImplicitly]
-        public ImplicitUseTargetFlags TargetFlags { get; private set; }
+        public ImplicitUseTargetFlags TargetFlags { get; }
 
         [UsedImplicitly]
-        public ImplicitUseKindFlags UseKindFlags { get; private set; }
+        public ImplicitUseKindFlags UseKindFlags { get; }
     }
 
     [Flags]

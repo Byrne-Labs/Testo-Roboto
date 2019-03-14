@@ -6,7 +6,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.Resources
     {
         static BlnsBase64()
         {
-            Values = LoadStringsFromResource(typeof(BlnsBase64).Assembly, "ByrneLabs.TestoRoboto.HttpServices.Mutators.Resources.blns.base64.json");
+            Values = LoadStringsFromResource(typeof(BlnsBase64).Assembly, "ByrneLabs.TestoRoboto.HttpServices.Mutators.Resources.blns.base64.txt");
         }
 
         protected BlnsBase64()

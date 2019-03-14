@@ -5,16 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Mutators\Resources\blns.base64.json" />
-    <None Remove="Mutators\Resources\blns.json" />
+    <None Remove="Mutators\Resources\blns.base64.txt" />
+    <None Remove="Mutators\Resources\blns.txt" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Mutators\Resources\blns.json" />
+    <EmbeddedResource Include="Mutators\Resources\blns.txt" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Mutators\Resources\blns.base64.json" />
+    <EmbeddedResource Include="Mutators\Resources\blns.base64.txt" />
   </ItemGroup>
 
   <ItemGroup>

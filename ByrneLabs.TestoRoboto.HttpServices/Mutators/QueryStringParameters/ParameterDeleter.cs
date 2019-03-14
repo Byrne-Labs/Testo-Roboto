@@ -3,11 +3,10 @@ using System.Linq;
 
 namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.QueryStringParameters
 {
-  public  class ParameterDeleter : Mutator
+    public class ParameterDeleter : Mutator
     {
         protected override IEnumerable<RequestMessage> MutateMessage(RequestMessage requestMessage)
         {
-
             var fuzzedRequestMessages = new List<RequestMessage>();
             foreach (var parameter in requestMessage.QueryStringParameters)
             {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
+﻿namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
     public class AwsSignatureAuthenticationViewModel
     {
@@ -17,6 +11,5 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
         public string ServiceName { get; set; }
 
         public string SessionToken { get; set; }
-
     }
 }
