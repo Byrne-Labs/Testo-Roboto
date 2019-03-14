@@ -26,7 +26,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             subCollection.Items.Add(new RequestMessage { Body = new RawBody { Text = "{ \"xyz\": 456 }" } });
 
             var mutator = new Mock<Mutator>();
-            mutator.Setup(m => m.MutateMessage(It.IsAny<RequestMessage>())).Returns((RequestMessage requestMessageToFuzz) =>
+            mutator.Setup(m => m.MutateMessages(It.IsAny<RequestMessage>())).Returns((RequestMessage requestMessageToFuzz) =>
             {
                 var fuzzedRequestMessage = requestMessageToFuzz.Clone();
                 fuzzedRequestMessage.FuzzedMessage = true;

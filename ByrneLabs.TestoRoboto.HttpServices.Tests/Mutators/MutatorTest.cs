@@ -9,7 +9,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests.Mutators
     {
         private class MockMutator : Mutator
         {
-            protected override IEnumerable<RequestMessage> MutateMessage1(RequestMessage requestMessage)
+            protected override IEnumerable<RequestMessage> MutateMessage(RequestMessage requestMessage)
             {
                 var mutatedRequestMessage = requestMessage.Clone();
                 ((RawBody) mutatedRequestMessage.Body).Text = "{ \"xyz\": 456 }";
@@ -24,7 +24,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests.Mutators
             var requestMessage = new RequestMessage { Body = new RawBody { Text = "{ \"abc\": 123 }" } };
 
             var mutator = new MockMutator();
-            var mutatedRequestMessages = mutator.MutateMessage(requestMessage);
+            var mutatedRequestMessages = mutator.MutateMessages(requestMessage);
 
             Assert.Single(mutatedRequestMessages);
             Assert.NotSame(requestMessage, mutatedRequestMessages.Single());

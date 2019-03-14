@@ -30,7 +30,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                 {
                     foreach (var mutator in mutators)
                     {
-                        fuzzedMessages.Items.AddRange(mutator.MutateMessage(nonFuzzedMessage));
+                        fuzzedMessages.Items.AddRange(mutator.MutateMessages(nonFuzzedMessage));
                     }
                 }
 

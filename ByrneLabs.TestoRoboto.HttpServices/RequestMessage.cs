@@ -69,7 +69,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             }
         }
 
-        public new RequestMessage Clone(CloneDepth depth = CloneDepth.Deep) => (RequestMessage) base.Clone(depth);
+        public new RequestMessage Clone(CloneDepth depth = CloneDepth.Deep) => (RequestMessage)base.Clone(depth);
 
         public override bool Validate() => base.Validate() && HttpMethod != null;
 
@@ -88,7 +88,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
                     uriBuilder.Remove(uriBuilder.Length - 1, 1);
 
-                    _uri = new Uri(uriBuilder.ToString());
+                    _uri = new Uri(uriBuilder.Length <= 2083 ? uriBuilder.ToString() : uriBuilder.ToString().Substring(0, 2083));
                 }
             };
         }

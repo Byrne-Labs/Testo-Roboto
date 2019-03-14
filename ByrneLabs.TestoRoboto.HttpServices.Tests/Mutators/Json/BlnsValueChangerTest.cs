@@ -3,12 +3,12 @@ using Xunit;
 
 namespace ByrneLabs.TestoRoboto.HttpServices.Tests.Mutators.Json
 {
-    public class SqlInjectorTest : MutatorTestBase
+    public class BlnsValueChangerTest : MutatorTestBase
     {
         [Fact]
-        public void TestSqlInjector()
+        public void TestBlnsValueChanger()
         {
-            TestJsonMessageCountReturned<SqlInjector>(377);
+            TestJsonMessageCountReturned<BlnsValueChanger>(6552);
         }
     }
 }

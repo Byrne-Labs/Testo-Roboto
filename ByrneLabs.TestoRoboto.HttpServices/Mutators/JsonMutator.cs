@@ -6,7 +6,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Mutators
     {
         protected abstract IEnumerable<string> MutateMessage(string message);
 
-        protected override IEnumerable<RequestMessage> MutateMessage1(RequestMessage requestMessage)
+        protected override IEnumerable<RequestMessage> MutateMessage(RequestMessage requestMessage)
         {
             var mutatedRequestMessages = new List<RequestMessage>();
             if (requestMessage.Body is RawBody rawBody)

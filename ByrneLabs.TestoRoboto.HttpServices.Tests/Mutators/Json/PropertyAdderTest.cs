@@ -3,12 +3,12 @@ using Xunit;
 
 namespace ByrneLabs.TestoRoboto.HttpServices.Tests.Mutators.Json
 {
-    public class PropertyAdderTest : MutatorTest
+    public class PropertyAdderTest : MutatorTestBase
     {
         [Fact]
         public void TestPropertyAdder()
         {
-            TestMessageCountReturned<PropertyAdder>(4);
+            TestJsonMessageCountReturned<PropertyAdder>(4);
         }
     }
 }

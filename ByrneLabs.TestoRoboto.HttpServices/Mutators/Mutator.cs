@@ -4,9 +4,9 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Mutators
 {
     public abstract class Mutator
     {
-        public virtual IEnumerable<RequestMessage> MutateMessage(RequestMessage requestMessage)
+        public virtual IEnumerable<RequestMessage> MutateMessages(RequestMessage requestMessage)
         {
-            var fuzzedRequestMessages = MutateMessage1(requestMessage);
+            var fuzzedRequestMessages = MutateMessage(requestMessage);
             foreach (var fuzzedRequestMessage in fuzzedRequestMessages)
             {
                 fuzzedRequestMessage.FuzzedMessage = true;
@@ -15,6 +15,6 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Mutators
             return fuzzedRequestMessages;
         }
 
-        protected abstract IEnumerable<RequestMessage> MutateMessage1(RequestMessage requestMessage);
+        protected abstract IEnumerable<RequestMessage> MutateMessage(RequestMessage requestMessage);
     }
 }

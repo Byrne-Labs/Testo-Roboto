@@ -3,12 +3,12 @@ using Xunit;
 
 namespace ByrneLabs.TestoRoboto.HttpServices.Tests.Mutators.Json
 {
-    public class ArrayGrowerTest : MutatorTest
+    public class ArrayGrowerTest : MutatorTestBase
     {
         [Fact]
         public void TestArrayGrower()
         {
-            TestMessageCountReturned<ArrayGrower>(4);
+            TestJsonMessageCountReturned<ArrayGrower>(4);
         }
     }
 }

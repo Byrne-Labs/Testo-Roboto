@@ -5,8 +5,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ByrneLabs.Commons" Version="1.0.0.101-alpha" />
-    <PackageReference Include="ByrneLabs.Commons.Domain" Version="1.0.0.101-alpha" />
+    <None Remove="Mutators\Resources\blns.base64.json" />
+    <None Remove="Mutators\Resources\blns.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Mutators\Resources\blns.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Mutators\Resources\blns.base64.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ByrneLabs.Commons" Version="1.0.0.102-alpha" />
+    <PackageReference Include="ByrneLabs.Commons.Domain" Version="1.0.0.102-alpha" />
     <PackageReference Include="ByrneLabs.Serializer" Version="1.0.0.19-alpha" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
   </ItemGroup>

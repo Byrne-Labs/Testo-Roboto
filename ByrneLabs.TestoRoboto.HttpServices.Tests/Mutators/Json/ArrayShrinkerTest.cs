@@ -3,12 +3,12 @@ using Xunit;
 
 namespace ByrneLabs.TestoRoboto.HttpServices.Tests.Mutators.Json
 {
-    public class ArrayShrinkerTest : MutatorTest
+    public class ArrayShrinkerTest : MutatorTestBase
     {
         [Fact]
         public void TestArrayShrinker()
         {
-            TestMessageCountReturned<ArrayShrinker>(3);
+            TestJsonMessageCountReturned<ArrayShrinker>(3);
         }
     }
 }

@@ -3,8 +3,8 @@ using ByrneLabs.TestoRoboto.HttpServices.Mutators.Resources;
 
 namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.Json
 {
-    public class RandomValueChanger : ValueChanger
+    public class BlnsValueChanger : ValueChanger
     {
-        protected override IEnumerable<object> TestValues => RandomValues.Values;
+        protected override IEnumerable<object> TestValues => Blns.Values;
     }
 }
