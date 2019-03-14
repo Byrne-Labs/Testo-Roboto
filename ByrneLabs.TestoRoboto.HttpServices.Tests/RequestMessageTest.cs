@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using Xunit;
 
 namespace ByrneLabs.TestoRoboto.HttpServices.Tests
@@ -44,6 +45,78 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             Assert.Null(requestMessage.QueryStringParameters[2].Description);
             requestMessage.Uri = new Uri("https://some.domain.com/patha/pathb/resource.something?");
             Assert.Empty(requestMessage.QueryStringParameters);
+        }
+
+        [Fact]
+        public void TestGetRequestFingerprint()
+        {
+            var requestMessage = new RequestMessage();
+            requestMessage.HttpMethod = HttpMethod.Get;
+            requestMessage.Uri = new Uri("https://some.domain/path1/path2/resource?Key1=Value%201");
+            requestMessage.Cookies.Add(new Cookie { Name = "Key1", Value = "Value 1" });
+            requestMessage.Headers.Add(new Header { Key = "Key1", Value = "Value 1" });
+            requestMessage.Headers.Add(new Header { Key = "Content-Type", Value = "application/json" });
+            var body = new NoBody();
+            requestMessage.Body = body;
+
+            var expected =
+@"method: GET
+URL: https://some.domain/path1/path2/resource
+query string parameters: Key1
+headers: Key1, Content-Type
+cookies: Key1
+";
+            Assert.Equal(expected, requestMessage.Fingerprint);
+        }
+
+        [Fact]
+        public void TestFormUrlEncodedPostRequestFingerprint()
+        {
+            var requestMessage = new RequestMessage();
+            requestMessage.HttpMethod = HttpMethod.Get;
+            requestMessage.Uri = new Uri("https://some.domain/path1/path2/resource?Key1=Value%201");
+            requestMessage.Cookies.Add(new Cookie { Name = "Key1", Value = "Value 1" });
+            requestMessage.Headers.Add(new Header { Key = "Key1", Value = "Value 1" });
+            requestMessage.Headers.Add(new Header { Key = "Content-Type", Value = "application/json" });
+            var body = new FormUrlEncodedBody();
+            body.FormData.Add(new KeyValue{ Key = "Key1", Value = "Value 1" });
+            body.FormData.Add(new KeyValue { Key = "Key2", Value = "Value 2" });
+            body.FormData.Add(new KeyValue { Key = "Key2", Value = "Value 3" });
+            requestMessage.Body = body;
+
+            var expected =
+                @"method: GET
+URL: https://some.domain/path1/path2/resource
+query string parameters: Key1
+headers: Key1, Content-Type
+cookies: Key1
+body: Key1, Key2, Key2
+";
+            Assert.Equal(expected, requestMessage.Fingerprint);
+        }
+
+        [Fact]
+        public void TestJsonPostRequestFingerprint()
+        {
+            var requestMessage = new RequestMessage();
+            requestMessage.HttpMethod=HttpMethod.Post;
+            requestMessage.Uri = new Uri("https://some.domain/path1/path2/resource?Key1=Value%201");
+            requestMessage.Cookies.Add(new Cookie { Name = "Key1", Value = "Value 1" });
+            requestMessage.Headers.Add(new Header { Key = "Key1", Value = "Value 1" });
+            requestMessage.Headers.Add(new Header { Key = "Content-Type", Value = "application/json" });
+            var body = new RawBody();
+            body.Text = "{ \"prop1\": 123, \"prop2\": [ { \"prop3\": 123 }, { \"prop3\": \"asdf\" } ] }";
+            requestMessage.Body = body;
+
+            var expected = 
+@"method: POST
+URL: https://some.domain/path1/path2/resource
+query string parameters: Key1
+headers: Key1, Content-Type
+cookies: Key1
+body: {""prop1"":null,""prop2"":[{""prop3"":null}]}
+";
+            Assert.Equal(expected, requestMessage.Fingerprint);
         }
     }
 }

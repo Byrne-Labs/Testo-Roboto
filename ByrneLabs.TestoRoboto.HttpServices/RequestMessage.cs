@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using ByrneLabs.Commons;
 using ByrneLabs.Commons.Domain;
+using JetBrains.Annotations;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
+    [PublicAPI]
     public class RequestMessage : Item, IEntity<RequestMessage>
     {
         private ObservableCollection<QueryStringParameter> _queryStringParameters;
@@ -28,11 +33,70 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
         public HttpStatusCode? ExpectedStatusCode { get; set; } = HttpStatusCode.OK;
 
+        public string Fingerprint
+        {
+            get
+            {
+                var fingerprint = new StringBuilder();
+                if (HttpMethod != null)
+                {
+                    fingerprint.Append("method: ").AppendLine(HttpMethod.ToString());
+                }
+
+                if (Uri != null)
+                {
+                    fingerprint.Append("URL: ").Append(Uri.Scheme).Append(Uri.SchemeDelimiter).Append(Uri.Host).AppendLine(Uri.AbsolutePath);
+                }
+
+                if (QueryStringParameters.Any())
+                {
+                    fingerprint.Append("query string parameters: ").AppendLine(string.Join(", ", QueryStringParameters.Select(queryStringParameter => queryStringParameter.Key)));
+                }
+
+                if (Headers.Any())
+                {
+                    fingerprint.Append("headers: ").AppendLine(string.Join(", ", Headers.Select(header => header.Key)));
+                }
+
+                if (Cookies.Any())
+                {
+                    fingerprint.Append("cookies: ").AppendLine(string.Join(", ", Cookies.Select(cookie => cookie.Name)));
+                }
+
+                if (IsBodyContentJson)
+                {
+                    fingerprint.Append("body: ").AppendLine(GetJsonFingerprint(((RawBody) Body).Text));
+                }
+                else if (!(Body is NoBody))
+                {
+                    fingerprint.Append("body: ").AppendLine(Body.Fingerprint);
+                }
+
+                return fingerprint.ToString();
+            }
+        }
+
         public bool FuzzedMessage { get; set; }
 
         public IList<Header> Headers { get; } = new List<Header>();
 
         public HttpMethod HttpMethod { get; set; }
+
+        public bool IsBodyContentJson
+        {
+            get
+            {
+                return Body is RawBody && Headers.Any(header => header.Key == "Content-Type" && header.Value.StartsWith("application/json", StringComparison.Ordinal));
+            }
+        }
+
+        public bool IsBodyContentXml
+        {
+            get
+            {
+                return Body is RawBody && Headers.Any(header => header.Key == "Content-Type" && (header.Value.StartsWith("application/xml", StringComparison.Ordinal) || header.Value.StartsWith("text/xml", StringComparison.Ordinal)));
+            }
+        }
 
         public IList<QueryStringParameter> QueryStringParameters => _queryStringParameters;
 
@@ -58,6 +122,70 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
                 InitializeQueryStringParameters(queryStringParameters);
             }
+        }
+
+        [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
+        private static void ClearValues(JObject json)
+        {
+            foreach (var child in json.Children().OfType<JProperty>())
+            {
+                switch (child.Value)
+                {
+                    case JObject jObject:
+                        ClearValues(jObject);
+                        break;
+                    case JArray jArray:
+                        foreach (var item in jArray.Cast<JObject>())
+                        {
+                            ClearValues(item);
+                        }
+
+                        var itemStrings = new List<string>();
+                        var itemsToRemove = new List<JObject>();
+
+                        foreach (var item in jArray.Cast<JObject>())
+                        {
+                            var itemString = item.ToString(Formatting.None);
+                            if (itemStrings.Contains(itemString))
+                            {
+                                itemsToRemove.Add(item);
+                            }
+                            else
+                            {
+                                itemStrings.Add(itemString);
+                            }
+                        }
+
+                        foreach (var itemToRemove in itemsToRemove)
+                        {
+                            jArray.Remove(itemToRemove);
+                        }
+
+                        break;
+                    case JValue jValue:
+                        jValue.Value = null;
+                        break;
+                    default:
+                        throw new ArgumentException($"Unexpected type {child.GetType()}");
+                }
+            }
+        }
+
+        private static string GetJsonFingerprint(string jsonText)
+        {
+            JObject json;
+            try
+            {
+                json = JObject.Parse(jsonText);
+            }
+            catch
+            {
+                return jsonText;
+            }
+
+            ClearValues(json);
+
+            return json.ToString(Formatting.None);
         }
 
         public override void AssertValid()
