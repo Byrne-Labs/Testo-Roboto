@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
@@ -21,6 +22,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.Json
             return mutatedMessages.Select(mutatedMessage => mutatedMessage.ToString()).ToArray();
         }
 
+        [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
         private IEnumerable<JObject> ChangeValues(JProperty property)
         {
             var mutatedMessages = new List<JObject>();

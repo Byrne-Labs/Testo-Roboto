@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using ByrneLabs.Commons;
 using Newtonsoft.Json.Linq;
@@ -7,6 +8,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.Json
 {
     public class ArrayGrower : JsonMutator
     {
+        [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
         private static JObject AddDuplicate(JArray originalArray, int duplicateCount)
         {
             var clonedMessage = originalArray.Root.DeepClone();

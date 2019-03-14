@@ -17,7 +17,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             if (Items.OfType<RequestMessage>().Any())
             {
                 Collection fuzzedMessages;
-                if (!Items.OfType<Collection>().Any(collection => collection.Name == _fuzzedMessageCollectionName))
+                if (Items.OfType<Collection>().All(collection => collection.Name != _fuzzedMessageCollectionName))
                 {
                     Items.Add(fuzzedMessages = new Collection { Description = "Fuzzed messages", Name = _fuzzedMessageCollectionName });
                 }

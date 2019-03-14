@@ -1,11 +1,6 @@
-﻿using System.Windows.Controls;
-
-namespace ByrneLabs.TestoRoboto.Desktop
+﻿namespace ByrneLabs.TestoRoboto.Desktop
 {
-    /// <summary>
-    ///     Interaction logic for RequestMessage.xaml
-    /// </summary>
-    public partial class RequestMessage : UserControl
+    public partial class RequestMessage
     {
         public RequestMessage()
         {

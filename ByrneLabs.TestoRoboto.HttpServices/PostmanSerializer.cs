@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -54,6 +55,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             return jsonItem;
         }
 
+        [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
         private static JObject ExportToPostman(AuthenticationMethod authentication)
         {
             var jsonAuthentication = new JObject();
@@ -345,6 +347,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             return collection;
         }
 
+        [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
         private static IEnumerable<Item> LoadItems(JArray jsonItems)
         {
             var items = new List<Item>();

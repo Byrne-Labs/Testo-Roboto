@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using ByrneLabs.Commons;
 
 namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.Resources
@@ -16,9 +17,9 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.Resources
             float.MaxValue, float.MinValue,
             int.MaxValue.ToString(), int.MinValue.ToString(), "0", BetterRandom.Next().ToString(),
             long.MaxValue.ToString(), long.MinValue.ToString(), BetterRandom.NextLong().ToString(),
-            decimal.MaxValue.ToString(), decimal.MinValue.ToString(), "0.0",
-            double.MaxValue.ToString(), double.MinValue.ToString(), "00.00",
-            float.MaxValue.ToString(), float.MinValue.ToString(),
+            decimal.MaxValue.ToString(CultureInfo.InvariantCulture), decimal.MinValue.ToString(CultureInfo.InvariantCulture), "0.0",
+            double.MaxValue.ToString(CultureInfo.InvariantCulture), double.MinValue.ToString(CultureInfo.InvariantCulture), "00.00",
+            float.MaxValue.ToString(CultureInfo.InvariantCulture), float.MinValue.ToString(CultureInfo.InvariantCulture),
             "999999999999999999999999999999999999999999999999999999", "-999999999999999999999999999999999999999999999999999999",
             BetterRandom.NextString(10, 10), BetterRandom.NextString(10, 10, BetterRandom.CharacterGroup.Ascii), BetterRandom.NextString(10, 10, BetterRandom.CharacterGroup.ExtendedAscii), BetterRandom.NextString(10, 10, BetterRandom.CharacterGroup.Unicode),
             BetterRandom.NextString(100, 100), BetterRandom.NextString(100, 100, BetterRandom.CharacterGroup.Ascii), BetterRandom.NextString(100, 100, BetterRandom.CharacterGroup.ExtendedAscii), BetterRandom.NextString(100, 100, BetterRandom.CharacterGroup.Unicode),

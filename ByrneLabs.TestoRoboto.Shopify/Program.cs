@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using ByrneLabs.TestoRoboto.HttpServices;
@@ -65,6 +66,10 @@ namespace ByrneLabs.TestoRoboto.Shopify
             dispatcher.Dispatch(testRequest);
 
             var failures = collection.DescendentRequestMessages().Where(request => (int) request.ResponseMessages.First().StatusCode >= 500 && (int) request.ResponseMessages.First().StatusCode < 600).ToList();
+            if (failures.Any())
+            {
+                Debugger.Break();
+            }
         }
     }
 }
