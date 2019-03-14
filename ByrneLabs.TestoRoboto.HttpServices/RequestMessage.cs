@@ -76,8 +76,6 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             }
         }
 
-        public bool FuzzedMessage { get; set; }
-
         public IList<Header> Headers { get; } = new List<Header>();
 
         public HttpMethod HttpMethod { get; set; }
@@ -198,6 +196,8 @@ namespace ByrneLabs.TestoRoboto.HttpServices
         }
 
         public new RequestMessage Clone(CloneDepth depth = CloneDepth.Deep) => (RequestMessage) base.Clone(depth);
+
+        public FuzzedRequestMessage CloneIntoFuzzedRequestMessage() => DeepCloner.CloneInto<FuzzedRequestMessage, RequestMessage>(this);
 
         public override bool Validate() => base.Validate() && HttpMethod != null;
 

@@ -4,7 +4,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 {
     public class TestRequest
     {
-        public bool ExcludeDuplicateFormatRequests { get; set; } = true;
+        public bool ExcludeDuplicateFingerprintRequests { get; set; } = true;
 
         public bool ExcludeUnfuzzableRequests { get; set; } = true;
 

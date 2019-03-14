@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -10,11 +11,16 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 {
     public class Dispatcher
     {
-        public void Dispatch(TestRequest testRequest)
+        public static void Dispatch(TestRequest testRequest)
         {
             var requestMessages = testRequest.Items.OfType<RequestMessage>().Union(testRequest.Items.OfType<Collection>().SelectMany(collection => collection.DescendentRequestMessages())).ToList();
 
-            foreach (var requestMessage in requestMessages.Where(r => !r.FuzzedMessage))
+            if (testRequest.ExcludeDuplicateFingerprintRequests)
+            {
+                RemoveDuplicateFingerprints(requestMessages);
+            }
+
+            foreach (var requestMessage in requestMessages.Where(r => !(r is FuzzedRequestMessage)))
             {
                 DispatchRequest(requestMessage);
                 if (requestMessage.ExpectedStatusCode != null && requestMessage.ResponseMessages.Last().StatusCode != requestMessage.ExpectedStatusCode)
@@ -25,14 +31,14 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                 Thread.Sleep(testRequest.TimeBetweenRequests);
             }
 
-            foreach (var requestMessage in requestMessages.Where(r => r.FuzzedMessage))
+            foreach (var requestMessage in requestMessages.OfType<FuzzedRequestMessage>())
             {
                 DispatchRequest(requestMessage);
                 Thread.Sleep(testRequest.TimeBetweenRequests);
             }
         }
 
-        private void DispatchRequest(RequestMessage requestMessage)
+        private static void DispatchRequest(RequestMessage requestMessage)
         {
             var cookieContainer = new CookieContainer();
             foreach (var cookie in requestMessage.Cookies)
@@ -105,6 +111,28 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                 }
 
                 requestMessage.ResponseMessages.Add(responseMessage);
+            }
+        }
+
+        private static void RemoveDuplicateFingerprints(ICollection<RequestMessage> requestMessages)
+        {
+            var fingerprints = new List<string>();
+            var duplicateRequestMessages = new List<RequestMessage>();
+            foreach (var requestMessage in requestMessages)
+            {
+                if (!fingerprints.Contains(requestMessage.Fingerprint))
+                {
+                    fingerprints.Add(requestMessage.Fingerprint);
+                }
+                else
+                {
+                    duplicateRequestMessages.Add(requestMessage);
+                }
+            }
+
+            foreach (var duplicateRequestMessage in duplicateRequestMessages)
+            {
+                requestMessages.Remove(duplicateRequestMessage);
             }
         }
     }

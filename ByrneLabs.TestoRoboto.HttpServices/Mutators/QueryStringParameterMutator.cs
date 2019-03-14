@@ -5,18 +5,16 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Mutators
 {
     public abstract class QueryStringParameterMutator : Mutator
     {
-        protected abstract IEnumerable<QueryStringParameter> MutateQueryStringParameter(QueryStringParameter queryStringParameter);
-
-        protected override IEnumerable<RequestMessage> MutateMessage(RequestMessage requestMessage)
+        public override IEnumerable<FuzzedRequestMessage> MutateMessage(RequestMessage requestMessage)
         {
-            var fuzzedRequestMessages = new List<RequestMessage>();
+            var fuzzedRequestMessages = new List<FuzzedRequestMessage>();
             foreach (var queryStringParameter in requestMessage.QueryStringParameters)
             {
                 var queryStringParameterIndex = requestMessage.QueryStringParameters.IndexOf(queryStringParameter);
                 var fuzzedParameters = MutateQueryStringParameter(queryStringParameter.Clone());
                 foreach (var fuzzedParameter in fuzzedParameters)
                 {
-                    var fuzzedRequestMessage = requestMessage.Clone();
+                    var fuzzedRequestMessage = requestMessage.CloneIntoFuzzedRequestMessage();
                     var unfuzzedParameter = fuzzedRequestMessage.QueryStringParameters.Single(p => p.Key == queryStringParameter.Key);
                     fuzzedRequestMessage.QueryStringParameters.Remove(unfuzzedParameter);
                     fuzzedRequestMessage.QueryStringParameters.Insert(queryStringParameterIndex, fuzzedParameter);
@@ -26,5 +24,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Mutators
 
             return fuzzedRequestMessages;
         }
+
+        protected abstract IEnumerable<QueryStringParameter> MutateQueryStringParameter(QueryStringParameter queryStringParameter);
     }
 }

@@ -5,18 +5,16 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Mutators
 {
     public abstract class HeaderMutator : Mutator
     {
-        protected abstract IEnumerable<Header> MutateHeader(Header header);
-
-        protected override IEnumerable<RequestMessage> MutateMessage(RequestMessage requestMessage)
+        public override IEnumerable<FuzzedRequestMessage> MutateMessage(RequestMessage requestMessage)
         {
-            var fuzzedRequestMessages = new List<RequestMessage>();
+            var fuzzedRequestMessages = new List<FuzzedRequestMessage>();
             foreach (var header in requestMessage.Headers)
             {
                 var headerIndex = requestMessage.Headers.IndexOf(header);
                 var fuzzedHeaders = MutateHeader(header.Clone());
                 foreach (var fuzzedHeader in fuzzedHeaders)
                 {
-                    var fuzzedRequestMessage = requestMessage.Clone();
+                    var fuzzedRequestMessage = requestMessage.CloneIntoFuzzedRequestMessage();
                     var unfuzzedParameter = fuzzedRequestMessage.Headers.Single(h => h.Key == header.Key);
                     fuzzedRequestMessage.Headers.Remove(unfuzzedParameter);
                     fuzzedRequestMessage.Headers.Insert(headerIndex, fuzzedHeader);
@@ -26,5 +24,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Mutators
 
             return fuzzedRequestMessages;
         }
+
+        protected abstract IEnumerable<Header> MutateHeader(Header header);
     }
 }

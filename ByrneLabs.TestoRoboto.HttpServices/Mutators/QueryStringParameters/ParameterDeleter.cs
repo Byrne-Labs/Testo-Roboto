@@ -5,12 +5,12 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.QueryStringParameters
 {
     public class ParameterDeleter : Mutator
     {
-        protected override IEnumerable<RequestMessage> MutateMessage(RequestMessage requestMessage)
+        public override IEnumerable<FuzzedRequestMessage> MutateMessage(RequestMessage requestMessage)
         {
-            var fuzzedRequestMessages = new List<RequestMessage>();
+            var fuzzedRequestMessages = new List<FuzzedRequestMessage>();
             foreach (var parameter in requestMessage.QueryStringParameters)
             {
-                var fuzzedRequestMessage = requestMessage.Clone();
+                var fuzzedRequestMessage = requestMessage.CloneIntoFuzzedRequestMessage();
                 var unfuzzedParameter = fuzzedRequestMessage.QueryStringParameters.Single(p => p.Key == parameter.Key);
                 fuzzedRequestMessage.QueryStringParameters.Remove(unfuzzedParameter);
                 fuzzedRequestMessages.Add(fuzzedRequestMessage);

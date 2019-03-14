@@ -27,10 +27,9 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             collection.Items.Add(requestMessage);
 
             var mutator = new Mock<Mutator>();
-            mutator.Setup(m => m.MutateMessages(It.IsAny<RequestMessage>())).Returns((RequestMessage requestMessageToFuzz) =>
+            mutator.Setup(m => m.MutateMessage(It.IsAny<RequestMessage>())).Returns((RequestMessage requestMessageToFuzz) =>
             {
-                var fuzzedRequestMessage = requestMessageToFuzz.Clone();
-                fuzzedRequestMessage.FuzzedMessage = true;
+                var fuzzedRequestMessage = requestMessageToFuzz.CloneIntoFuzzedRequestMessage();
                 ((RawBody) fuzzedRequestMessage.Body).Text = "asdf 123";
 
                 return new[] { fuzzedRequestMessage };
@@ -41,8 +40,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             testRequest.TimeBetweenRequests = 500;
             testRequest.Items.Add(collection);
 
-            var dispatcher = new Dispatcher();
-            dispatcher.Dispatch(testRequest);
+            Dispatcher.Dispatch(testRequest);
 
             Assert.Single(requestMessage.ResponseMessages);
             Assert.Equal(HttpStatusCode.OK, requestMessage.ResponseMessages.Single().StatusCode);

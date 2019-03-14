@@ -21,7 +21,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests.Mutators
             requestMessage.QueryStringParameters.Add(new QueryStringParameter { Key = "Parameter1", Value = "Value1" });
             requestMessage.QueryStringParameters.Add(new QueryStringParameter { Key = "Parameter2", Value = "Value2" });
 
-            var mutatedMessages = mutator.MutateMessages(requestMessage);
+            var mutatedMessages = mutator.MutateMessage(requestMessage);
 
             Assert.NotNull(mutatedMessages);
             Assert.NotEmpty(mutatedMessages);
@@ -73,7 +73,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests.Mutators
             requestMessage.QueryStringParameters.Add(new QueryStringParameter { Key = "Parameter1", Value = "Value1" });
             requestMessage.QueryStringParameters.Add(new QueryStringParameter { Key = "Parameter2", Value = "Value2" });
 
-            var mutatedMessages = mutator.MutateMessages(requestMessage);
+            var mutatedMessages = mutator.MutateMessage(requestMessage);
 
             Assert.NotNull(mutatedMessages);
             Assert.NotEmpty(mutatedMessages);

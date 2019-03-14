@@ -26,11 +26,11 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                     fuzzedMessages = Items.OfType<Collection>().Single(collection => collection.Name == _fuzzedMessageCollectionName);
                 }
 
-                foreach (var nonFuzzedMessage in Items.OfType<RequestMessage>().Where(message => !message.FuzzedMessage))
+                foreach (var nonFuzzedMessage in Items.OfType<RequestMessage>().Where(message => !(message is FuzzedRequestMessage)))
                 {
                     foreach (var mutator in mutators)
                     {
-                        fuzzedMessages.Items.AddRange(mutator.MutateMessages(nonFuzzedMessage));
+                        fuzzedMessages.Items.AddRange(mutator.MutateMessage(nonFuzzedMessage));
                     }
                 }
 

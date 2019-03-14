@@ -5,17 +5,17 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.FormParameters
 {
     public class ParameterDeleter : Mutator
     {
-        protected override IEnumerable<RequestMessage> MutateMessage(RequestMessage requestMessage)
+        public override IEnumerable<FuzzedRequestMessage> MutateMessage(RequestMessage requestMessage)
         {
             if (!(requestMessage.Body is FormDataBody formDataBody))
             {
-                return Enumerable.Empty<RequestMessage>();
+                return Enumerable.Empty<FuzzedRequestMessage>();
             }
 
-            var fuzzedRequestMessages = new List<RequestMessage>();
+            var fuzzedRequestMessages = new List<FuzzedRequestMessage>();
             foreach (var parameter in formDataBody.FormData)
             {
-                var fuzzedRequestMessage = requestMessage.Clone();
+                var fuzzedRequestMessage = requestMessage.CloneIntoFuzzedRequestMessage();
                 var fuzzedFormDataBody = fuzzedRequestMessage.Body as FormDataBody;
                 var unfuzzedParameter = fuzzedFormDataBody.FormData.Single(p => p.Key == parameter.Key);
                 fuzzedFormDataBody.FormData.Remove(unfuzzedParameter);
