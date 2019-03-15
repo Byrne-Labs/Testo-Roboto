@@ -42,7 +42,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                     requestMessage.Cookies.Add(cookie);
                 }
 
-                if (harEntry["postData"] is JObject harPostData)
+                if (harEntry["request"]["postData"] is JObject harPostData)
                 {
                     var postMimeType = harPostData["mimeType"].ToString();
                     if (postMimeType.Contains("application/x-www-form-urlencoded") || requestMessage.Headers.Any(header => header.Key == "Content-Type" && header.Value.Contains("application/x-www-form-urlencoded")))
@@ -65,6 +65,10 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
                         requestMessage.Body = rawBody;
                     }
+                }
+                else
+                {
+                    requestMessage.Body = new NoBody();
                 }
 
                 var responseMessage = new ResponseMessage();
