@@ -20,7 +20,8 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             var json = JObject.Parse(collectionText);
             var collection = new Collection();
             collection.Name = "Import from HTTP archive";
-            foreach (var harEntry in json["log"]["entries"].Cast<JObject>())
+            var entries = (JArray) json["log"]["entries"];
+            foreach (var harEntry in entries.Cast<JObject>())
             {
                 var requestMessage = new RequestMessage();
                 requestMessage.HttpMethod = HttpTools.HttpMethodFromString(harEntry["request"]["method"].ToString());
@@ -39,6 +40,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                     var cookie = new Cookie();
                     cookie.Name = harCookie["name"].ToString();
                     cookie.Value = harCookie["value"].ToString();
+                    cookie.Domain = requestMessage.Uri.Host;
                     requestMessage.Cookies.Add(cookie);
                 }
 

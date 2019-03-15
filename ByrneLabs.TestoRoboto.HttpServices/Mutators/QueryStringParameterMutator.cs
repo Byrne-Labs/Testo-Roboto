@@ -15,7 +15,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Mutators
                 foreach (var fuzzedParameter in fuzzedParameters)
                 {
                     var fuzzedRequestMessage = requestMessage.CloneIntoFuzzedRequestMessage();
-                    var unfuzzedParameter = fuzzedRequestMessage.QueryStringParameters.Single(p => p.Key == queryStringParameter.Key);
+                    var unfuzzedParameter = fuzzedRequestMessage.QueryStringParameters.First(p => p.Key == queryStringParameter.Key);
                     fuzzedRequestMessage.QueryStringParameters.Remove(unfuzzedParameter);
                     fuzzedRequestMessage.QueryStringParameters.Insert(queryStringParameterIndex, fuzzedParameter);
                     fuzzedRequestMessages.Add(fuzzedRequestMessage);

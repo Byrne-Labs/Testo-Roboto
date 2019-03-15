@@ -8,22 +8,22 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 {
     public class Collection : Item, IEntity<Collection>
     {
-        private const string _fuzzedMessageCollectionName = "Fuzzed Messages";
-
         public List<Item> Items { get; } = new List<Item>();
+
+        private bool FuzzedMessageCollection { get; set; }
 
         public void AddFuzzedMessages(IEnumerable<Mutator> mutators, bool includeSubCollections)
         {
             if (Items.OfType<RequestMessage>().Any())
             {
                 Collection fuzzedMessages;
-                if (Items.OfType<Collection>().All(collection => collection.Name != _fuzzedMessageCollectionName))
+                if (Items.OfType<Collection>().All(collection => collection.FuzzedMessageCollection))
                 {
-                    Items.Add(fuzzedMessages = new Collection { Description = "Fuzzed messages", Name = _fuzzedMessageCollectionName });
+                    Items.Add(fuzzedMessages = new Collection { FuzzedMessageCollection = true, Description = "Fuzzed messages", Name = "Fuzzed Messages" });
                 }
                 else
                 {
-                    fuzzedMessages = Items.OfType<Collection>().Single(collection => collection.Name == _fuzzedMessageCollectionName);
+                    fuzzedMessages = Items.OfType<Collection>().Single(collection => collection.FuzzedMessageCollection);
                 }
 
                 foreach (var nonFuzzedMessage in Items.OfType<RequestMessage>().Where(message => !(message is FuzzedRequestMessage)))
@@ -36,9 +36,9 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
                 if (includeSubCollections)
                 {
-                    foreach (var subcollection in Items.OfType<Collection>().Where(c => c.Name != _fuzzedMessageCollectionName))
+                    foreach (var subCollection in Items.OfType<Collection>().Where(c => !c.FuzzedMessageCollection))
                     {
-                        subcollection.AddFuzzedMessages(mutators, true);
+                        subCollection.AddFuzzedMessages(mutators, true);
                     }
                 }
             }
@@ -53,9 +53,57 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             }
         }
 
-        public new Collection Clone(CloneDepth depth = CloneDepth.Deep) => (Collection) base.Clone(depth);
+        public new Collection Clone(CloneDepth depth = CloneDepth.Deep) => (Collection)base.Clone(depth);
 
         public IEnumerable<RequestMessage> DescendentRequestMessages() => Items.OfType<RequestMessage>().Union(Items.OfType<Collection>().SelectMany(collection => collection.DescendentRequestMessages()));
+
+        public void RemoveDuplicateFingerprints(bool includeSubCollections)
+        {
+            var fingerprints = new List<string>();
+            var duplicateRequestMessages = new List<RequestMessage>();
+            foreach (var requestMessage in Items.OfType<RequestMessage>().Where(rm => !(rm is FuzzedRequestMessage)))
+            {
+                if (!fingerprints.Contains(requestMessage.Fingerprint))
+                {
+                    fingerprints.Add(requestMessage.Fingerprint);
+                }
+                else
+                {
+                    duplicateRequestMessages.Add(requestMessage);
+                }
+            }
+
+            foreach (var duplicateRequestMessage in duplicateRequestMessages)
+            {
+                Items.Remove(duplicateRequestMessage);
+            }
+
+            var fuzzedMessages = Items.OfType<Collection>().SingleOrDefault(collection => collection.FuzzedMessageCollection);
+            if (fuzzedMessages != null)
+            {
+                var duplicatedFuzzedRequestMessages = new List<FuzzedRequestMessage>();
+                foreach (var fuzzedRequestMessage in fuzzedMessages.Items.OfType<FuzzedRequestMessage>())
+                {
+                    if (duplicateRequestMessages.Contains(fuzzedRequestMessage.SourceRequestMessage))
+                    {
+                        duplicatedFuzzedRequestMessages.Add(fuzzedRequestMessage);
+                    }
+                }
+
+                foreach (var duplicatedFuzzedRequestMessage in duplicatedFuzzedRequestMessages)
+                {
+                    fuzzedMessages.Items.Remove(duplicatedFuzzedRequestMessage);
+                }
+            }
+
+            if (includeSubCollections)
+            {
+                foreach (var subCollection in Items.OfType<Collection>().Where(sc => !sc.FuzzedMessageCollection))
+                {
+                    subCollection.RemoveDuplicateFingerprints(includeSubCollections);
+                }
+            }
+        }
 
         public override bool Validate() => base.Validate() && Items.All(item => item.Validate());
     }

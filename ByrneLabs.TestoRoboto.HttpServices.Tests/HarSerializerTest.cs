@@ -50,5 +50,14 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             Assert.Equal(HttpMethod.Post, requestMessage.HttpMethod);
             Assert.IsType<RawBody>(requestMessage.Body);
         }
+
+        [Fact]
+        public void TestHar3Serialize()
+        {
+            var harSerializer = new HarSerializer();
+            var collection = harSerializer.ReadFromFile("TestData\\Sample3.har");
+
+            Assert.Equal(2, collection.Items.Count);
+        }
     }
 }

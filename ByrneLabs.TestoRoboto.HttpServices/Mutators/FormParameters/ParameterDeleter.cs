@@ -17,7 +17,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.FormParameters
             {
                 var fuzzedRequestMessage = requestMessage.CloneIntoFuzzedRequestMessage();
                 var fuzzedFormDataBody = fuzzedRequestMessage.Body as FormDataBody;
-                var unfuzzedParameter = fuzzedFormDataBody.FormData.Single(p => p.Key == parameter.Key);
+                var unfuzzedParameter = fuzzedFormDataBody.FormData.First(p => p.Key == parameter.Key);
                 fuzzedFormDataBody.FormData.Remove(unfuzzedParameter);
                 fuzzedRequestMessages.Add(fuzzedRequestMessage);
             }

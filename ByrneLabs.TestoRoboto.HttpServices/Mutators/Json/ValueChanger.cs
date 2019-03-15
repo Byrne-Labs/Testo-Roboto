@@ -12,11 +12,18 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.Json
 
         protected override IEnumerable<string> MutateMessage(string message)
         {
-            var jObject = JObject.Parse(message);
             var mutatedMessages = new List<JObject>();
-            foreach (var property in jObject.Descendants().OfType<JProperty>().Where(p => p.HasValues))
+            try
             {
-                mutatedMessages.AddRange(ChangeValues(property));
+                var jObject = JObject.Parse(message);
+                foreach (var property in jObject.Descendants().OfType<JProperty>().Where(p => p.HasValues))
+                {
+                    mutatedMessages.AddRange(ChangeValues(property));
+                }
+            }
+            catch
+            {
+                //we should probably log something here for debugging purposes
             }
 
             return mutatedMessages.Select(mutatedMessage => mutatedMessage.ToString()).ToArray();

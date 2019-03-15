@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
@@ -15,31 +16,47 @@ namespace ByrneLabs.TestoRoboto.HttpServices
         {
             var requestMessages = testRequest.Items.OfType<RequestMessage>().Union(testRequest.Items.OfType<Collection>().SelectMany(collection => collection.DescendentRequestMessages())).ToList();
 
-            if (testRequest.ExcludeDuplicateFingerprintRequests)
-            {
-                RemoveDuplicateFingerprints(requestMessages);
-            }
-
             if (testRequest.ExcludeUnfuzzableRequests)
             {
                 RemoveUnfuzzableRequestMessages(requestMessages);
             }
 
-            foreach (var requestMessage in requestMessages.Where(r => !(r is FuzzedRequestMessage)))
+            if (testRequest.TimeBetweenRequests > 0)
             {
-                DispatchRequest(requestMessage);
-                if (requestMessage.ExpectedStatusCode != null && requestMessage.ResponseMessages.Last().StatusCode != requestMessage.ExpectedStatusCode)
+                foreach (var requestMessage in requestMessages.Where(r => !(r is FuzzedRequestMessage)))
                 {
-                    throw new HttpRequestException($"The unfuzzed message request returned a status code of {requestMessage.ResponseMessages.Last().StatusCode} instead of the expected {requestMessage.ExpectedStatusCode}");
-                }
+                    DispatchRequest(requestMessage);
+                    if (requestMessage.ExpectedStatusCode != null && requestMessage.ResponseMessages.Last().StatusCode != requestMessage.ExpectedStatusCode)
+                    {
+                        throw new HttpRequestException($"The unfuzzed message request returned a status code of {requestMessage.ResponseMessages.Last().StatusCode} instead of the expected {requestMessage.ExpectedStatusCode}");
+                    }
 
-                Thread.Sleep(testRequest.TimeBetweenRequests);
+                    Thread.Sleep(testRequest.TimeBetweenRequests);
+                }
+            }
+            else
+            {
+                Parallel.ForEach(requestMessages.OfType<FuzzedRequestMessage>(), requestMessage =>
+                {
+                    DispatchRequest(requestMessage);
+                    if (requestMessage.ExpectedStatusCode != null && requestMessage.ResponseMessages.Last().StatusCode != requestMessage.ExpectedStatusCode)
+                    {
+                        throw new HttpRequestException($"The unfuzzed message request returned a status code of {requestMessage.ResponseMessages.Last().StatusCode} instead of the expected {requestMessage.ExpectedStatusCode}");
+                    }
+                });
             }
 
-            foreach (var requestMessage in requestMessages.OfType<FuzzedRequestMessage>())
+            if (testRequest.TimeBetweenRequests > 0)
             {
-                DispatchRequest(requestMessage);
-                Thread.Sleep(testRequest.TimeBetweenRequests);
+                foreach (var requestMessage in requestMessages.OfType<FuzzedRequestMessage>())
+                {
+                    DispatchRequest(requestMessage);
+                    Thread.Sleep(testRequest.TimeBetweenRequests);
+                }
+            }
+            else
+            {
+                Parallel.ForEach(requestMessages.OfType<FuzzedRequestMessage>(), DispatchRequest);
             }
         }
 
@@ -93,57 +110,42 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                 var responseMessage = new ResponseMessage();
                 responseMessage.RequestSent = DateTime.Now;
 
-                var httpResult = httpClient.SendAsync(httpRequestMessage).Result;
-
-                responseMessage.Received = DateTime.Now;
-                responseMessage.Content = httpResult.Content.ReadAsStringAsync().Result;
-                foreach (var httpHeader in httpResult.Headers)
+                try
                 {
-                    var header = new Header();
-                    header.Key = httpHeader.Key;
-                    header.Value = string.Join(", ", httpHeader.Value);
-                    responseMessage.Headers.Add(header);
-                }
+                    var httpResult = httpClient.SendAsync(httpRequestMessage).Result;
 
-                foreach (var httpCookie in cookieContainer.GetCookies(requestMessage.Uri).Cast<System.Net.Cookie>())
+                    responseMessage.Received = DateTime.Now;
+                    responseMessage.Content = httpResult.Content.ReadAsStringAsync().Result;
+                    foreach (var httpHeader in httpResult.Headers)
+                    {
+                        var header = new Header();
+                        header.Key = httpHeader.Key;
+                        header.Value = string.Join(", ", httpHeader.Value);
+                        responseMessage.Headers.Add(header);
+                    }
+
+                    foreach (var httpCookie in cookieContainer.GetCookies(requestMessage.Uri).Cast<System.Net.Cookie>())
+                    {
+                        var cookie = new Cookie();
+                        cookie.Name = httpCookie.Name;
+                        cookie.Value = httpCookie.Value;
+                        cookie.Domain = httpCookie.Domain;
+                        cookie.Path = httpCookie.Path;
+                        responseMessage.Cookies.Add(cookie);
+                    }
+
+                    requestMessage.ResponseMessages.Add(responseMessage);
+                }
+                catch
                 {
-                    var cookie = new Cookie();
-                    cookie.Name = httpCookie.Name;
-                    cookie.Value = httpCookie.Value;
-                    cookie.Domain = httpCookie.Domain;
-                    cookie.Path = httpCookie.Path;
-                    responseMessage.Cookies.Add(cookie);
+                    //log exception but keep going
                 }
-
-                requestMessage.ResponseMessages.Add(responseMessage);
-            }
-        }
-
-        private static void RemoveDuplicateFingerprints(ICollection<RequestMessage> requestMessages)
-        {
-            var fingerprints = new List<string>();
-            var duplicateRequestMessages = new List<RequestMessage>();
-            foreach (var requestMessage in requestMessages)
-            {
-                if (!fingerprints.Contains(requestMessage.Fingerprint))
-                {
-                    fingerprints.Add(requestMessage.Fingerprint);
-                }
-                else
-                {
-                    duplicateRequestMessages.Add(requestMessage);
-                }
-            }
-
-            foreach (var duplicateRequestMessage in duplicateRequestMessages)
-            {
-                requestMessages.Remove(duplicateRequestMessage);
             }
         }
 
         private static void RemoveUnfuzzableRequestMessages(ICollection<RequestMessage> requestMessages)
         {
-            var requestMessagesToRemove = requestMessages.Where(requestMessage => !(requestMessage is FuzzedRequestMessage) && !requestMessages.OfType<FuzzedRequestMessage>().Any(fuzzedRequestMessage => fuzzedRequestMessage.SourceRequestMessage == requestMessage));
+            var requestMessagesToRemove = requestMessages.Where(requestMessage => !(requestMessage is FuzzedRequestMessage) && !requestMessages.OfType<FuzzedRequestMessage>().Any(fuzzedRequestMessage => ReferenceEquals(fuzzedRequestMessage.SourceRequestMessage, requestMessage))).ToArray();
             foreach (var requestMessageToRemove in requestMessagesToRemove)
             {
                 requestMessages.Remove(requestMessageToRemove);

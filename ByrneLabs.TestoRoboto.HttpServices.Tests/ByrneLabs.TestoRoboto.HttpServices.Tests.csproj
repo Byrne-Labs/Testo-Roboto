@@ -25,7 +25,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="TestData\Sample.har">
+    <None Update="TestData\Sample1.har">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\Sample2.har">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TestData\Sample3.har">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

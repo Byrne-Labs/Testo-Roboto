@@ -11,7 +11,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Mutators.Headers
             foreach (var header in requestMessage.Headers)
             {
                 var fuzzedRequestMessage = requestMessage.CloneIntoFuzzedRequestMessage();
-                var unfuzzedHeader = fuzzedRequestMessage.Headers.Single(p => p.Key == header.Key);
+                var unfuzzedHeader = fuzzedRequestMessage.Headers.First(p => p.Key == header.Key);
                 fuzzedRequestMessage.Headers.Remove(unfuzzedHeader);
                 fuzzedRequestMessages.Add(fuzzedRequestMessage);
             }

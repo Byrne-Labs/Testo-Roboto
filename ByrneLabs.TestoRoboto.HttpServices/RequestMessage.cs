@@ -133,7 +133,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                         ClearValues(jObject);
                         break;
                     case JArray jArray:
-                        foreach (var item in jArray.Cast<JObject>())
+                        foreach (var item in jArray.OfType<JObject>())
                         {
                             ClearValues(item);
                         }
@@ -141,7 +141,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                         var itemStrings = new List<string>();
                         var itemsToRemove = new List<JObject>();
 
-                        foreach (var item in jArray.Cast<JObject>())
+                        foreach (var item in jArray.OfType<JObject>())
                         {
                             var itemString = item.ToString(Formatting.None);
                             if (itemStrings.Contains(itemString))
