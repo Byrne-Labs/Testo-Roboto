@@ -18,6 +18,8 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
         public bool RandomizeOrder { get; set; } = true;
 
+        public IList<string> ResponseErrorsToIgnore { get; set; } = new List<string>();
+
         public SessionData SessionData { get; set; } = new SessionData();
 
         public int TimeBetweenRequests { get; set; }

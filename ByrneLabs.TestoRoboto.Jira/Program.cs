@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using ByrneLabs.TestoRoboto.HttpServices;
@@ -39,9 +40,22 @@ namespace ByrneLabs.TestoRoboto.Jira
 
             var testRequest = new TestRequest();
             testRequest.OnTheFlyMutators.Add(new BlnsValueChanger());
+            testRequest.OnTheFlyMutators.Add(new HttpServices.Mutators.FormParameters.BlnsValueChanger());
+            testRequest.OnTheFlyMutators.Add(new HttpServices.Mutators.Headers.BlnsValueChanger());
+            testRequest.OnTheFlyMutators.Add(new HttpServices.Mutators.QueryStringParameters.BlnsValueChanger());
             testRequest.Items.Add(collection);
             testRequest.SessionData = GetSessionData();
             testRequest.LogDirectory = "server-errors";
+            testRequest.ResponseErrorsToIgnore = new List<string>
+            {
+                @"Can not deserialize instance of java\.util\.HashSet out of VALUE_STRING token.*com\.atlassian\.greenhopper\.web\.rapid\.view\.CreatePresetsRequest\[\\""\w+\\""\]",
+                @"Can not construct instance of boolean from String value .*: only \\""true\\"" or \\""false\\"" recognized",
+                @"Can not deserialize instance of java\.util\.ArrayList out of VALUE_STRING token.*com\.atlassian\.webresource\.plugin\.rest\.Request\[\\""\w+\\""\]",
+                @"java\.lang\.RuntimeException: Error parsing JQL",
+                @"Can not deserialize instance of java\.util\.ArrayList out of VALUE_STRING token.*com\.atlassian\.jira\.quickedit\.rest\.api\.UserPreferences\[\\""\w+\\""]",
+                @"Uploading the avatar has failed\. Please check that you are logged in and have sufficient permissions",
+                @"Can not instantiate value of type \[map type; class java\.util\.LinkedHashMap, \[simple type, class java\.lang\.String\] -> \[simple type, class java\.lang\.String\]\] from JSON String"
+            };
 
             Dispatcher.Dispatch(testRequest);
         }

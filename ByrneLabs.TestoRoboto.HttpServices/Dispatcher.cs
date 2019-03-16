@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using ByrneLabs.Commons;
@@ -13,46 +14,67 @@ using Newtonsoft.Json.Linq;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public static class Dispatcher
+    public class Dispatcher
     {
-        public static IEnumerable<ResponseMessage> Dispatch(TestRequest testRequest)
+        private readonly TestRequest _testRequest;
+
+        private Dispatcher(TestRequest testRequest)
         {
-            if (!string.IsNullOrWhiteSpace(testRequest.LogDirectory))
+            _testRequest = testRequest;
+        }
+
+        public static IEnumerable<ResponseMessage> Dispatch(TestRequest testRequest) => new Dispatcher(testRequest).Dispatch();
+
+        public static ResponseMessage Dispatch(RequestMessage requestMessage) => new Dispatcher(new TestRequest { Items = { requestMessage }, LogServerErrors = false, ExcludeUnfuzzableRequests = false }).Dispatch().Single();
+
+        private static void RemoveUnfuzzableRequestMessages(ICollection<RequestMessage> requestMessages)
+        {
+            var requestMessagesToRemove = requestMessages.Where(requestMessage => !(requestMessage is FuzzedRequestMessage) && !requestMessages.OfType<FuzzedRequestMessage>().Any(fuzzedRequestMessage => ReferenceEquals(fuzzedRequestMessage.SourceRequestMessage, requestMessage))).ToArray();
+            foreach (var requestMessageToRemove in requestMessagesToRemove)
             {
-                Directory.CreateDirectory(testRequest.LogDirectory);
+                requestMessages.Remove(requestMessageToRemove);
             }
-            var requestMessages = testRequest.GetAllRequestMessages().ToList();
-            if (testRequest.RandomizeOrder)
+        }
+
+        private IEnumerable<ResponseMessage> Dispatch()
+        {
+            if (!string.IsNullOrWhiteSpace(_testRequest.LogDirectory))
+            {
+                Directory.CreateDirectory(_testRequest.LogDirectory);
+            }
+
+            var requestMessages = _testRequest.GetAllRequestMessages().ToList();
+            if (_testRequest.RandomizeOrder)
             {
                 requestMessages = requestMessages.OrderBy(x => BetterRandom.Next()).ToList();
             }
 
-            if (testRequest.ExcludeUnfuzzableRequests && !testRequest.OnTheFlyMutators.Any())
+            if (_testRequest.ExcludeUnfuzzableRequests && !_testRequest.OnTheFlyMutators.Any())
             {
                 RemoveUnfuzzableRequestMessages(requestMessages);
             }
 
             var responseMessages = new List<ResponseMessage>();
 
-            if (testRequest.TimeBetweenRequests > 0)
+            if (_testRequest.TimeBetweenRequests > 0)
             {
                 foreach (var requestMessage in requestMessages.Where(r => !(r is FuzzedRequestMessage)))
                 {
-                    var responseMessage = DispatchRequest(requestMessage, testRequest.SessionData, testRequest.LogServerErrors, testRequest.LogDirectory);
+                    var responseMessage = DispatchRequest(requestMessage);
                     responseMessages.Add(responseMessage);
                     if (requestMessage.ExpectedStatusCode != null && responseMessage.StatusCode != requestMessage.ExpectedStatusCode)
                     {
                         throw new HttpRequestException($"The unfuzzed message request returned a status code of {responseMessage.StatusCode} instead of the expected {requestMessage.ExpectedStatusCode}");
                     }
 
-                    Thread.Sleep(testRequest.TimeBetweenRequests);
+                    Thread.Sleep(_testRequest.TimeBetweenRequests);
                 }
             }
             else
             {
-                Parallel.ForEach(requestMessages.OfType<FuzzedRequestMessage>(), requestMessage =>
+                Parallel.ForEach(requestMessages.Where(r => !(r is FuzzedRequestMessage)), requestMessage =>
                 {
-                    var responseMessage = DispatchRequest(requestMessage, testRequest.SessionData, testRequest.LogServerErrors, testRequest.LogDirectory);
+                    var responseMessage = DispatchRequest(requestMessage);
                     responseMessages.Add(responseMessage);
                     if (requestMessage.ExpectedStatusCode != null && responseMessage.StatusCode != requestMessage.ExpectedStatusCode)
                     {
@@ -61,24 +83,24 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                 });
             }
 
-            if (testRequest.TimeBetweenRequests > 0)
+            if (_testRequest.TimeBetweenRequests > 0)
             {
                 foreach (var requestMessage in requestMessages.OfType<FuzzedRequestMessage>())
                 {
-                    var responseMessage = DispatchRequest(requestMessage, testRequest.SessionData, testRequest.LogServerErrors, testRequest.LogDirectory);
+                    var responseMessage = DispatchRequest(requestMessage);
                     responseMessages.Add(responseMessage);
-                    Thread.Sleep(testRequest.TimeBetweenRequests);
+                    Thread.Sleep(_testRequest.TimeBetweenRequests);
                 }
 
-                foreach (var mutator in testRequest.OnTheFlyMutators)
+                foreach (var mutator in _testRequest.OnTheFlyMutators)
                 {
                     foreach (var requestMessage in requestMessages.Where(r => !(r is FuzzedRequestMessage)))
                     {
                         foreach (var mutatedRequestMessage in mutator.MutateMessage(requestMessage))
                         {
-                            var responseMessage = DispatchRequest(mutatedRequestMessage, testRequest.SessionData, testRequest.LogServerErrors, testRequest.LogDirectory);
+                            var responseMessage = DispatchRequest(mutatedRequestMessage);
                             responseMessages.Add(responseMessage);
-                            Thread.Sleep(testRequest.TimeBetweenRequests);
+                            Thread.Sleep(_testRequest.TimeBetweenRequests);
                         }
                     }
                 }
@@ -87,16 +109,16 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             {
                 Parallel.ForEach(requestMessages.OfType<FuzzedRequestMessage>(), fuzzedRequestMessage =>
                 {
-                    var responseMessage = DispatchRequest(fuzzedRequestMessage, testRequest.SessionData, testRequest.LogServerErrors, testRequest.LogDirectory);
+                    var responseMessage = DispatchRequest(fuzzedRequestMessage);
                     responseMessages.Add(responseMessage);
                 });
-                Parallel.ForEach(testRequest.OnTheFlyMutators, mutator =>
+                Parallel.ForEach(_testRequest.OnTheFlyMutators, mutator =>
                 {
                     Parallel.ForEach(requestMessages.Where(r => !(r is FuzzedRequestMessage)), requestMessage =>
                     {
                         Parallel.ForEach(mutator.MutateMessage(requestMessage), mutatedRequestMessage =>
                         {
-                            var responseMessage = DispatchRequest(mutatedRequestMessage, testRequest.SessionData, testRequest.LogServerErrors, testRequest.LogDirectory);
+                            var responseMessage = DispatchRequest(mutatedRequestMessage);
                             responseMessages.Add(responseMessage);
                         });
                     });
@@ -106,27 +128,32 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             return responseMessages;
         }
 
-        public static ResponseMessage Dispatch(RequestMessage requestMessage) => DispatchRequest(requestMessage, new SessionData(), false, string.Empty);
-
-        private static ResponseMessage DispatchRequest(RequestMessage requestMessage, SessionData sessionData, bool logServerError, string logDirectory)
+        private ResponseMessage DispatchRequest(RequestMessage requestMessage)
         {
             var cookieContainer = new CookieContainer();
             foreach (var cookie in requestMessage.Cookies)
             {
-                if (!sessionData.Cookies.Any(sc => sc.Name == cookie.Name && sc.Domain == cookie.Domain))
+                if (!_testRequest.SessionData.Cookies.Any(sc => sc.Name == cookie.Name && sc.Domain == cookie.Domain))
                 {
-                    cookieContainer.Add(new System.Net.Cookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain));
+                    try
+                    {
+                        cookieContainer.Add(new System.Net.Cookie(cookie.Name, cookie.Value, cookie.Path, cookie.Domain));
+                    }
+                    catch (CookieException)
+                    {
+                        //oh well, let's try the next cookie
+                    }
                 }
             }
 
-            foreach (var sessionCookie in sessionData.Cookies)
+            foreach (var sessionCookie in _testRequest.SessionData.Cookies)
             {
                 cookieContainer.Add(new System.Net.Cookie(sessionCookie.Name, sessionCookie.Value, sessionCookie.Path, sessionCookie.Domain));
             }
 
             ResponseMessage responseMessage;
 
-            using (var handler = new HttpClientHandler { CookieContainer = cookieContainer })
+            using (var handler = new HttpClientHandler { CookieContainer = cookieContainer, AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate })
             using (var httpClient = new HttpClient(handler))
             {
                 HttpContent httpContent;
@@ -140,6 +167,10 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                     var parameters = formUrlEncodedBody.FormData.Select(parameter => new KeyValuePair<string, string>(parameter.Key, parameter.Value)).ToList();
                     httpContent = new FormUrlEncodedContent(parameters);
                 }
+                else if (requestMessage.Body is NoBody || requestMessage.Body ==null)
+                {
+                    httpContent = null;
+                }
                 else
                 {
                     throw new NotSupportedException("Only raw and form URL encoded bodies are currently supported");
@@ -147,7 +178,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
                 var uri = requestMessage.Uri;
 
-                foreach (var sessionQueryStringParameter in sessionData.QueryStringParameters)
+                foreach (var sessionQueryStringParameter in _testRequest.SessionData.QueryStringParameters)
                 {
                     uri = uri.AddQueryParameter(sessionQueryStringParameter.Key, sessionQueryStringParameter.Value);
                 }
@@ -174,13 +205,13 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
                 foreach (var header in requestMessage.Headers)
                 {
-                    if (!sessionData.Headers.Any(sh => sh.Key == header.Key))
+                    if (_testRequest.SessionData.Headers.All(sh => sh.Key != header.Key))
                     {
                         httpRequestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value);
                     }
                 }
 
-                foreach (var sessionHeader in sessionData.Headers)
+                foreach (var sessionHeader in _testRequest.SessionData.Headers)
                 {
                     httpRequestMessage.Headers.TryAddWithoutValidation(sessionHeader.Key, sessionHeader.Value);
                 }
@@ -215,16 +246,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
                     requestMessage.ResponseMessages.Add(responseMessage);
 
-                    if (logServerError && (int) responseMessage.StatusCode >= 500 && (int) responseMessage.StatusCode < 600)
-                    {
-                        responseMessage.EntityId = Guid.NewGuid();
-                        var failedRequestMessage = requestMessage.CloneIntoFuzzedRequestMessage();
-                        failedRequestMessage.SourceRequestMessage = null;
-                        failedRequestMessage.ResponseMessages.Clear();
-                        failedRequestMessage.ResponseMessages.Add(responseMessage.Clone());
-                        var jsonFailedRequestMessage = JObject.FromObject(failedRequestMessage);
-                        File.WriteAllText($"{logDirectory}/error-{responseMessage.EntityId.ToString()}.json", jsonFailedRequestMessage.ToString());
-                    }
+                    LogResponse(requestMessage, responseMessage);
                 }
                 catch (Exception exception)
                 {
@@ -236,13 +258,20 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             return responseMessage;
         }
 
-        private static void RemoveUnfuzzableRequestMessages(ICollection<RequestMessage> requestMessages)
+        private void LogResponse(RequestMessage requestMessage, ResponseMessage responseMessage)
         {
-            var requestMessagesToRemove = requestMessages.Where(requestMessage => !(requestMessage is FuzzedRequestMessage) && !requestMessages.OfType<FuzzedRequestMessage>().Any(fuzzedRequestMessage => ReferenceEquals(fuzzedRequestMessage.SourceRequestMessage, requestMessage))).ToArray();
-            foreach (var requestMessageToRemove in requestMessagesToRemove)
+            if (!_testRequest.LogServerErrors || (int) responseMessage.StatusCode >= 600 || (int) responseMessage.StatusCode < 500 || _testRequest.ResponseErrorsToIgnore.Any(ignore => Regex.IsMatch(responseMessage.Content, ignore)))
             {
-                requestMessages.Remove(requestMessageToRemove);
+                return;
             }
+
+            responseMessage.EntityId = Guid.NewGuid();
+            var failedRequestMessage = requestMessage.CloneIntoFuzzedRequestMessage();
+            failedRequestMessage.SourceRequestMessage = null;
+            failedRequestMessage.ResponseMessages.Clear();
+            failedRequestMessage.ResponseMessages.Add(responseMessage.Clone());
+            var jsonFailedRequestMessage = JObject.FromObject(failedRequestMessage);
+            File.WriteAllText($"{_testRequest.LogDirectory}/error-{responseMessage.EntityId.ToString()}.json", jsonFailedRequestMessage.ToString());
         }
     }
 }
