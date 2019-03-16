@@ -11,6 +11,8 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
         public IList<Cookie> Cookies { get; set; } = new List<Cookie>();
 
+        public Exception Exception { get; set; }
+
         public IList<Header> Headers { get; set; } = new List<Header>();
 
         public Version HttpVersion { get; set; }

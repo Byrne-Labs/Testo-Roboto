@@ -31,7 +31,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
         public Encoding Encoding { get; set; } = Encoding.UTF8;
 
-        public HttpStatusCode? ExpectedStatusCode { get; set; } = HttpStatusCode.OK;
+        public HttpStatusCode? ExpectedStatusCode { get; set; }
 
         public string Fingerprint
         {
