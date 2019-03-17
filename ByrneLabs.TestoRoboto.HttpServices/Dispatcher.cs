@@ -43,11 +43,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                 Directory.CreateDirectory(_testRequest.LogDirectory);
             }
 
-            var requestMessages = _testRequest.GetAllRequestMessages().ToList();
-            if (_testRequest.RandomizeOrder)
-            {
-                requestMessages = requestMessages.OrderBy(x => BetterRandom.Next()).ToList();
-            }
+            var requestMessages = _testRequest.GetAllRequestMessages().OrderBy(x => _testRequest.RandomizeOrder ? BetterRandom.Next() : 1).ToList();
 
             if (_testRequest.ExcludeUnfuzzableRequests && !_testRequest.OnTheFlyMutators.Any())
             {
@@ -92,11 +88,11 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                     Thread.Sleep(_testRequest.TimeBetweenRequests);
                 }
 
-                foreach (var mutator in _testRequest.OnTheFlyMutators)
+                foreach (var requestMessage in requestMessages.Where(r => !(r is FuzzedRequestMessage)))
                 {
-                    foreach (var requestMessage in requestMessages.Where(r => !(r is FuzzedRequestMessage)))
+                    foreach (var mutator in _testRequest.OnTheFlyMutators.OrderBy(x => _testRequest.RandomizeOrder ? BetterRandom.Next() : 1))
                     {
-                        foreach (var mutatedRequestMessage in mutator.MutateMessage(requestMessage))
+                        foreach (var mutatedRequestMessage in mutator.MutateMessage(requestMessage).OrderBy(x => _testRequest.RandomizeOrder ? BetterRandom.Next() : 1))
                         {
                             var responseMessage = DispatchRequest(mutatedRequestMessage);
                             responseMessages.Add(responseMessage);
@@ -107,20 +103,20 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             }
             else
             {
-                Parallel.ForEach(requestMessages.OfType<FuzzedRequestMessage>(), fuzzedRequestMessage =>
+                Parallel.ForEach(requestMessages.OfType<FuzzedRequestMessage>().OrderBy(x => _testRequest.RandomizeOrder ? BetterRandom.Next() : 1), fuzzedRequestMessage =>
                 {
                     var responseMessage = DispatchRequest(fuzzedRequestMessage);
                     responseMessages.Add(responseMessage);
                 });
-                Parallel.ForEach(_testRequest.OnTheFlyMutators, mutator =>
+                Parallel.ForEach(requestMessages.Where(r => !(r is FuzzedRequestMessage)), requestMessage =>
                 {
-                    Parallel.ForEach(requestMessages.Where(r => !(r is FuzzedRequestMessage)), requestMessage =>
+                    Parallel.ForEach(_testRequest.OnTheFlyMutators.OrderBy(x => _testRequest.RandomizeOrder ? BetterRandom.Next() : 1), mutator =>
                     {
-                        Parallel.ForEach(mutator.MutateMessage(requestMessage), mutatedRequestMessage =>
-                        {
-                            var responseMessage = DispatchRequest(mutatedRequestMessage);
-                            responseMessages.Add(responseMessage);
-                        });
+                        Parallel.ForEach(mutator.MutateMessage(requestMessage).OrderBy(x => _testRequest.RandomizeOrder ? BetterRandom.Next() : 1), mutatedRequestMessage =>
+                            {
+                                var responseMessage = DispatchRequest(mutatedRequestMessage);
+                                responseMessages.Add(responseMessage);
+                            });
                     });
                 });
             }
@@ -167,7 +163,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                     var parameters = formUrlEncodedBody.FormData.Select(parameter => new KeyValuePair<string, string>(parameter.Key, parameter.Value)).ToList();
                     httpContent = new FormUrlEncodedContent(parameters);
                 }
-                else if (requestMessage.Body is NoBody || requestMessage.Body ==null)
+                else if (requestMessage.Body is NoBody || requestMessage.Body == null)
                 {
                     httpContent = null;
                 }
@@ -260,7 +256,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
         private void LogResponse(RequestMessage requestMessage, ResponseMessage responseMessage)
         {
-            if (!_testRequest.LogServerErrors || (int) responseMessage.StatusCode >= 600 || (int) responseMessage.StatusCode < 500 || _testRequest.ResponseErrorsToIgnore.Any(ignore => Regex.IsMatch(responseMessage.Content, ignore)))
+            if (!_testRequest.LogServerErrors || (int)responseMessage.StatusCode >= 600 || (int)responseMessage.StatusCode < 500 || _testRequest.ResponseErrorsToIgnore.Any(ignore => Regex.IsMatch(responseMessage.Content, ignore)))
             {
                 return;
             }
