@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ByrneLabs.Commons" Version="1.0.0.112-alpha" />
+    <PackageReference Include="ByrneLabs.Commons.Domain" Version="1.0.0.112-alpha" />
+    <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
+    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="73.0.3683.68" />
+  </ItemGroup>
+
+</Project>
