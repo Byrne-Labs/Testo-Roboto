@@ -6,20 +6,23 @@
              xmlns:local="clr-namespace:ByrneLabs.TestoRoboto.Desktop"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             xmlns:viewModels="clr-namespace:ByrneLabs.TestoRoboto.Desktop.ViewModels"
+             d:DataContext="{d:DesignInstance viewModels:RequestMessageViewModel, IsDesignTimeCreatable=true }">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="1">
-            <xctk:WatermarkTextBox Margin="5" MinWidth="200" Watermark="Name" KeepWatermarkOnGotFocus="False" />
+        <StackPanel Grid.Row="0">
+            <xctk:WatermarkTextBox Margin="5" MinWidth="200" Watermark="Name" KeepWatermarkOnGotFocus="False" Text="{Binding Name}" />
 
 
         </StackPanel>
-        <TabControl Grid.Row="3">
-            <TabItem Header="Parameters" />
+        <TabControl Grid.Row="1">
+            <TabItem Header="Parameters">
+                <DataGrid ItemsSource="{Binding QueryParameters}"></DataGrid>
+            </TabItem>
             <TabItem Header="Authentication" />
             <TabItem Header="Headers" />
             <TabItem Header="Cookies" />

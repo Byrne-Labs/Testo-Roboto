@@ -61,6 +61,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="KeyValue.xaml.cs">
+      <DependentUpon>KeyValue.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="RequestMessage.xaml.cs">
       <DependentUpon>RequestMessage.xaml</DependentUpon>
@@ -78,6 +81,10 @@
     <Compile Include="ViewModels\Oath2AuthenticationViewModel.cs" />
     <Compile Include="ViewModels\RawBodyViewModel.cs" />
     <Compile Include="ViewModels\RequestMessageViewModel.cs" />
+    <Page Include="KeyValue.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
