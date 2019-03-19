@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using OpenQA.Selenium.Remote;
+using OpenQA.Selenium;
 
 namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
@@ -9,10 +9,6 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 
         public override IEnumerable<string> InputTypes => new[] { "date" };
 
-        public override void FillInput(RemoteWebDriver webDriver, PageItem input)
-        {
-            var element = FindElement(webDriver, input);
-            element.SendKeys("01/01/2019");
-        }
+        protected override string GetSampleText(IWebElement webElement) => "01/01/2019";
     }
 }

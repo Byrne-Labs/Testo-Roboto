@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using ByrneLabs.TestoRoboto.Crawler;
 using ByrneLabs.TestoRoboto.HttpServices;
 using ByrneLabs.TestoRoboto.HttpServices.Mutators.Json;
+using Cookie = OpenQA.Selenium.Cookie;
 
 namespace ByrneLabs.TestoRoboto.Jira
 {
@@ -24,14 +26,38 @@ namespace ByrneLabs.TestoRoboto.Jira
             Dispatcher.Dispatch(loginRequestMessage);
 
             var sessionCookie = loginRequestMessage.ResponseMessages.Single().Cookies.Single(cookie => cookie.Name == "JSESSIONID");
+            var xsrfCookie = loginRequestMessage.ResponseMessages.Single().Cookies.Single(cookie => cookie.Name == "atlassian.xsrf.token");
 
             var sessionData = new SessionData();
             sessionData.Cookies.Add(sessionCookie.Clone());
+            sessionData.Cookies.Add(xsrfCookie.Clone());
 
             return sessionData;
         }
 
         private static void Main(string[] args)
+        {
+            CrawlJira();
+        }
+
+        private static void CrawlJira()
+        {
+            var sessionData = GetSessionData();
+            var crawlOptions = new CrawlOptions();
+            crawlOptions.AllowedUrlPatterns.Add("^http://localhost:8080");
+            crawlOptions.MaximumChainLength = 12;
+            crawlOptions.MaximumThreads = 1;
+            crawlOptions.StartingUrls.Add("http://localhost:8080");
+            foreach (var cookie in sessionData.Cookies)
+            {
+                crawlOptions.SessionCookies.Add(new Cookie(cookie.Name, cookie.Value, cookie.Domain, cookie.Path, null));
+            }
+
+            var crawlManager = new CrawlManager(crawlOptions);
+            crawlManager.Start();
+        }
+
+        private static void FuzzTestHarFile()
         {
             var harSerializer = new HarSerializer();
             var collection = harSerializer.ReadFromFile("Jira4.har");

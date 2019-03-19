@@ -4,20 +4,20 @@ using OpenQA.Selenium.Remote;
 
 namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
-    public class Button : ActionHandler
+    public class RadioButton : ActionHandler
     {
-        public override string Identifier => "InputButton";
+        public override string Identifier => "RadioButton";
 
-        public override bool CanHandle(PageItem pageItem) => pageItem.Tag == "input" && new[] { "button", "search", "submit" }.Contains(pageItem.Type);
+        public override bool CanHandle(PageItem pageItem) => pageItem.Tag == "input" && pageItem.Type == "radio";
 
-        public override void ExecuteAction(RemoteWebDriver remoteWebDriver, PageItem input)
+        public override void ExecuteAction(RemoteWebDriver webDriver, PageItem pageItem)
         {
-            var webElement = FindElement(remoteWebDriver, input);
+            var webElement = FindElement(webDriver, pageItem);
             webElement.Click();
         }
 
         public override IEnumerable<PageItem> FindActions(RemoteWebDriver webDriver) =>
-            FindElementsByXPath(webDriver, "//pageItem[@type='button' or @type='submit' or @type='search']").Where(webElement => webElement.Displayed && webElement.Enabled).Select(webElement =>
+            FindElementsByXPath(webDriver, "//pageItem[@type='checkbox']").Where(webElement => webElement.Displayed && webElement.Enabled).Select(webElement =>
                 PageItem.CreatePageItem(
                     webElement.GetAttribute("class"),
                     webElement.GetAttribute("id"),

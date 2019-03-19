@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ByrneLabs.Commons.Domain;
+using OpenQA.Selenium;
 
 namespace ByrneLabs.TestoRoboto.Crawler
 {

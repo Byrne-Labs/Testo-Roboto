@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ByrneLabs.TestoRoboto.Crawler.PageItems;
+using OpenQA.Selenium;
 
 namespace ByrneLabs.TestoRoboto.Crawler
 {
     internal class Crawler : IDisposable
     {
-        private readonly CrawlSetup _crawlSetup;
+        private readonly CrawlerSetup _crawlSetup;
         private ActionChain _currentActionChain;
 
-        public Crawler(CrawlSetup crawlSetup)
+        public Crawler(CrawlerSetup crawlSetup)
         {
             _crawlSetup = crawlSetup;
         }
 
         public void Crawl(string url)
         {
-            _crawlSetup.WebDriver.Navigate().GoToUrl(url);
-
+            InitializeWebDriver(url);
             _currentActionChain = new ActionChain();
 
             Crawl();
@@ -25,7 +26,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
 
         public void Crawl(ActionChain actionChain)
         {
-            _crawlSetup.WebDriver.Navigate().GoToUrl(actionChain.Items.First().Url);
+            InitializeWebDriver(actionChain.Items.First().Url);
 
             foreach (var actionChainItem in actionChain.Items)
             {
@@ -33,6 +34,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
             }
 
             _currentActionChain = actionChain;
+
             Crawl();
         }
 
@@ -53,7 +55,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
 
         private void Crawl()
         {
-            while (_currentActionChain != null && !_currentActionChain.IsLooped && _currentActionChain.Items.Count <= _crawlSetup.MaxChainLength)
+            while (_currentActionChain != null && !_currentActionChain.IsLooped && _currentActionChain.Items.Count <= _crawlSetup.MaximumChainLength)
             {
                 var discoveredActionChains = GetActionChainsForCurrentPage();
                 _crawlSetup.CrawlManager.ReportDiscoveredActionChains(discoveredActionChains);
@@ -77,17 +79,23 @@ namespace ByrneLabs.TestoRoboto.Crawler
 
         private void ExecuteActionChainItem(ActionChainItem actionChainItem)
         {
-            if (actionChainItem.ChosenActionItem.Tag != "a" || !actionChainItem.ChosenActionItem.Class.StartsWith("http", StringComparison.Ordinal))
+            foreach (var dataInputItem in actionChainItem.DataInputItems)
             {
-                foreach (var dataInputItem in actionChainItem.DataInputItems)
+                foreach (var dataInputHandler in _crawlSetup.DataInputHandlers)
                 {
-                    foreach (var dataInputHandler in _crawlSetup.DataInputHandlers)
+                    if (dataInputHandler.CanHandle(dataInputItem))
                     {
-                        if (dataInputHandler.CanHandle(dataInputItem))
+                        try
                         {
                             dataInputHandler.FillInput(_crawlSetup.WebDriver, dataInputItem);
-                            break;
                         }
+                        catch (ItemNotFoundException)
+                        {
+                            /*
+                             * Ideally this should never happen but if it does, we can safely ignore it.  The worst case scenario is the input doesn't get set.
+                             */
+                        }
+                        break;
                     }
                 }
             }
@@ -97,15 +105,37 @@ namespace ByrneLabs.TestoRoboto.Crawler
             {
                 if (actionHandler.CanHandle(actionChainItem.ChosenActionItem))
                 {
-                    actionHandler.ExecuteAction(_crawlSetup.WebDriver, actionChainItem.ChosenActionItem);
+                    try
+                    {
+                        actionHandler.ExecuteAction(_crawlSetup.WebDriver, actionChainItem.ChosenActionItem);
+                    }
+                    catch (ItemNotFoundException)
+                    {
+                        /*
+                         * Ideally this should never happen but if it does, we can safely ignore it and the action chain will loop out
+                         */
+                    }
+
                     actionHandled = true;
-                    break;
+                        break;
                 }
             }
 
             if (!actionHandled)
             {
                 throw new InvalidOperationException("Unable to find action handler for action item");
+            }
+
+            try
+            {
+                _crawlSetup.WebDriver.SwitchTo().Alert().Accept();
+            }
+            catch (NoAlertPresentException)
+            {
+                /*
+                 * Unfortunately, there is no way to determine if an alert is open without trying to do something like close it or click on a link below it.  This is intended
+                 * to get rid of the "Changes you made may not be saved" alert that pops up when you navigate away from a page and have filled in some of the form fields.
+                 */
             }
         }
 
@@ -125,6 +155,17 @@ namespace ByrneLabs.TestoRoboto.Crawler
             }
 
             return discoveredActionChains;
+        }
+
+        private void InitializeWebDriver(string url)
+        {
+            _crawlSetup.WebDriver.Navigate().GoToUrl(url);
+            _crawlSetup.WebDriver.Manage().Cookies.DeleteAllCookies();
+            foreach (var cookie in _crawlSetup.SessionCookies)
+            {
+                _crawlSetup.WebDriver.Manage().Cookies.AddCookie(cookie);
+            }
+            _crawlSetup.WebDriver.Navigate().Refresh();
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using OpenQA.Selenium.Remote;
+using OpenQA.Selenium;
 
 namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
@@ -7,20 +7,22 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
     {
         public override string Identifier => "TextInput";
 
-        public override IEnumerable<string> InputTypes => new[] { "text", "password" };
+        public override IEnumerable<string> InputTypes => new[] { "text", "password", string.Empty, null };
 
-        public override void FillInput(RemoteWebDriver webDriver, PageItem input)
+        protected override string GetSampleText(IWebElement webElement)
         {
-            var element = FindElement(webDriver, input);
-            var maxLengthString = element.GetAttribute("maxlength");
+            var maxLengthString = webElement.GetAttribute("maxlength");
+            string sampleText;
             if (int.TryParse(maxLengthString, out var maxLength))
             {
-                element.SendKeys(new string('a', maxLength));
+                sampleText = new string('a', maxLength);
             }
             else
             {
-                element.SendKeys(new string('a', 10));
+                sampleText = new string('a', 10);
             }
+
+            return sampleText;
         }
     }
 }

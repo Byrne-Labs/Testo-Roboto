@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using ByrneLabs.TestoRoboto.Crawler.PageItems;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
 
 namespace ByrneLabs.TestoRoboto.Crawler
 {
-    internal class CrawlSetup
+    internal class CrawlerSetup
     {
         public IList<ActionHandler> ActionHandlers { get; } = new List<ActionHandler>();
 
@@ -12,7 +13,9 @@ namespace ByrneLabs.TestoRoboto.Crawler
 
         public IList<DataInputHandler> DataInputHandlers { get; } = new List<DataInputHandler>();
 
-        public int MaxChainLength { get; set; } = 12;
+        public int MaximumChainLength { get; set; } = 12;
+
+        public IList<Cookie> SessionCookies { get; } = new List<Cookie>();
 
         public RemoteWebDriver WebDriver { get; set; }
     }

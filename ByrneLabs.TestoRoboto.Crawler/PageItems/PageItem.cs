@@ -5,7 +5,7 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
     public class PageItem : IEquatable<PageItem>
     {
-        public PageItem(string @class, string id, string name, string onClick, string title, string tag, string type, string handler)
+        private PageItem(string @class, string id, string name, string onClick, string title, string tag, string type, string handler)
         {
             Class = @class;
             Id = id;
@@ -32,6 +32,16 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
         public string Title { get; }
 
         public string Type { get; }
+
+        public static PageItem CreatePageItem(string @class, string id, string name, string onClick, string title, string tag, string type, string handler)
+        {
+            if (string.IsNullOrWhiteSpace(@class) && string.IsNullOrWhiteSpace(id) && string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(onClick) && string.IsNullOrWhiteSpace(title))
+            {
+                return null;
+            }
+
+            return new PageItem(@class, id, name, onClick, title, tag, type, handler);
+        }
 
         public static bool operator ==(PageItem left, PageItem right) => Equals(left, right);
 

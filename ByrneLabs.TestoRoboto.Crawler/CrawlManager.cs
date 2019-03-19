@@ -1,9 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ByrneLabs.Commons;
 using ByrneLabs.TestoRoboto.Crawler.PageItems;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
 namespace ByrneLabs.TestoRoboto.Crawler
@@ -12,15 +14,36 @@ namespace ByrneLabs.TestoRoboto.Crawler
     {
         private readonly ConcurrentQueue<ActionChain> _actionChainsToCrawl = new ConcurrentQueue<ActionChain>();
         private readonly IList<ActionChainItem> _crawledActionChainItems = new List<ActionChainItem>();
+        private readonly CrawlOptions _crawlOptions;
 
-        private CrawlManager()
+        public CrawlManager(CrawlOptions crawlOptions)
         {
+            _crawlOptions = crawlOptions;
         }
 
-        public static void Crawl(string url, int maxChainLength, int maxThreads)
+        public void Start()
         {
-            var crawlManager = new CrawlManager();
-            crawlManager.Start(url, maxChainLength, maxThreads);
+            Parallel.ForEach(_crawlOptions.StartingUrls, url =>
+            {
+                using (var initialCrawler = new Crawler(GetCrawlerSetup(_crawlOptions)))
+                {
+                    initialCrawler.Crawl(url);
+                }
+            });
+
+            var parallelOptions = new ParallelOptions();
+            parallelOptions.MaxDegreeOfParallelism = _crawlOptions.MaximumThreads;
+
+            BetterParallel.While(parallelOptions, () => !_actionChainsToCrawl.IsEmpty, () =>
+            {
+                if (_actionChainsToCrawl.TryDequeue(out var actionChainToCrawl))
+                {
+                    using (var crawler = new Crawler(GetCrawlerSetup(_crawlOptions)))
+                    {
+                        crawler.Crawl(actionChainToCrawl);
+                    }
+                }
+            });
         }
 
         internal void ReportDiscoveredActionChains(IEnumerable<ActionChain> discoveredActionChains)
@@ -41,7 +64,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
         {
             lock (_crawledActionChainItems)
             {
-                if (!_crawledActionChainItems.Contains(actionChainItem))
+                if (!_crawledActionChainItems.Contains(actionChainItem) && _crawlOptions.AllowedUrlPatterns.Any(allowedUrlPattern=> Regex.IsMatch(actionChainItem.Url, allowedUrlPattern)))
                 {
                     _crawledActionChainItems.Add(actionChainItem);
                     actionChainItem.Crawled = true;
@@ -52,46 +75,34 @@ namespace ByrneLabs.TestoRoboto.Crawler
             }
         }
 
-        private CrawlSetup GetCrawlSetup(int maxChainLength)
+        private CrawlerSetup GetCrawlerSetup(CrawlOptions crawlOptions)
         {
-            var crawlSetup = new CrawlSetup();
-            crawlSetup.ActionHandlers.Add(new Anchor());
-            crawlSetup.ActionHandlers.Add(new Button());
+            var crawlerSetup = new CrawlerSetup();
+            crawlerSetup.ActionHandlers.Add(new Anchor());
+            crawlerSetup.ActionHandlers.Add(new Button());
 
-            crawlSetup.DataInputHandlers.Add(new TextInput());
-            crawlSetup.DataInputHandlers.Add(new DateInput());
+            crawlerSetup.DataInputHandlers.Add(new DateInput());
+            crawlerSetup.DataInputHandlers.Add(new DateTimeInput());
+            crawlerSetup.DataInputHandlers.Add(new EmailInput());
+            crawlerSetup.DataInputHandlers.Add(new MonthInput());
+            crawlerSetup.DataInputHandlers.Add(new NumberInput());
+            crawlerSetup.DataInputHandlers.Add(new TelephoneInput());
+            crawlerSetup.DataInputHandlers.Add(new TextInput());
+            crawlerSetup.DataInputHandlers.Add(new TimeInput());
+            crawlerSetup.DataInputHandlers.Add(new UrlInput());
+            crawlerSetup.DataInputHandlers.Add(new WeekInput());
 
-            crawlSetup.CrawlManager = this;
+            crawlerSetup.CrawlManager = this;
 
-            crawlSetup.WebDriver = new ChromeDriver();
+            crawlerSetup.WebDriver = new ChromeDriver();
 
-            crawlSetup.MaxChainLength = maxChainLength;
-
-            return crawlSetup;
-        }
-
-        private void Start(string url, int maxChainLength, int maxThreads)
-        {
-            var initialCrawlSetup = GetCrawlSetup(maxChainLength);
-            using (var initialCrawler = new Crawler(initialCrawlSetup))
+            foreach (var cookie in crawlOptions.SessionCookies)
             {
-                initialCrawler.Crawl(url);
+                crawlerSetup.SessionCookies.Add(cookie);
             }
 
-            var parallelOptions = new ParallelOptions();
-            parallelOptions.MaxDegreeOfParallelism = maxThreads;
-
-            BetterParallel.While(parallelOptions, () => !_actionChainsToCrawl.IsEmpty, () =>
-            {
-                if (_actionChainsToCrawl.TryDequeue(out var actionChainToCrawl))
-                {
-                    var crawlSetup = GetCrawlSetup(maxChainLength);
-                    using (var crawler = new Crawler(crawlSetup))
-                    {
-                        crawler.Crawl(actionChainToCrawl);
-                    }
-                }
-            });
+            crawlerSetup.MaximumChainLength = crawlOptions.MaximumChainLength;
+            return crawlerSetup;
         }
     }
 }
