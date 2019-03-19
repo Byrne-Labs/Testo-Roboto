@@ -17,26 +17,23 @@ namespace ByrneLabs.TestoRoboto.Crawler
         public void Crawl(string url)
         {
             _crawlSetup.WebDriver.Navigate().GoToUrl(url);
+
+            _currentActionChain = new ActionChain();
+
+            Crawl();
         }
 
         public void Crawl(ActionChain actionChain)
         {
+            _crawlSetup.WebDriver.Navigate().GoToUrl(actionChain.Items.First().Url);
+
             foreach (var actionChainItem in actionChain.Items)
             {
-                foreach (var dataInputItem in actionChainItem.DataInputItems)
-                {
-                    foreach (var dataInputHandler in _crawlSetup.DataInputHandlers)
-                    {
-                        if (dataInputHandler.CanHandle(dataInputItem))
-                        {
-                            dataInputHandler.FillInput(_crawlSetup.WebDriver, dataInputItem);
-                            break;
-                        }
-                    }
-                }
-
-                ExecuteAction(actionChainItem.ChosenActionItem);
+                ExecuteActionChainItem(actionChainItem);
             }
+
+            _currentActionChain = actionChain;
+            Crawl();
         }
 
         public void Dispose()
@@ -58,57 +55,49 @@ namespace ByrneLabs.TestoRoboto.Crawler
         {
             while (_currentActionChain != null && !_currentActionChain.IsLooped && _currentActionChain.Items.Count <= _crawlSetup.MaxChainLength)
             {
-                CrawlCurrentPage();
+                var discoveredActionChains = GetActionChainsForCurrentPage();
+                _crawlSetup.CrawlManager.ReportDiscoveredActionChains(discoveredActionChains);
 
-                ExecuteAction(_currentActionChain.Items.Last().ChosenActionItem);
+                _currentActionChain = null;
+                foreach (var discoveredActionChain in discoveredActionChains)
+                {
+                    if (!discoveredActionChain.IsLooped && _crawlSetup.CrawlManager.ShouldBeCrawled(discoveredActionChain.Items.Last()))
+                    {
+                        _currentActionChain = discoveredActionChain;
+                        break;
+                    }
+                }
+
+                if (_currentActionChain != null)
+                {
+                    ExecuteActionChainItem(_currentActionChain.Items.Last());
+                }
             }
         }
 
-        private void CrawlCurrentPage()
+        private void ExecuteActionChainItem(ActionChainItem actionChainItem)
         {
-            var currentActionChainItem = _currentActionChain.Items.Last();
-            foreach (var dataInputItem in currentActionChainItem.DataInputItems)
+            if (actionChainItem.ChosenActionItem.Tag != "a" || !actionChainItem.ChosenActionItem.Class.StartsWith("http", StringComparison.Ordinal))
             {
-                foreach (var dataInputHandler in _crawlSetup.DataInputHandlers)
+                foreach (var dataInputItem in actionChainItem.DataInputItems)
                 {
-                    if (dataInputHandler.CanHandle(dataInputItem))
+                    foreach (var dataInputHandler in _crawlSetup.DataInputHandlers)
                     {
-                        dataInputHandler.FillInput(_crawlSetup.WebDriver, dataInputItem);
-                        break;
+                        if (dataInputHandler.CanHandle(dataInputItem))
+                        {
+                            dataInputHandler.FillInput(_crawlSetup.WebDriver, dataInputItem);
+                            break;
+                        }
                     }
                 }
             }
 
-            var actionChainItems = GetActionChainItemsForCurrentPage();
-            var discoveredActionChains = new List<ActionChain>();
-            foreach (var actionChainItem in actionChainItems)
-            {
-                var discoveredActionChain = _currentActionChain.Clone();
-                discoveredActionChain.Items.Add(actionChainItem);
-                discoveredActionChains.Add(discoveredActionChain);
-            }
-
-            _crawlSetup.CrawlManager.ReportDiscoveredActionChains(discoveredActionChains);
-
-            _currentActionChain = null;
-            foreach (var discoveredActionChain in discoveredActionChains)
-            {
-                if (_crawlSetup.CrawlManager.ShouldBeCrawled(discoveredActionChain.Items.Last()))
-                {
-                    _currentActionChain = discoveredActionChain;
-                    break;
-                }
-            }
-        }
-
-        private void ExecuteAction(PageItem actionItem)
-        {
             var actionHandled = false;
             foreach (var actionHandler in _crawlSetup.ActionHandlers)
             {
-                if (actionHandler.CanHandle(actionItem))
+                if (actionHandler.CanHandle(actionChainItem.ChosenActionItem))
                 {
-                    actionHandler.ExecuteAction(_crawlSetup.WebDriver, actionItem);
+                    actionHandler.ExecuteAction(_crawlSetup.WebDriver, actionChainItem.ChosenActionItem);
                     actionHandled = true;
                     break;
                 }
@@ -120,12 +109,22 @@ namespace ByrneLabs.TestoRoboto.Crawler
             }
         }
 
-        private IEnumerable<ActionChainItem> GetActionChainItemsForCurrentPage()
+        private IEnumerable<ActionChain> GetActionChainsForCurrentPage()
         {
             var availableActionItems = _crawlSetup.ActionHandlers.SelectMany(actionHandler => actionHandler.FindActions(_crawlSetup.WebDriver)).ToList();
             var dataInputItems = _crawlSetup.DataInputHandlers.SelectMany(actionHandler => actionHandler.FindDataInputs(_crawlSetup.WebDriver)).ToList();
 
-            return availableActionItems.Select(availableActionItem => new ActionChainItem(availableActionItems, dataInputItems, availableActionItem, _crawlSetup.WebDriver.Url)).ToList();
+            var actionChainItems = availableActionItems.Select(availableActionItem => new ActionChainItem(availableActionItems, dataInputItems, availableActionItem, _crawlSetup.WebDriver.Url)).ToList();
+
+            var discoveredActionChains = new List<ActionChain>();
+            foreach (var actionChainItem in actionChainItems)
+            {
+                var discoveredActionChain = _currentActionChain.Clone();
+                discoveredActionChain.Items.Add(actionChainItem);
+                discoveredActionChains.Add(discoveredActionChain);
+            }
+
+            return discoveredActionChains;
         }
     }
 }

@@ -2,7 +2,7 @@
 using System.Linq;
 using OpenQA.Selenium.Remote;
 
-namespace ByrneLabs.TestoRoboto.Crawler.ItemHandlers
+namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
     public class Anchor : ActionHandler
     {
@@ -17,14 +17,14 @@ namespace ByrneLabs.TestoRoboto.Crawler.ItemHandlers
         }
 
         public override IEnumerable<PageItem> FindActions(RemoteWebDriver webDriver) =>
-            webDriver.FindElementsByXPath("//a").Select(webElement =>
+            webDriver.FindElementsByXPath("//a").Where(webElement => webElement.Displayed && webElement.Enabled).Select(webElement =>
                 new PageItem(
+                    webElement.GetAttribute("class"),
                     webElement.GetAttribute("id"),
                     webElement.GetAttribute("name"),
                     webElement.GetAttribute("onclick"),
-                    webElement.GetAttribute("src"),
+                    webElement.GetAttribute("title"),
                     webElement.TagName,
-                    null,
                     webElement.GetAttribute("type"),
                     Identifier)
             ).ToArray();

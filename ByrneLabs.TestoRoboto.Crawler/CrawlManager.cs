@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ByrneLabs.Commons;
-using ByrneLabs.TestoRoboto.Crawler.ItemHandlers;
+using ByrneLabs.TestoRoboto.Crawler.PageItems;
 using OpenQA.Selenium.Chrome;
 
 namespace ByrneLabs.TestoRoboto.Crawler
@@ -73,8 +73,10 @@ namespace ByrneLabs.TestoRoboto.Crawler
         private void Start(string url, int maxChainLength, int maxThreads)
         {
             var initialCrawlSetup = GetCrawlSetup(maxChainLength);
-            var initialCrawler = new Crawler(initialCrawlSetup);
-            initialCrawler.Crawl(url);
+            using (var initialCrawler = new Crawler(initialCrawlSetup))
+            {
+                initialCrawler.Crawl(url);
+            }
 
             var parallelOptions = new ParallelOptions();
             parallelOptions.MaxDegreeOfParallelism = maxThreads;
@@ -84,9 +86,10 @@ namespace ByrneLabs.TestoRoboto.Crawler
                 if (_actionChainsToCrawl.TryDequeue(out var actionChainToCrawl))
                 {
                     var crawlSetup = GetCrawlSetup(maxChainLength);
-                    var crawler = new Crawler(crawlSetup);
-
-                    crawler.Crawl(actionChainToCrawl);
+                    using (var crawler = new Crawler(crawlSetup))
+                    {
+                        crawler.Crawl(actionChainToCrawl);
+                    }
                 }
             });
         }

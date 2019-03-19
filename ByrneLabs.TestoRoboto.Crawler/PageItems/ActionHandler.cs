@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using OpenQA.Selenium.Remote;
 
-namespace ByrneLabs.TestoRoboto.Crawler.ItemHandlers
+namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
     public abstract class ActionHandler : ItemHandler
     {

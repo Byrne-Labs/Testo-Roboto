@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using ByrneLabs.TestoRoboto.Crawler.ItemHandlers;
+using ByrneLabs.TestoRoboto.Crawler.PageItems;
 using OpenQA.Selenium.Remote;
 
 namespace ByrneLabs.TestoRoboto.Crawler

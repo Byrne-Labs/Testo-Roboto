@@ -2,7 +2,7 @@
 using System.Linq;
 using OpenQA.Selenium.Remote;
 
-namespace ByrneLabs.TestoRoboto.Crawler.ItemHandlers
+namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
     public abstract class InputElementHandler : DataInputHandler
     {
@@ -13,14 +13,14 @@ namespace ByrneLabs.TestoRoboto.Crawler.ItemHandlers
         public override IEnumerable<PageItem> FindDataInputs(RemoteWebDriver webDriver)
         {
             var typeCheck = string.Join(" or ", InputTypes.Select(inputType => $"@type='{inputType}'"));
-            return webDriver.FindElementsByXPath("//input[" + typeCheck + "]").Select(webElement =>
+            return webDriver.FindElementsByXPath("//input[" + typeCheck + "]").Where(webElement => webElement.Displayed && webElement.Enabled).Select(webElement =>
                  new PageItem(
+                     webElement.GetAttribute("class"),
                      webElement.GetAttribute("id"),
                      webElement.GetAttribute("name"),
-                     webElement.GetAttribute("onclick"),
-                     webElement.GetAttribute("src"),
-                     webElement.TagName,
                      null,
+                     webElement.GetAttribute("title"),
+                     webElement.TagName,
                      webElement.GetAttribute("type"),
                      Identifier)
             ).ToArray();

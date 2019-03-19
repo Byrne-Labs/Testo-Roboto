@@ -7,7 +7,27 @@ namespace ByrneLabs.TestoRoboto.Crawler
 {
     internal class ActionChain : Entity<ActionChain>, IEquatable<ActionChain>
     {
-        public bool IsLooped => Items.Count > Items.Distinct().Count();
+        private class ActionChainLoopFinder : IEqualityComparer<ActionChainItem>
+        {
+            public bool Equals(ActionChainItem x, ActionChainItem y)
+            {
+                if (ReferenceEquals(x, y))
+                {
+                    return true;
+                }
+
+                if (x == null || y == null || y.GetType() != x.GetType())
+                {
+                    return false;
+                }
+
+                return x.AvailableActionItems.SequenceEqual(y.AvailableActionItems) && x.DataInputItems.SequenceEqual(y.DataInputItems) && Equals(x.Url, y.Url);
+            }
+
+            public int GetHashCode(ActionChainItem obj) => obj.Url.GetHashCode();
+        }
+
+        public bool IsLooped => Items.Count > Items.Distinct(new ActionChainLoopFinder()).Count();
 
         public IList<ActionChainItem> Items { get; } = new List<ActionChainItem>();
 
@@ -28,5 +48,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
         }
 
         public override int GetHashCode() => GetType().GetHashCode();
+
+        public override string ToString() => string.Join(" ==> ", Items.Select(item => item.ToString()));
     }
 }

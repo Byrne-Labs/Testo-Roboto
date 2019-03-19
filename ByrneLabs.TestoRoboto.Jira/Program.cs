@@ -34,7 +34,7 @@ namespace ByrneLabs.TestoRoboto.Jira
         private static void Main(string[] args)
         {
             var harSerializer = new HarSerializer();
-            var collection = harSerializer.ReadFromFile("Jira.har");
+            var collection = harSerializer.ReadFromFile("Jira4.har");
 
             collection.RemoveDuplicateFingerprints(true);
 
