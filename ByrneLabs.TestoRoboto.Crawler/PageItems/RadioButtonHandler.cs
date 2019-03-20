@@ -23,7 +23,7 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
                     null,
                     webElement.GetProperty("id"),
                     webElement.GetProperty("name"),
-                    webElement.GetProperty("onclick"),
+                    null,
                     webElement.GetProperty("title"),
                     webElement.TagName,
                     webElement.GetProperty("type"),

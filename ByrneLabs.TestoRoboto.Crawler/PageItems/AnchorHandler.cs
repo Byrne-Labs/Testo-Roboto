@@ -43,7 +43,7 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
                 foreach (var anchor in anchors)
                 {
                     var href = anchor.GetProperty("href");
-                    if (!_returnedHrefs.Contains(href))
+                    if (!_returnedHrefs.Contains(href) && string.IsNullOrWhiteSpace(anchor.GetAttribute("onclick")))
                     {
                         newAnchors.Add(anchor);
                         _returnedHrefs.Add(href);
@@ -57,7 +57,7 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
                     webElement.GetProperty("href"),
                     webElement.GetProperty("id"),
                     webElement.GetProperty("name"),
-                    webElement.GetProperty("onclick"),
+                    webElement.GetAttribute("onclick"),
                     webElement.GetProperty("title"),
                     webElement.TagName,
                     webElement.GetProperty("type"),

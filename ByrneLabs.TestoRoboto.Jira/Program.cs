@@ -17,7 +17,7 @@ namespace ByrneLabs.TestoRoboto.Jira
             var crawlOptions = new CrawlOptions();
             crawlOptions.AllowedUrlPatterns.Add("^http://localhost:8080");
             crawlOptions.MaximumChainLength = 12;
-            crawlOptions.MaximumThreads = 24;
+            crawlOptions.MaximumThreads = 12;
             crawlOptions.HeadlessBrowsing = true;
             crawlOptions.StartingUrls.Add("http://localhost:8080");
             foreach (var cookie in sessionData.Cookies)

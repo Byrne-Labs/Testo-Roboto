@@ -55,6 +55,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
 
         private void Crawl()
         {
+            var completedActionChain = _currentActionChain;
             while (_currentActionChain != null && !_currentActionChain.IsLooped && _currentActionChain.Items.Count <= _crawlSetup.MaximumChainLength)
             {
                 var discoveredActionChains = GetActionChainsForCurrentPage();
@@ -73,8 +74,10 @@ namespace ByrneLabs.TestoRoboto.Crawler
                 if (_currentActionChain != null)
                 {
                     ExecuteActionChainItem(_currentActionChain.Items.Last());
+                    completedActionChain = _currentActionChain;
                 }
             }
+            _crawlSetup.CrawlManager.ReportCompmletedActionChain(completedActionChain);
         }
 
         private void ExecuteActionChainItem(ActionChainItem actionChainItem)

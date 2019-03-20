@@ -52,13 +52,16 @@ namespace ByrneLabs.TestoRoboto.Crawler
                             //todo: log exception
                         }
                     }
-
-                    lock (_logFileLock)
-                    {
-                        File.AppendAllText("completed action chains.txt", $"{DateTime.Now.ToString(CultureInfo.InvariantCulture)}\t{actionChainToCrawl}\r\n");
-                    }
                 }
             });
+        }
+
+        internal void ReportCompmletedActionChain(ActionChain actionChain)
+        {
+            lock (_logFileLock)
+            {
+                File.AppendAllText("completed action chains.txt", $"{DateTime.Now.ToString(CultureInfo.InvariantCulture)}\t{actionChain}\r\n");
+            }
         }
 
         internal void ReportDiscoveredActionChains(IEnumerable<ActionChain> discoveredActionChains)
