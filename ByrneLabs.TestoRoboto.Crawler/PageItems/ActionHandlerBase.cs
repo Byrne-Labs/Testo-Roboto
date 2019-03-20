@@ -3,7 +3,7 @@ using OpenQA.Selenium.Remote;
 
 namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
-    public abstract class ActionHandlerBase : ItemHandler
+    public abstract class ActionHandlerBase : ItemHandlerBase
     {
         public abstract void ExecuteAction(RemoteWebDriver webDriver, PageItem pageItem);
 

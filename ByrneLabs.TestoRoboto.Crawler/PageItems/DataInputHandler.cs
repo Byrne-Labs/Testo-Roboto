@@ -3,7 +3,7 @@ using OpenQA.Selenium.Remote;
 
 namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
-    public abstract class DataInputHandler : ItemHandler
+    public abstract class DataInputHandler : ItemHandlerBase
     {
         public abstract void FillInput(RemoteWebDriver webDriver, PageItem input);
 

@@ -3,7 +3,7 @@ using OpenQA.Selenium;
 
 namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
-    public class EmailInputHandler : InputElementHandlerBase
+    public class EmailInputHandler : InputHandlerBase
     {
         public override string Identifier => "EmailInput";
 

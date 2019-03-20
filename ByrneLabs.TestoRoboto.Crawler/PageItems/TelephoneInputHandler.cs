@@ -3,7 +3,7 @@ using OpenQA.Selenium;
 
 namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
-    public class TelephoneInputHandler : InputElementHandlerBase
+    public class TelephoneInputHandler : InputHandlerBase
     {
         public override string Identifier => "TelephoneInput";
 

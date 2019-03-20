@@ -3,7 +3,7 @@ using OpenQA.Selenium;
 
 namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
-    public class MonthInputHandler : InputElementHandlerBase
+    public class MonthInputHandler : InputHandlerBase
     {
         public override string Identifier => "MonthInput";
 
