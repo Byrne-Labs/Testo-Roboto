@@ -21,7 +21,7 @@
         </StackPanel>
         <TabControl Grid.Row="1">
             <TabItem Header="Parameters">
-                <DataGrid ItemsSource="{Binding QueryParameters}"></DataGrid>
+                <DataGrid ItemsSource="{Binding QueryParameters}" />
             </TabItem>
             <TabItem Header="Authentication" />
             <TabItem Header="Headers" />

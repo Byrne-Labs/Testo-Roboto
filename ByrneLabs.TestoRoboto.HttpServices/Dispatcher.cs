@@ -113,10 +113,10 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                     Parallel.ForEach(_testRequest.OnTheFlyMutators.OrderBy(x => _testRequest.RandomizeOrder ? BetterRandom.Next() : 1), mutator =>
                     {
                         Parallel.ForEach(mutator.MutateMessage(requestMessage).OrderBy(x => _testRequest.RandomizeOrder ? BetterRandom.Next() : 1), mutatedRequestMessage =>
-                            {
-                                var responseMessage = DispatchRequest(mutatedRequestMessage);
-                                responseMessages.Add(responseMessage);
-                            });
+                        {
+                            var responseMessage = DispatchRequest(mutatedRequestMessage);
+                            responseMessages.Add(responseMessage);
+                        });
                     });
                 });
             }
@@ -256,7 +256,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
         private void LogResponse(RequestMessage requestMessage, ResponseMessage responseMessage)
         {
-            if (!_testRequest.LogServerErrors || (int)responseMessage.StatusCode >= 600 || (int)responseMessage.StatusCode < 500 || _testRequest.ResponseErrorsToIgnore.Any(ignore => Regex.IsMatch(responseMessage.Content, ignore)))
+            if (!_testRequest.LogServerErrors || (int) responseMessage.StatusCode >= 600 || (int) responseMessage.StatusCode < 500 || _testRequest.ResponseErrorsToIgnore.Any(ignore => Regex.IsMatch(responseMessage.Content, ignore)))
             {
                 return;
             }

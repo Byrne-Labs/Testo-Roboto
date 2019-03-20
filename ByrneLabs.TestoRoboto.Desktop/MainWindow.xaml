@@ -8,5 +8,5 @@
         Title="Testo Roboto"
         Width="800"
         Height="600">
-    <local:RequestMessage></local:RequestMessage>
+    <local:RequestMessage />
 </Window>

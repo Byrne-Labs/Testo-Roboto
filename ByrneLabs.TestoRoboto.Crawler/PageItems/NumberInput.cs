@@ -11,8 +11,8 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 
         protected override string GetSampleText(IWebElement webElement)
         {
-            var maxValueString = webElement.GetAttribute("max");
-            var minValueString = webElement.GetAttribute("min");
+            var maxValueString = webElement.GetProperty("max");
+            var minValueString = webElement.GetProperty("min");
             string sampleText;
             if (!string.IsNullOrWhiteSpace(maxValueString))
             {

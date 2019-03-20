@@ -11,42 +11,14 @@ namespace ByrneLabs.TestoRoboto.Jira
 {
     internal class Program
     {
-        private static SessionData GetSessionData()
-        {
-            var loginRequestMessage = new RequestMessage();
-            loginRequestMessage.Uri = new Uri("http://localhost:8080/login.jsp");
-            loginRequestMessage.HttpMethod = HttpMethod.Post;
-            loginRequestMessage.Headers.Add(new Header { Key = "Content-Type", Value = "application/x-www-form-urlencoded" });
-
-            var loginBody = new FormUrlEncodedBody();
-            loginBody.FormData.Add(new KeyValue { Key = "os_username", Value = "jonathan.byrne" });
-            loginBody.FormData.Add(new KeyValue { Key = "os_password", Value = "Password1!" });
-            loginRequestMessage.Body = loginBody;
-
-            Dispatcher.Dispatch(loginRequestMessage);
-
-            var sessionCookie = loginRequestMessage.ResponseMessages.Single().Cookies.Single(cookie => cookie.Name == "JSESSIONID");
-            var xsrfCookie = loginRequestMessage.ResponseMessages.Single().Cookies.Single(cookie => cookie.Name == "atlassian.xsrf.token");
-
-            var sessionData = new SessionData();
-            sessionData.Cookies.Add(sessionCookie.Clone());
-            sessionData.Cookies.Add(xsrfCookie.Clone());
-
-            return sessionData;
-        }
-
-        private static void Main(string[] args)
-        {
-            CrawlJira();
-        }
-
         private static void CrawlJira()
         {
             var sessionData = GetSessionData();
             var crawlOptions = new CrawlOptions();
             crawlOptions.AllowedUrlPatterns.Add("^http://localhost:8080");
             crawlOptions.MaximumChainLength = 12;
-            crawlOptions.MaximumThreads = 1;
+            crawlOptions.MaximumThreads = 24;
+            crawlOptions.HeadlessBrowsing = true;
             crawlOptions.StartingUrls.Add("http://localhost:8080");
             foreach (var cookie in sessionData.Cookies)
             {
@@ -93,6 +65,35 @@ namespace ByrneLabs.TestoRoboto.Jira
             };
 
             Dispatcher.Dispatch(testRequest);
+        }
+
+        private static SessionData GetSessionData()
+        {
+            var loginRequestMessage = new RequestMessage();
+            loginRequestMessage.Uri = new Uri("http://localhost:8080/login.jsp");
+            loginRequestMessage.HttpMethod = HttpMethod.Post;
+            loginRequestMessage.Headers.Add(new Header { Key = "Content-Type", Value = "application/x-www-form-urlencoded" });
+
+            var loginBody = new FormUrlEncodedBody();
+            loginBody.FormData.Add(new KeyValue { Key = "os_username", Value = "jonathan.byrne" });
+            loginBody.FormData.Add(new KeyValue { Key = "os_password", Value = "Password1!" });
+            loginRequestMessage.Body = loginBody;
+
+            Dispatcher.Dispatch(loginRequestMessage);
+
+            var sessionCookie = loginRequestMessage.ResponseMessages.Single().Cookies.Single(cookie => cookie.Name == "JSESSIONID");
+            var xsrfCookie = loginRequestMessage.ResponseMessages.Single().Cookies.Single(cookie => cookie.Name == "atlassian.xsrf.token");
+
+            var sessionData = new SessionData();
+            sessionData.Cookies.Add(sessionCookie.Clone());
+            sessionData.Cookies.Add(xsrfCookie.Clone());
+
+            return sessionData;
+        }
+
+        private static void Main(string[] args)
+        {
+            CrawlJira();
         }
     }
 }

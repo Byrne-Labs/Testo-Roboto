@@ -11,7 +11,7 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 
         protected override string GetSampleText(IWebElement webElement)
         {
-            var maxLengthString = webElement.GetAttribute("maxlength");
+            var maxLengthString = webElement.GetProperty("maxlength");
             string sampleText;
             if (int.TryParse(maxLengthString, out var maxLength))
             {

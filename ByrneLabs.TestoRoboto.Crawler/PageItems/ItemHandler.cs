@@ -61,34 +61,7 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
             return elements.Single();
         }
 
-        protected static IReadOnlyCollection<IWebElement> FindElementsByXPath(RemoteWebDriver webDriver, string xPath)
-        {
-            var staleCount = 0;
-            while (true)
-            {
-                try
-                {
-                    var elements = webDriver.FindElementsByXPath(xPath);
-                    foreach (var element in elements)
-                    {
-                        // ReSharper disable once UnusedVariable -- will throw exception if element is stale
-                        var test = element.Displayed;
-                    }
-
-                    return elements;
-                }
-                catch (StaleElementReferenceException)
-                {
-                    if (staleCount >= 10)
-                    {
-                        throw;
-                    }
-
-                    staleCount++;
-                    Thread.Sleep(1000);
-                }
-            }
-        }
+        protected static IReadOnlyCollection<IWebElement> FindElementsByXPath(RemoteWebDriver webDriver, string xPath)=> webDriver.FindElementsByXPath(xPath).Select(element => new SmartWebElement(element)).ToList().AsReadOnly();
 
         public abstract bool CanHandle(PageItem pageItem);
     }

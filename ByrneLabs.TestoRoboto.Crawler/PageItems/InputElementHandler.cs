@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
@@ -25,7 +24,7 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
             /*
              * We might have already filled in this field and we only want to do it once
              */
-            if (element.GetAttribute("value") != sampleText)
+            if (element.GetProperty("value") != sampleText)
             {
                 try
                 {
@@ -44,15 +43,17 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
         public override IEnumerable<PageItem> FindDataInputs(RemoteWebDriver webDriver)
         {
             var typeCheck = string.Join(" or ", InputTypes.Select(inputType => $"@type='{inputType}'"));
-            return FindElementsByXPath(webDriver, "//pageItem[" + typeCheck + "]").Where(webElement => webElement.Displayed && webElement.Enabled).Select(webElement =>
+            return FindElementsByXPath(webDriver, "//input[" + typeCheck + "]").Select(webElement =>
                 PageItem.CreatePageItem(
-                    webElement.GetAttribute("class"),
-                    webElement.GetAttribute("id"),
-                    webElement.GetAttribute("name"),
+                    webElement.GetProperty("class"),
                     null,
-                    webElement.GetAttribute("title"),
+                    webElement.GetProperty("id"),
+                    webElement.GetProperty("name"),
+                    null,
+                    webElement.GetProperty("title"),
                     webElement.TagName,
-                    webElement.GetAttribute("type"),
+                    webElement.GetProperty("type"),
+                    webElement.GetProperty("value"),
                     Identifier)
             ).Where(pageItem => pageItem != null).ToArray();
         }

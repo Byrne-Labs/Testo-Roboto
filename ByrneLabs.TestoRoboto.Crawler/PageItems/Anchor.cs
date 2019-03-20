@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using OpenQA.Selenium.Remote;
 using System.Text.RegularExpressions;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Remote;
 
 namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
     public class Anchor : ActionHandler
     {
+        private readonly IList<string> _returnedHrefs = new List<string>();
+
         public override string Identifier => "Anchor";
 
         public override bool CanHandle(PageItem pageItem) => pageItem.Tag == "a";
@@ -26,21 +27,43 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
                 {
                     throw;
                 }
-                // Else the link is probably hidden by some sort of modal div or some such nonsense.  We can ignore it and pretend nothing happened and the action chain will terminate because it is looped.
+
+                /*
+                 * Else the link is probably hidden by some sort of modal div or some such nonsense.  We can ignore it and pretend nothing happened and the action chain will terminate because it is looped.
+                 */
             }
         }
 
-        public override IEnumerable<PageItem> FindActions(RemoteWebDriver webDriver) =>
-            FindElementsByXPath(webDriver, "//a").Where(webElement => webElement.Displayed && webElement.Enabled).Select(webElement =>
-                 PageItem.CreatePageItem(
-                     webElement.GetAttribute("class"),
-                     webElement.GetAttribute("id"),
-                     webElement.GetAttribute("name"),
-                     webElement.GetAttribute("onclick"),
-                     webElement.GetAttribute("title"),
-                     webElement.TagName,
-                     webElement.GetAttribute("type"),
-                     Identifier)
+        public override IEnumerable<PageItem> FindActions(RemoteWebDriver webDriver)
+        {
+            var anchors = FindElementsByXPath(webDriver, "//a");
+            var newAnchors = new List<IWebElement>();
+            lock (_returnedHrefs)
+            {
+                foreach (var anchor in anchors)
+                {
+                    var href = anchor.GetProperty("href");
+                    if (!_returnedHrefs.Contains(href))
+                    {
+                        newAnchors.Add(anchor);
+                        _returnedHrefs.Add(href);
+                    }
+                }
+            }
+
+            return newAnchors.Select(webElement =>
+                PageItem.CreatePageItem(
+                    webElement.GetProperty("class"),
+                    webElement.GetProperty("href"),
+                    webElement.GetProperty("id"),
+                    webElement.GetProperty("name"),
+                    webElement.GetProperty("onclick"),
+                    webElement.GetProperty("title"),
+                    webElement.TagName,
+                    webElement.GetProperty("type"),
+                    webElement.GetProperty("value"),
+                    Identifier)
             ).Where(pageItem => pageItem != null).ToArray();
+        }
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using ByrneLabs.Commons.Domain;
-using OpenQA.Selenium;
 
 namespace ByrneLabs.TestoRoboto.Crawler
 {
@@ -22,7 +21,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
                     return false;
                 }
 
-                return x.AvailableActionItems.SequenceEqual(y.AvailableActionItems) && x.DataInputItems.SequenceEqual(y.DataInputItems) && Equals(x.Url, y.Url);
+                return x.AvailableActionItems.SequenceEqual(y.AvailableActionItems) && x.DataInputItems.SequenceEqual(y.DataInputItems);
             }
 
             public int GetHashCode(ActionChainItem obj) => obj.Url.GetHashCode();

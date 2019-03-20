@@ -10,7 +10,7 @@ namespace ByrneLabs.TestoRoboto.Desktop
 
             var requestMessageViewModel = new RequestMessageViewModel();
             requestMessageViewModel.Name = "name";
-            requestMessageViewModel.QueryParameters.Add(new KeyValueViewModel { Key = "key1", Value = "value1", Description = "description"});
+            requestMessageViewModel.QueryParameters.Add(new KeyValueViewModel { Key = "key1", Value = "value1", Description = "description" });
 
             DataContext = requestMessageViewModel;
         }

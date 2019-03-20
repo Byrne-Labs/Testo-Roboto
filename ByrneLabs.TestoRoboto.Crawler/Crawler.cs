@@ -89,12 +89,19 @@ namespace ByrneLabs.TestoRoboto.Crawler
                         {
                             dataInputHandler.FillInput(_crawlSetup.WebDriver, dataInputItem);
                         }
+                        catch (ElementNotVisibleException)
+                        {
+                            /*
+                             * It is faster to try the action and catch the exception than it is to check the visibility of every element.
+                             */
+                        }
                         catch (ItemNotFoundException)
                         {
                             /*
                              * Ideally this should never happen but if it does, we can safely ignore it.  The worst case scenario is the input doesn't get set.
                              */
                         }
+
                         break;
                     }
                 }
@@ -109,6 +116,12 @@ namespace ByrneLabs.TestoRoboto.Crawler
                     {
                         actionHandler.ExecuteAction(_crawlSetup.WebDriver, actionChainItem.ChosenActionItem);
                     }
+                    catch (ElementNotVisibleException)
+                    {
+                        /*
+                         * It is faster to try the action and catch the exception than it is to check the visibility of every element.
+                         */
+                    }
                     catch (ItemNotFoundException)
                     {
                         /*
@@ -117,7 +130,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
                     }
 
                     actionHandled = true;
-                        break;
+                    break;
                 }
             }
 
@@ -165,6 +178,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
             {
                 _crawlSetup.WebDriver.Manage().Cookies.AddCookie(cookie);
             }
+
             _crawlSetup.WebDriver.Navigate().Refresh();
         }
     }

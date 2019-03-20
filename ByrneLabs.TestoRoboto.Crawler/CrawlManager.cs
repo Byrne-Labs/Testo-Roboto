@@ -1,17 +1,20 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ByrneLabs.Commons;
 using ByrneLabs.TestoRoboto.Crawler.PageItems;
-using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
 namespace ByrneLabs.TestoRoboto.Crawler
 {
     public class CrawlManager
     {
+        private static readonly object _logFileLock = new object();
         private readonly ConcurrentQueue<ActionChain> _actionChainsToCrawl = new ConcurrentQueue<ActionChain>();
         private readonly IList<ActionChainItem> _crawledActionChainItems = new List<ActionChainItem>();
         private readonly CrawlOptions _crawlOptions;
@@ -40,7 +43,19 @@ namespace ByrneLabs.TestoRoboto.Crawler
                 {
                     using (var crawler = new Crawler(GetCrawlerSetup(_crawlOptions)))
                     {
-                        crawler.Crawl(actionChainToCrawl);
+                        try
+                        {
+                            crawler.Crawl(actionChainToCrawl);
+                        }
+                        catch (Exception exception)
+                        {
+                            //todo: log exception
+                        }
+                    }
+
+                    lock (_logFileLock)
+                    {
+                        File.AppendAllText("completed action chains.txt", $"{DateTime.Now.ToString(CultureInfo.InvariantCulture)}\t{actionChainToCrawl}\r\n");
                     }
                 }
             });
@@ -64,7 +79,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
         {
             lock (_crawledActionChainItems)
             {
-                if (!_crawledActionChainItems.Contains(actionChainItem) && _crawlOptions.AllowedUrlPatterns.Any(allowedUrlPattern=> Regex.IsMatch(actionChainItem.Url, allowedUrlPattern)))
+                if (!_crawledActionChainItems.Contains(actionChainItem) && _crawlOptions.AllowedUrlPatterns.Any(allowedUrlPattern => Regex.IsMatch(actionChainItem.Url, allowedUrlPattern)))
                 {
                     _crawledActionChainItems.Add(actionChainItem);
                     actionChainItem.Crawled = true;
@@ -94,7 +109,22 @@ namespace ByrneLabs.TestoRoboto.Crawler
 
             crawlerSetup.CrawlManager = this;
 
-            crawlerSetup.WebDriver = new ChromeDriver();
+            var driverService = ChromeDriverService.CreateDefaultService();
+            driverService.SuppressInitialDiagnosticInformation = true;
+
+            var chromeOptions = new ChromeOptions();
+
+            if (crawlOptions.DisableImageDownloading)
+            {
+                chromeOptions.AddUserProfilePreference("profile.default_content_setting_values.images", 2);
+            }
+
+            if (crawlOptions.HeadlessBrowsing)
+            {
+                chromeOptions.AddArgument("headless");
+            }
+
+            crawlerSetup.WebDriver = new ChromeDriver(driverService, chromeOptions);
 
             foreach (var cookie in crawlOptions.SessionCookies)
             {
