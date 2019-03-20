@@ -10,6 +10,7 @@
     <PackageReference Include="HtmlAgilityPack" Version="1.11.0" />
     <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
     <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="73.0.3683.68" />
+    <PackageReference Include="Titanium.Web.Proxy" Version="3.0.907" />
   </ItemGroup>
 
 </Project>

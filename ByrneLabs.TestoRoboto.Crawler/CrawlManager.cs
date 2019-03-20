@@ -4,20 +4,27 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ByrneLabs.Commons;
 using ByrneLabs.TestoRoboto.Crawler.PageItems;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using Titanium.Web.Proxy;
+using Titanium.Web.Proxy.EventArguments;
+using Titanium.Web.Proxy.Models;
 
 namespace ByrneLabs.TestoRoboto.Crawler
 {
     public class CrawlManager
     {
         private static readonly object _logFileLock = new object();
+        private static int _nextProxyPort = 49152;
         private readonly ConcurrentQueue<ActionChain> _actionChainsToCrawl = new ConcurrentQueue<ActionChain>();
         private readonly IList<ActionChainItem> _crawledActionChainItems = new List<ActionChainItem>();
         private readonly CrawlOptions _crawlOptions;
+        private int _proxyPort;
 
         public CrawlManager(CrawlOptions crawlOptions)
         {
@@ -26,6 +33,8 @@ namespace ByrneLabs.TestoRoboto.Crawler
 
         public void Start()
         {
+            SetupProxyServer();
+
             Parallel.ForEach(_crawlOptions.StartingUrls, url =>
             {
                 using (var initialCrawler = new Crawler(GetCrawlerSetup(_crawlOptions)))
@@ -43,24 +52,17 @@ namespace ByrneLabs.TestoRoboto.Crawler
                 {
                     using (var crawler = new Crawler(GetCrawlerSetup(_crawlOptions)))
                     {
-                        try
-                        {
-                            crawler.Crawl(actionChainToCrawl);
-                        }
-                        catch (Exception exception)
-                        {
-                            //todo: log exception
-                        }
+                        crawler.Crawl(actionChainToCrawl);
                     }
                 }
             });
         }
 
-        internal void ReportCompmletedActionChain(ActionChain actionChain)
+        internal void ReportCompletedActionChain(ActionChain actionChain)
         {
             lock (_logFileLock)
             {
-                File.AppendAllText("completed action chains.txt", $"{DateTime.Now.ToString(CultureInfo.InvariantCulture)}\t{actionChain}\r\n");
+                File.AppendAllText("completed action chains.txt", $"{DateTime.Now.ToString(CultureInfo.InvariantCulture)}\t{actionChain.TerminationReason}\t{actionChain.Items.Count}\t{actionChain}\r\n");
             }
         }
 
@@ -78,18 +80,36 @@ namespace ByrneLabs.TestoRoboto.Crawler
             }
         }
 
-        internal bool ShouldBeCrawled(ActionChainItem actionChainItem)
+        internal bool ShouldBeCrawled(ActionChain actionChain)
         {
             lock (_crawledActionChainItems)
             {
-                if (!_crawledActionChainItems.Contains(actionChainItem) && _crawlOptions.AllowedUrlPatterns.Any(allowedUrlPattern => Regex.IsMatch(actionChainItem.Url, allowedUrlPattern)))
+                if (actionChain.IsLooped)
                 {
-                    _crawledActionChainItems.Add(actionChainItem);
-                    actionChainItem.Crawled = true;
-                    return true;
+                    actionChain.TerminationReason = "Looped";
+                    return false;
                 }
 
-                return false;
+                var lastActionChainItem = actionChain.Items.Last();
+                if (_crawledActionChainItems.Contains(lastActionChainItem))
+                {
+                    actionChain.TerminationReason = "Already Crawled";
+                    return false;
+                }
+
+                if (!_crawlOptions.AllowedUrlPatterns.Any(allowedUrlPattern => Regex.IsMatch(lastActionChainItem.Url, allowedUrlPattern)))
+                {
+                    actionChain.TerminationReason = "Banned URL Pattern";
+                    return false;
+                }
+
+                _crawledActionChainItems.Add(lastActionChainItem);
+                lastActionChainItem.Crawled = true;
+                lock (_logFileLock)
+                {
+                    File.AppendAllText("crawled actions.txt", $"{DateTime.Now.ToString(CultureInfo.InvariantCulture)}\t{lastActionChainItem}\r\n");
+                }
+                return true;
             }
         }
 
@@ -127,6 +147,14 @@ namespace ByrneLabs.TestoRoboto.Crawler
                 chromeOptions.AddArgument("headless");
             }
 
+            chromeOptions.AcceptInsecureCertificates = true;
+            chromeOptions.UnhandledPromptBehavior = UnhandledPromptBehavior.Accept;
+            chromeOptions.SetLoggingPreference(LogType.Browser, LogLevel.Off);
+            chromeOptions.SetLoggingPreference(LogType.Client, LogLevel.Warning);
+            chromeOptions.SetLoggingPreference(LogType.Driver, LogLevel.Warning);
+            chromeOptions.SetLoggingPreference(LogType.Profiler, LogLevel.Warning);
+            chromeOptions.SetLoggingPreference(LogType.Server, LogLevel.Warning);
+            chromeOptions.Proxy = new Proxy { HttpProxy = "localhost:" + _proxyPort, SslProxy = "localhost:" + _proxyPort };
             crawlerSetup.WebDriver = new ChromeDriver(driverService, chromeOptions);
 
             foreach (var cookie in crawlOptions.SessionCookies)
@@ -136,6 +164,28 @@ namespace ByrneLabs.TestoRoboto.Crawler
 
             crawlerSetup.MaximumChainLength = crawlOptions.MaximumChainLength;
             return crawlerSetup;
+        }
+
+        private async Task ProxyServer_BeforeRequest(object sender, SessionEventArgs e)
+        {
+            await Task.Run(() => { });
+        }
+
+        private async Task ProxyServer_BeforeResponse(object sender, SessionEventArgs e)
+        {
+            await Task.Run(() => { });
+        }
+
+        private void SetupProxyServer()
+        {
+            var proxyServer = new ProxyServer();
+            proxyServer.CertificateManager.TrustRootCertificate(true);
+            proxyServer.BeforeRequest += ProxyServer_BeforeRequest;
+            proxyServer.BeforeResponse += ProxyServer_BeforeResponse;
+            _proxyPort = _nextProxyPort++;
+            var explicitEndPoint = new ExplicitProxyEndPoint(IPAddress.Any, _proxyPort);
+            proxyServer.AddEndPoint(explicitEndPoint);
+            proxyServer.Start();
         }
     }
 }

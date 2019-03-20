@@ -15,11 +15,11 @@ namespace ByrneLabs.TestoRoboto.Jira
         {
             var sessionData = GetSessionData();
             var crawlOptions = new CrawlOptions();
-            crawlOptions.AllowedUrlPatterns.Add("^http://localhost:8080");
+            crawlOptions.AllowedUrlPatterns.Add("^http://devworkstation:8080");
             crawlOptions.MaximumChainLength = 12;
             crawlOptions.MaximumThreads = 12;
             crawlOptions.HeadlessBrowsing = true;
-            crawlOptions.StartingUrls.Add("http://localhost:8080");
+            crawlOptions.StartingUrls.Add("http://devworkstation:8080");
             foreach (var cookie in sessionData.Cookies)
             {
                 crawlOptions.SessionCookies.Add(new Cookie(cookie.Name, cookie.Value, cookie.Domain, cookie.Path, null));

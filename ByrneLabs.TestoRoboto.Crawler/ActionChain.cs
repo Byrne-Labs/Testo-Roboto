@@ -27,9 +27,13 @@ namespace ByrneLabs.TestoRoboto.Crawler
             public int GetHashCode(ActionChainItem obj) => obj.Url.GetHashCode();
         }
 
+        public Exception Exception { get; set; }
+
         public bool IsLooped => Items.Count > Items.Distinct(new ActionChainLoopFinder()).Count();
 
         public IList<ActionChainItem> Items { get; } = new List<ActionChainItem>();
+
+        public string TerminationReason { get; set; }
 
         public static bool operator ==(ActionChain left, ActionChain right) => Equals(left, right);
 
