@@ -93,19 +93,19 @@ namespace ByrneLabs.TestoRoboto.Crawler
         private CrawlerSetup GetCrawlerSetup(CrawlOptions crawlOptions)
         {
             var crawlerSetup = new CrawlerSetup();
-            crawlerSetup.ActionHandlers.Add(new Anchor());
-            crawlerSetup.ActionHandlers.Add(new Button());
+            crawlerSetup.ActionHandlers.Add(new AnchorHandler());
+            crawlerSetup.ActionHandlers.Add(new ButtonHandler());
 
-            crawlerSetup.DataInputHandlers.Add(new DateInput());
-            crawlerSetup.DataInputHandlers.Add(new DateTimeInput());
-            crawlerSetup.DataInputHandlers.Add(new EmailInput());
-            crawlerSetup.DataInputHandlers.Add(new MonthInput());
-            crawlerSetup.DataInputHandlers.Add(new NumberInput());
-            crawlerSetup.DataInputHandlers.Add(new TelephoneInput());
-            crawlerSetup.DataInputHandlers.Add(new TextInput());
-            crawlerSetup.DataInputHandlers.Add(new TimeInput());
-            crawlerSetup.DataInputHandlers.Add(new UrlInput());
-            crawlerSetup.DataInputHandlers.Add(new WeekInput());
+            crawlerSetup.DataInputHandlers.Add(new DateInputHandler());
+            crawlerSetup.DataInputHandlers.Add(new DateTimeInputHandler());
+            crawlerSetup.DataInputHandlers.Add(new EmailInputHandler());
+            crawlerSetup.DataInputHandlers.Add(new MonthInputHandler());
+            crawlerSetup.DataInputHandlers.Add(new NumberInputHandler());
+            crawlerSetup.DataInputHandlers.Add(new TelephoneInputHandler());
+            crawlerSetup.DataInputHandlers.Add(new TextInputHandler());
+            crawlerSetup.DataInputHandlers.Add(new TimeInputHandler());
+            crawlerSetup.DataInputHandlers.Add(new UrlInputHandler());
+            crawlerSetup.DataInputHandlers.Add(new WeekInputHandler());
 
             crawlerSetup.CrawlManager = this;
 

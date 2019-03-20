@@ -7,7 +7,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
 {
     internal class CrawlerSetup
     {
-        public IList<ActionHandler> ActionHandlers { get; } = new List<ActionHandler>();
+        public IList<ActionHandlerBase> ActionHandlers { get; } = new List<ActionHandlerBase>();
 
         public CrawlManager CrawlManager { get; set; }
 

@@ -3,7 +3,7 @@ using OpenQA.Selenium;
 
 namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
-    public class DateTimeInput : InputElementHandler
+    public class DateTimeInputHandler : InputElementHandlerBase
     {
         public override string Identifier => "DateTimeInput";
 

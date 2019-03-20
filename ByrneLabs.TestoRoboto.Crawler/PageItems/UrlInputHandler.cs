@@ -3,7 +3,7 @@ using OpenQA.Selenium;
 
 namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
-    public class UrlInput : InputElementHandler
+    public class UrlInputHandler : InputElementHandlerBase
     {
         public override string Identifier => "UrlInput";
 

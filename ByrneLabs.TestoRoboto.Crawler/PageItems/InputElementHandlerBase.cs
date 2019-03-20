@@ -5,7 +5,7 @@ using OpenQA.Selenium.Remote;
 
 namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
-    public abstract class InputElementHandler : DataInputHandler
+    public abstract class InputElementHandlerBase : DataInputHandler
     {
         public abstract IEnumerable<string> InputTypes { get; }
 

@@ -4,20 +4,20 @@ using OpenQA.Selenium.Remote;
 
 namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
-    public class CheckBox : ActionHandler
+    public class ButtonHandler : ActionHandlerBase
     {
-        public override string Identifier => "CheckBox";
+        public override string Identifier => "InputButton";
 
-        public override bool CanHandle(PageItem pageItem) => pageItem.Tag == "input" && pageItem.Type == "checkbox";
+        public override bool CanHandle(PageItem pageItem) => pageItem.Tag == "input" && new[] { "button", "search", "submit" }.Contains(pageItem.Type);
 
-        public override void ExecuteAction(RemoteWebDriver webDriver, PageItem pageItem)
+        public override void ExecuteAction(RemoteWebDriver remoteWebDriver, PageItem input)
         {
-            var webElement = FindElement(webDriver, pageItem);
+            var webElement = FindElement(remoteWebDriver, input);
             webElement.Click();
         }
 
         public override IEnumerable<PageItem> FindActions(RemoteWebDriver webDriver) =>
-            FindElementsByXPath(webDriver, "//input[@type='checkbox']").Select(webElement =>
+            FindElementsByXPath(webDriver, "//input[@type='button' or @type='submit' or @type='search']").Select(webElement =>
                 PageItem.CreatePageItem(
                     webElement.GetProperty("class"),
                     null,
@@ -27,7 +27,7 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
                     webElement.GetProperty("title"),
                     webElement.TagName,
                     webElement.GetProperty("type"),
-                    webElement.GetProperty("value"),
+                    null,
                     Identifier)
             ).Where(pageItem => pageItem != null).ToArray();
     }

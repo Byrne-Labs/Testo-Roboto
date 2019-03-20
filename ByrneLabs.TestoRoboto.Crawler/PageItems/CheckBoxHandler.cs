@@ -4,11 +4,11 @@ using OpenQA.Selenium.Remote;
 
 namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
-    public class RadioButton : ActionHandler
+    public class CheckBoxHandler : ActionHandlerBase
     {
-        public override string Identifier => "RadioButton";
+        public override string Identifier => "CheckBox";
 
-        public override bool CanHandle(PageItem pageItem) => pageItem.Tag == "input" && pageItem.Type == "radio";
+        public override bool CanHandle(PageItem pageItem) => pageItem.Tag == "input" && pageItem.Type == "checkbox";
 
         public override void ExecuteAction(RemoteWebDriver webDriver, PageItem pageItem)
         {

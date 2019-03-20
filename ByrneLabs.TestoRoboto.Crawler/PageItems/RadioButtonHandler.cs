@@ -4,20 +4,20 @@ using OpenQA.Selenium.Remote;
 
 namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
-    public class Button : ActionHandler
+    public class RadioButtonHandler : ActionHandlerBase
     {
-        public override string Identifier => "InputButton";
+        public override string Identifier => "RadioButton";
 
-        public override bool CanHandle(PageItem pageItem) => pageItem.Tag == "input" && new[] { "button", "search", "submit" }.Contains(pageItem.Type);
+        public override bool CanHandle(PageItem pageItem) => pageItem.Tag == "input" && pageItem.Type == "radio";
 
-        public override void ExecuteAction(RemoteWebDriver remoteWebDriver, PageItem input)
+        public override void ExecuteAction(RemoteWebDriver webDriver, PageItem pageItem)
         {
-            var webElement = FindElement(remoteWebDriver, input);
+            var webElement = FindElement(webDriver, pageItem);
             webElement.Click();
         }
 
         public override IEnumerable<PageItem> FindActions(RemoteWebDriver webDriver) =>
-            FindElementsByXPath(webDriver, "//input[@type='button' or @type='submit' or @type='search']").Select(webElement =>
+            FindElementsByXPath(webDriver, "//input[@type='checkbox']").Select(webElement =>
                 PageItem.CreatePageItem(
                     webElement.GetProperty("class"),
                     null,
@@ -27,7 +27,7 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
                     webElement.GetProperty("title"),
                     webElement.TagName,
                     webElement.GetProperty("type"),
-                    null,
+                    webElement.GetProperty("value"),
                     Identifier)
             ).Where(pageItem => pageItem != null).ToArray();
     }

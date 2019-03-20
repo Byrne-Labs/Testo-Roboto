@@ -6,7 +6,7 @@ using OpenQA.Selenium.Remote;
 
 namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
-    public class Anchor : ActionHandler
+    public class AnchorHandler : ActionHandlerBase
     {
         private readonly IList<string> _returnedHrefs = new List<string>();
 
