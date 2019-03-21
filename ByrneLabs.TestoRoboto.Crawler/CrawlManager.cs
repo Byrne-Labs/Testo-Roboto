@@ -97,7 +97,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
                     return false;
                 }
 
-                if (!_crawlOptions.AllowedUrlPatterns.Any(allowedUrlPattern => Regex.IsMatch(lastActionChainItem.Url, allowedUrlPattern)))
+                if (!_crawlOptions.AllowedUrlPatterns.Any(allowedUrlPattern => Regex.IsMatch(lastActionChainItem.Url, allowedUrlPattern, RegexOptions.IgnoreCase)))
                 {
                     actionChain.TerminationReason = "Banned URL Pattern";
                     return false;
@@ -263,6 +263,12 @@ namespace ByrneLabs.TestoRoboto.Crawler
                         {
                             crawler.Crawl(actionChainToCrawl);
                         }
+                    }
+                    catch (WebDriverException exception)
+                    {
+                        actionChainToCrawl.Exception = exception;
+                        actionChainToCrawl.TerminationReason = "Selenium Exception";
+                        ReportCompletedActionChain(actionChainToCrawl);
                     }
                     catch (Exception exception)
                     {

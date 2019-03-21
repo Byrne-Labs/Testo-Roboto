@@ -17,21 +17,7 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
         public override void ExecuteAction(RemoteWebDriver webDriver, PageItem pageItem)
         {
             var webElement = FindElement(webDriver, pageItem);
-            try
-            {
-                webElement.Click();
-            }
-            catch (WebDriverException exception)
-            {
-                if (!Regex.IsMatch(exception.Message, @"unknown error: Element .+ is not clickable at point \(\d+, \d+\)\. Other element would receive the click: "))
-                {
-                    throw;
-                }
-
-                /*
-                 * Else the link is probably hidden by some sort of modal div or some such nonsense.  We can ignore it and pretend nothing happened and the action chain will terminate because it is looped.
-                 */
-            }
+            webElement.Click();
         }
 
         public override IEnumerable<PageItem> FindActions(RemoteWebDriver webDriver)

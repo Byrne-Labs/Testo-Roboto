@@ -148,7 +148,13 @@ namespace ByrneLabs.TestoRoboto.Crawler
                 throw new InvalidOperationException("Unable to find action handler for action item");
             }
 
+            foreach (var logEntry in _crawlSetup.WebDriver.Manage().Logs.GetLog(LogType.Browser))
+            {
+                actionChainItem.JavaScriptErrors.Add(logEntry.ToString());
+            }
+
             try
+
             {
                 _crawlSetup.WebDriver.SwitchTo().Alert().Accept();
             }
@@ -185,7 +191,6 @@ namespace ByrneLabs.TestoRoboto.Crawler
         private void InitializeWebDriver(string url)
         {
             _crawlSetup.WebDriver.Navigate().GoToUrl(url);
-            Thread.Sleep(2000);
             _crawlSetup.WebDriver.Manage().Cookies.DeleteAllCookies();
             foreach (var cookie in _crawlSetup.SessionCookies)
             {

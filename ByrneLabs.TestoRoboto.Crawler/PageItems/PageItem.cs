@@ -135,7 +135,7 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
                 stringBuilder.Append($"value='{Value}' ");
             }
 
-            stringBuilder.Append("/>");
+            stringBuilder.Append("/> (").Append(Handler).Append(")");
 
             return stringBuilder.ToString();
         }

@@ -23,6 +23,8 @@ namespace ByrneLabs.TestoRoboto.Crawler
 
         public IEnumerable<PageItem> DataInputItems { get; }
 
+        public IList<string> JavaScriptErrors { get; } = new List<string>();
+
         public string Url { get; }
 
         public static bool operator ==(ActionChainItem left, ActionChainItem right) => Equals(left, right);
@@ -43,25 +45,10 @@ namespace ByrneLabs.TestoRoboto.Crawler
                 return true;
             }
 
-            return Equals(ChosenActionItem, other.ChosenActionItem) && AvailableActionItems.SequenceEqual(other.AvailableActionItems) && Crawled == other.Crawled && DataInputItems.SequenceEqual(other.DataInputItems) && Equals(Url, other.Url);
+            return Equals(ChosenActionItem, other.ChosenActionItem) && AvailableActionItems.SequenceEqual(other.AvailableActionItems) && DataInputItems.SequenceEqual(other.DataInputItems) && Equals(Url, other.Url);
         }
 
         public override int GetHashCode() => Url != null ? Url.GetHashCode() : 0;
-
-        public bool SameState(ActionChainItem other)
-        {
-            if (other == null || other.GetType() != GetType())
-            {
-                return false;
-            }
-
-            if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
-
-            return Equals(ChosenActionItem, other.ChosenActionItem) && AvailableActionItems.SequenceEqual(other.AvailableActionItems) && DataInputItems.SequenceEqual(other.DataInputItems) && Equals(Url, other.Url);
-        }
 
         public override string ToString() => $"{Url} - {ChosenActionItem}";
     }

@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System.Text.RegularExpressions;
 using System.Threading;
 using HtmlAgilityPack;
 using OpenQA.Selenium;
 
 namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
-    public class SmartWebElement : IWebElement //, IEquatable<FastWebElement>
+    public class SmartWebElement : IWebElement
     {
         private readonly IWebElement _webElement;
 
@@ -89,12 +90,26 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 
         public void Clear()
         {
-            _webElement.Clear();
+            TryAction(() => _webElement.Clear());
         }
 
         public void Click()
         {
-            _webElement.Click();
+            try
+            {
+                TryAction(() => _webElement.Click());
+            }
+            catch (WebDriverException exception)
+            {
+                if (!Regex.IsMatch(exception.Message, @"unknown error: Element .+ is not clickable at point \(\d+, \d+\)\. Other element would receive the click: "))
+                {
+                    throw;
+                }
+
+                /*
+                 * Else the link is probably hidden by some sort of modal div or some such nonsense.  We can ignore it and pretend nothing happened and the action chain will terminate because it is looped.
+                 */
+            }
         }
 
         public IWebElement FindElement(By by) => TryAction(() => _webElement.FindElement(by));
