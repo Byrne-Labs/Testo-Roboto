@@ -60,6 +60,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="ByrneLabs.Serializer">
+      <Version>1.0.0.19-alpha</Version>
+    </PackageReference>
     <PackageReference Include="Selenium.WebDriver">
       <Version>3.141.0</Version>
     </PackageReference>

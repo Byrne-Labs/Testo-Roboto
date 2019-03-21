@@ -1,61 +1,56 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ByrneLabs.Commons;
 using ByrneLabs.TestoRoboto.Crawler.PageItems;
+using ByrneLabs.TestoRoboto.HttpServices;
+using JetBrains.Annotations;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using Titanium.Web.Proxy;
 using Titanium.Web.Proxy.EventArguments;
 using Titanium.Web.Proxy.Models;
+using Cookie = ByrneLabs.TestoRoboto.HttpServices.Cookie;
 
 namespace ByrneLabs.TestoRoboto.Crawler
 {
+    [PublicAPI]
     public class CrawlManager
     {
+        private class FingerprintRequestMessageComparer : IEqualityComparer<RequestMessage>
+        {
+            public bool Equals(RequestMessage x, RequestMessage y) => x?.Fingerprint == y?.Fingerprint;
+
+            public int GetHashCode(RequestMessage obj) => obj.Fingerprint.GetHashCode();
+        }
+
         private static readonly object _logFileLock = new object();
         private static int _nextProxyPort = 49152;
         private readonly ConcurrentQueue<ActionChain> _actionChainsToCrawl = new ConcurrentQueue<ActionChain>();
         private readonly IList<ActionChainItem> _crawledActionChainItems = new List<ActionChainItem>();
         private readonly CrawlOptions _crawlOptions;
+        private readonly ConcurrentBag<RequestMessage> _requestMessages = new ConcurrentBag<RequestMessage>();
         private int _proxyPort;
 
-        public CrawlManager(CrawlOptions crawlOptions)
+        private CrawlManager(CrawlOptions crawlOptions)
         {
             _crawlOptions = crawlOptions;
         }
 
-        public void Start()
+        public static IEnumerable<RequestMessage> FindServerMessages(CrawlOptions crawlOptions)
         {
-            SetupProxyServer();
+            var crawlManager = new CrawlManager(crawlOptions);
+            crawlManager.Start();
 
-            Parallel.ForEach(_crawlOptions.StartingUrls, url =>
-            {
-                using (var initialCrawler = new Crawler(GetCrawlerSetup(_crawlOptions)))
-                {
-                    initialCrawler.Crawl(url);
-                }
-            });
-
-            var parallelOptions = new ParallelOptions();
-            parallelOptions.MaxDegreeOfParallelism = _crawlOptions.MaximumThreads;
-
-            BetterParallel.While(parallelOptions, () => !_actionChainsToCrawl.IsEmpty, () =>
-            {
-                if (_actionChainsToCrawl.TryDequeue(out var actionChainToCrawl))
-                {
-                    using (var crawler = new Crawler(GetCrawlerSetup(_crawlOptions)))
-                    {
-                        crawler.Crawl(actionChainToCrawl);
-                    }
-                }
-            });
+            return crawlManager._requestMessages.Distinct(new FingerprintRequestMessageComparer()).ToList();
         }
 
         internal void ReportCompletedActionChain(ActionChain actionChain)
@@ -91,6 +86,11 @@ namespace ByrneLabs.TestoRoboto.Crawler
                 }
 
                 var lastActionChainItem = actionChain.Items.Last();
+                if (lastActionChainItem == null)
+                {
+                    Debugger.Break();
+                }
+
                 if (_crawledActionChainItems.Contains(lastActionChainItem))
                 {
                     actionChain.TerminationReason = "Already Crawled";
@@ -109,6 +109,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
                 {
                     File.AppendAllText("crawled actions.txt", $"{DateTime.Now.ToString(CultureInfo.InvariantCulture)}\t{lastActionChainItem}\r\n");
                 }
+
                 return true;
             }
         }
@@ -149,11 +150,11 @@ namespace ByrneLabs.TestoRoboto.Crawler
 
             chromeOptions.AcceptInsecureCertificates = true;
             chromeOptions.UnhandledPromptBehavior = UnhandledPromptBehavior.Accept;
-            chromeOptions.SetLoggingPreference(LogType.Browser, LogLevel.Off);
-            chromeOptions.SetLoggingPreference(LogType.Client, LogLevel.Warning);
-            chromeOptions.SetLoggingPreference(LogType.Driver, LogLevel.Warning);
-            chromeOptions.SetLoggingPreference(LogType.Profiler, LogLevel.Warning);
-            chromeOptions.SetLoggingPreference(LogType.Server, LogLevel.Warning);
+            chromeOptions.SetLoggingPreference(LogType.Browser, LogLevel.Severe);
+            chromeOptions.SetLoggingPreference(LogType.Client, LogLevel.Severe);
+            chromeOptions.SetLoggingPreference(LogType.Driver, LogLevel.Severe);
+            chromeOptions.SetLoggingPreference(LogType.Profiler, LogLevel.Severe);
+            chromeOptions.SetLoggingPreference(LogType.Server, LogLevel.Severe);
             chromeOptions.Proxy = new Proxy { HttpProxy = "localhost:" + _proxyPort, SslProxy = "localhost:" + _proxyPort };
             crawlerSetup.WebDriver = new ChromeDriver(driverService, chromeOptions);
 
@@ -168,7 +169,56 @@ namespace ByrneLabs.TestoRoboto.Crawler
 
         private async Task ProxyServer_BeforeRequest(object sender, SessionEventArgs e)
         {
-            await Task.Run(() => { });
+            await Task.Run(() =>
+            {
+                var requestMessage = new RequestMessage();
+                requestMessage.Uri = new Uri(e.HttpClient.Request.Url);
+                foreach (var tiHeader in e.HttpClient.Request.Headers.Where(th => th.Name != "Cookie"))
+                {
+                    var header = new Header();
+                    header.Key = tiHeader.Name;
+                    header.Value = tiHeader.Value;
+                    requestMessage.Headers.Add(header);
+                }
+
+                var cookies = e.HttpClient.Request.Headers.HeaderExists("Cookie") ? e.HttpClient.Request.Headers.GetFirstHeader("Cookie").Value : string.Empty;
+                foreach (var cookie in cookies.Split(new[] { "; " }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var name = cookie.SubstringBeforeLast("=");
+                    var value = cookie.SubstringAfterLast("=");
+
+                    requestMessage.Cookies.Add(new Cookie { Name = name, Value = value });
+                }
+
+                requestMessage.Encoding = e.HttpClient.Request.Encoding;
+
+                var contentType = e.HttpClient.Request.Headers.HeaderExists("Content-Type") ? e.HttpClient.Request.Headers.GetFirstHeader("Content-Type").Value : string.Empty;
+
+                if (!e.HttpClient.Request.HasBody)
+                {
+                    requestMessage.Body = new NoBody();
+                }
+                else
+                {
+                    var bodyText = e.GetRequestBodyAsString().Result;
+                    if (contentType == "application/x-www-form-urlencoded")
+                    {
+                        requestMessage.Body = FormUrlEncodedBody.GetFromBodyText(bodyText);
+                    }
+                    else if (contentType == "multipart/form-data")
+                    {
+                        requestMessage.Body = FormDataBody.GetFromBodyText(bodyText);
+                    }
+                    else
+                    {
+                        requestMessage.Body = RawBody.GetFromBodyText(bodyText);
+                    }
+                }
+
+                requestMessage.HttpMethod = new HttpMethod(e.HttpClient.Request.Method);
+
+                _requestMessages.Add(requestMessage);
+            });
         }
 
         private async Task ProxyServer_BeforeResponse(object sender, SessionEventArgs e)
@@ -186,6 +236,42 @@ namespace ByrneLabs.TestoRoboto.Crawler
             var explicitEndPoint = new ExplicitProxyEndPoint(IPAddress.Any, _proxyPort);
             proxyServer.AddEndPoint(explicitEndPoint);
             proxyServer.Start();
+        }
+
+        private void Start()
+        {
+            SetupProxyServer();
+
+            Parallel.ForEach(_crawlOptions.StartingUrls, url =>
+            {
+                using (var initialCrawler = new Crawler(GetCrawlerSetup(_crawlOptions)))
+                {
+                    initialCrawler.Crawl(url);
+                }
+            });
+
+            var parallelOptions = new ParallelOptions();
+            parallelOptions.MaxDegreeOfParallelism = _crawlOptions.MaximumThreads;
+
+            BetterParallel.While(parallelOptions, () => !_actionChainsToCrawl.IsEmpty, () =>
+            {
+                if (_actionChainsToCrawl.TryDequeue(out var actionChainToCrawl))
+                {
+                    try
+                    {
+                        using (var crawler = new Crawler(GetCrawlerSetup(_crawlOptions)))
+                        {
+                            crawler.Crawl(actionChainToCrawl);
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        actionChainToCrawl.Exception = exception;
+                        actionChainToCrawl.TerminationReason = "Exception";
+                        ReportCompletedActionChain(actionChainToCrawl);
+                    }
+                }
+            });
         }
     }
 }

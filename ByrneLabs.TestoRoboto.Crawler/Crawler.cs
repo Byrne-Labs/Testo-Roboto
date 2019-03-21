@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using ByrneLabs.TestoRoboto.Crawler.PageItems;
 using OpenQA.Selenium;
 
@@ -56,38 +57,30 @@ namespace ByrneLabs.TestoRoboto.Crawler
         private void Crawl()
         {
             var completedActionChain = _currentActionChain;
-            try
+            while (_currentActionChain != null && !_currentActionChain.IsLooped && _currentActionChain.Items.Count <= _crawlSetup.MaximumChainLength)
             {
-                while (_currentActionChain != null && !_currentActionChain.IsLooped && _currentActionChain.Items.Count <= _crawlSetup.MaximumChainLength)
-                {
-                    var (discoveredActionChains, nextActionChainItem) = GetActionChainsForCurrentPage();
-                    _crawlSetup.CrawlManager.ReportDiscoveredActionChains(discoveredActionChains);
+                var (discoveredActionChains, nextActionChainItem) = GetActionChainsForCurrentPage();
+                _crawlSetup.CrawlManager.ReportDiscoveredActionChains(discoveredActionChains);
 
-                    _currentActionChain.Items.Add(nextActionChainItem);
-                    if (!_crawlSetup.CrawlManager.ShouldBeCrawled(_currentActionChain))
+                _currentActionChain.Items.Add(nextActionChainItem);
+                if (!_crawlSetup.CrawlManager.ShouldBeCrawled(_currentActionChain))
+                {
+                    _currentActionChain = null;
+                    foreach (var discoveredActionChain in discoveredActionChains)
                     {
-                        _currentActionChain = null;
-                        foreach (var discoveredActionChain in discoveredActionChains)
+                        if (_crawlSetup.CrawlManager.ShouldBeCrawled(discoveredActionChain))
                         {
-                            if (_crawlSetup.CrawlManager.ShouldBeCrawled(discoveredActionChain))
-                            {
-                                _currentActionChain = discoveredActionChain;
-                                break;
-                            }
+                            _currentActionChain = discoveredActionChain;
+                            break;
                         }
                     }
-
-                    if (_currentActionChain != null)
-                    {
-                        ExecuteActionChainItem(_currentActionChain.Items.Last());
-                        completedActionChain = _currentActionChain;
-                    }
                 }
-            }
-            catch (Exception exception)
-            {
-                completedActionChain.Exception = exception;
-                completedActionChain.TerminationReason = "Exception";
+
+                if (_currentActionChain != null)
+                {
+                    ExecuteActionChainItem(_currentActionChain.Items.Last());
+                    completedActionChain = _currentActionChain;
+                }
             }
 
             _crawlSetup.CrawlManager.ReportCompletedActionChain(completedActionChain);
@@ -192,6 +185,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
         private void InitializeWebDriver(string url)
         {
             _crawlSetup.WebDriver.Navigate().GoToUrl(url);
+            Thread.Sleep(2000);
             _crawlSetup.WebDriver.Manage().Cookies.DeleteAllCookies();
             foreach (var cookie in _crawlSetup.SessionCookies)
             {

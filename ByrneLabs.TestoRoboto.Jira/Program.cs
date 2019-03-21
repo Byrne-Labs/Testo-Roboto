@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
+using ByrneLabs.Serializer;
 using ByrneLabs.TestoRoboto.Crawler;
 using ByrneLabs.TestoRoboto.HttpServices;
 using ByrneLabs.TestoRoboto.HttpServices.Mutators.Json;
@@ -15,18 +17,19 @@ namespace ByrneLabs.TestoRoboto.Jira
         {
             var sessionData = GetSessionData();
             var crawlOptions = new CrawlOptions();
-            crawlOptions.AllowedUrlPatterns.Add("^http://devworkstation:8080");
+            crawlOptions.AllowedUrlPatterns.Add("^http://" + Environment.MachineName + ":8080");
             crawlOptions.MaximumChainLength = 12;
             crawlOptions.MaximumThreads = 12;
             crawlOptions.HeadlessBrowsing = true;
-            crawlOptions.StartingUrls.Add("http://devworkstation:8080");
+            crawlOptions.StartingUrls.Add("http://" + Environment.MachineName + ":8080");
             foreach (var cookie in sessionData.Cookies)
             {
                 crawlOptions.SessionCookies.Add(new Cookie(cookie.Name, cookie.Value, cookie.Domain, cookie.Path, null));
             }
 
-            var crawlManager = new CrawlManager(crawlOptions);
-            crawlManager.Start();
+            var requestMessages = CrawlManager.FindServerMessages(crawlOptions);
+            var requestMessageBytes = ByrneLabsSerializer.Serialize(requestMessages);
+            File.WriteAllBytes("jira crawl request messages.bls", requestMessageBytes);
         }
 
         private static void FuzzTestHarFile()
@@ -70,7 +73,7 @@ namespace ByrneLabs.TestoRoboto.Jira
         private static SessionData GetSessionData()
         {
             var loginRequestMessage = new RequestMessage();
-            loginRequestMessage.Uri = new Uri("http://localhost:8080/login.jsp");
+            loginRequestMessage.Uri = new Uri("http://" + Environment.MachineName + ":8080/login.jsp");
             loginRequestMessage.HttpMethod = HttpMethod.Post;
             loginRequestMessage.Headers.Add(new Header { Key = "Content-Type", Value = "application/x-www-form-urlencoded" });
 

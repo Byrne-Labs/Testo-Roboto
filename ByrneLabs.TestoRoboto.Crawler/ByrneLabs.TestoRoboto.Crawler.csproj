@@ -13,4 +13,8 @@
     <PackageReference Include="Titanium.Web.Proxy" Version="3.0.907" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ByrneLabs.TestoRoboto.HttpServices\ByrneLabs.TestoRoboto.HttpServices.csproj" />
+  </ItemGroup>
+
 </Project>

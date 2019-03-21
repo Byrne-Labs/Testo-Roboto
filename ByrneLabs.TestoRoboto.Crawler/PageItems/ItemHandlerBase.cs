@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Remote;
 
@@ -61,7 +60,7 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
             return elements.Single();
         }
 
-        protected static IReadOnlyCollection<IWebElement> FindElementsByXPath(RemoteWebDriver webDriver, string xPath)=> webDriver.FindElementsByXPath(xPath).Select(element => new SmartWebElement(element)).ToList().AsReadOnly();
+        protected static IReadOnlyCollection<IWebElement> FindElementsByXPath(RemoteWebDriver webDriver, string xPath) => webDriver.FindElementsByXPath(xPath).Select(element => new SmartWebElement(element)).ToList().AsReadOnly();
 
         public abstract bool CanHandle(PageItem pageItem);
     }
