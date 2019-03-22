@@ -39,6 +39,7 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 
             return newAnchors.Select(webElement =>
                 PageItem.CreatePageItem(
+                    webElement.GetProperty("href") != webDriver.Url,
                     webElement.GetProperty("class"),
                     webElement.GetProperty("href"),
                     webElement.GetProperty("id"),

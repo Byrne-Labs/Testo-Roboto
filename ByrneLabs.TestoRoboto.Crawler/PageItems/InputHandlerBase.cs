@@ -45,6 +45,7 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
             var typeCheck = string.Join(" or ", InputTypes.Select(inputType => $"@type='{inputType}'"));
             return FindElementsByXPath(webDriver, "//input[" + typeCheck + "]").Select(webElement =>
                 PageItem.CreatePageItem(
+                    false,
                     webElement.GetProperty("class"),
                     null,
                     webElement.GetProperty("id"),

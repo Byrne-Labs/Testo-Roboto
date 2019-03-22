@@ -53,13 +53,13 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
                 }
                 catch (StaleElementReferenceException)
                 {
-                    if (staleCount >= 100)
+                    if (staleCount >= 20)
                     {
                         throw;
                     }
 
                     staleCount++;
-                    Thread.Sleep(100);
+                    Thread.Sleep(1000);
                 }
             }
         }
@@ -77,13 +77,13 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
                 }
                 catch (StaleElementReferenceException)
                 {
-                    if (staleCount >= 100)
+                    if (staleCount >= 20)
                     {
                         throw;
                     }
 
                     staleCount++;
-                    Thread.Sleep(100);
+                    Thread.Sleep(1000);
                 }
             }
         }

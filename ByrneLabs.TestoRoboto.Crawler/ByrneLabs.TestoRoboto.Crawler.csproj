@@ -8,6 +8,7 @@
     <PackageReference Include="ByrneLabs.Commons" Version="1.0.0.112-alpha" />
     <PackageReference Include="ByrneLabs.Commons.Domain" Version="1.0.0.112-alpha" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0-preview3.19153.1" />
     <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
     <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="73.0.3683.68" />
     <PackageReference Include="Titanium.Web.Proxy" Version="3.0.907" />

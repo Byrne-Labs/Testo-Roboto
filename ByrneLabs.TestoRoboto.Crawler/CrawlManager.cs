@@ -103,6 +103,12 @@ namespace ByrneLabs.TestoRoboto.Crawler
                     return false;
                 }
 
+                if (lastActionChainItem.Crawled)
+                {
+                    actionChain.TerminationReason = "No More Actions";
+                    return false;
+                }
+
                 _crawledActionChainItems.Add(lastActionChainItem);
                 lastActionChainItem.Crawled = true;
                 lock (_logFileLock)
@@ -259,15 +265,25 @@ namespace ByrneLabs.TestoRoboto.Crawler
                 {
                     try
                     {
-                        using (var crawler = new Crawler(GetCrawlerSetup(_crawlOptions)))
+                        if (ShouldBeCrawled(actionChainToCrawl))
                         {
-                            crawler.Crawl(actionChainToCrawl);
+                            using (var crawler = new Crawler(GetCrawlerSetup(_crawlOptions)))
+                            {
+                                crawler.Crawl(actionChainToCrawl);
+                            }
                         }
                     }
                     catch (WebDriverException exception)
                     {
                         actionChainToCrawl.Exception = exception;
-                        actionChainToCrawl.TerminationReason = "Selenium Exception";
+                        if (Regex.IsMatch(exception.Message, "stale element reference: element is not attached to the page document"))
+                        {
+                            actionChainToCrawl.TerminationReason = "Stale Element Reference";
+                        }
+                        else
+                        {
+                            actionChainToCrawl.TerminationReason = "Selenium Exception";
+                        }
                         ReportCompletedActionChain(actionChainToCrawl);
                     }
                     catch (Exception exception)

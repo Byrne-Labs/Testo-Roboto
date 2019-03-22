@@ -61,8 +61,11 @@ namespace ByrneLabs.TestoRoboto.Crawler
             {
                 var (discoveredActionChains, nextActionChainItem) = GetActionChainsForCurrentPage();
                 _crawlSetup.CrawlManager.ReportDiscoveredActionChains(discoveredActionChains);
+                if (nextActionChainItem != null)
+                {
+                    _currentActionChain.Items.Add(nextActionChainItem);
+                }
 
-                _currentActionChain.Items.Add(nextActionChainItem);
                 if (!_crawlSetup.CrawlManager.ShouldBeCrawled(_currentActionChain))
                 {
                     _currentActionChain = null;
@@ -169,15 +172,16 @@ namespace ByrneLabs.TestoRoboto.Crawler
 
         private (IEnumerable<ActionChain>, ActionChainItem) GetActionChainsForCurrentPage()
         {
-            var availableActionItems = _crawlSetup.ActionHandlers.SelectMany(actionHandler => actionHandler.FindActions(_crawlSetup.WebDriver)).ToList();
-            var dataInputItems = _crawlSetup.DataInputHandlers.SelectMany(actionHandler => actionHandler.FindDataInputs(_crawlSetup.WebDriver)).ToList();
+            var availableActionItems = _crawlSetup.ActionHandlers.SelectMany(actionHandler => actionHandler.FindActions(_crawlSetup.WebDriver)).ToArray();
+            var dataInputItems = _crawlSetup.DataInputHandlers.SelectMany(actionHandler => actionHandler.FindDataInputs(_crawlSetup.WebDriver)).ToArray();
 
-            var actionChainItems = availableActionItems.Select(availableActionItem => new ActionChainItem(availableActionItems, dataInputItems, availableActionItem, _crawlSetup.WebDriver.Url)).ToList();
+            var actionChainItems = availableActionItems.Select(availableActionItem => new ActionChainItem(availableActionItems, dataInputItems, availableActionItem, _crawlSetup.WebDriver.Url)).ToArray();
+            var continuingActionChainItems = actionChainItems.Where(actionChainItem => !actionChainItem.ChosenActionItem.BeginsChain).ToArray();
 
             var discoveredActionChains = new List<ActionChain>();
-            if (actionChainItems.Count > 1)
+            if (continuingActionChainItems.Length > 1)
             {
-                foreach (var actionChainItem in actionChainItems.Skip(1))
+                foreach (var actionChainItem in continuingActionChainItems.Skip(1))
                 {
                     var discoveredActionChain = _currentActionChain.Clone();
                     discoveredActionChain.Items.Add(actionChainItem);
@@ -185,7 +189,15 @@ namespace ByrneLabs.TestoRoboto.Crawler
                 }
             }
 
-            return (discoveredActionChains, actionChainItems.FirstOrDefault());
+            var beginningActionChainItems = actionChainItems.Where(actionChainItem => actionChainItem.ChosenActionItem.BeginsChain).ToArray();
+            foreach (var actionChainItem in beginningActionChainItems)
+            {
+                var discoveredActionChain = new ActionChain();
+                discoveredActionChain.Items.Add(actionChainItem);
+                discoveredActionChains.Add(discoveredActionChain);
+            }
+
+            return (discoveredActionChains, continuingActionChainItems.FirstOrDefault());
         }
 
         private void InitializeWebDriver(string url)

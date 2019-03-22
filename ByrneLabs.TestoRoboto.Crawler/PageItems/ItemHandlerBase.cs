@@ -60,7 +60,13 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
             return elements.Single();
         }
 
-        protected static IReadOnlyCollection<IWebElement> FindElementsByXPath(RemoteWebDriver webDriver, string xPath) => webDriver.FindElementsByXPath(xPath).Select(element => new SmartWebElement(element)).ToList().AsReadOnly();
+        protected static IReadOnlyCollection<IWebElement> FindElementsByXPath(RemoteWebDriver webDriver, string xPath)
+        {
+            var elements = webDriver.FindElementsByXPath(xPath);
+            var smartElements = elements.Select(element => new SmartWebElement(element)).ToList().AsReadOnly();
+
+            return smartElements;
+        }
 
         public abstract bool CanHandle(PageItem pageItem);
     }

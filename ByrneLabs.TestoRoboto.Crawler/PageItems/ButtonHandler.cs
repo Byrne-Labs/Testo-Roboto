@@ -19,6 +19,7 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
         public override IEnumerable<PageItem> FindActions(RemoteWebDriver webDriver) =>
             FindElementsByXPath(webDriver, "//input[@type='button' or @type='submit' or @type='search']").Select(webElement =>
                 PageItem.CreatePageItem(
+                    false,
                     webElement.GetProperty("class"),
                     null,
                     webElement.GetProperty("id"),
