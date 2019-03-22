@@ -161,6 +161,8 @@ namespace ByrneLabs.TestoRoboto.Crawler
             chromeOptions.SetLoggingPreference(LogType.Driver, LogLevel.Severe);
             chromeOptions.SetLoggingPreference(LogType.Profiler, LogLevel.Severe);
             chromeOptions.SetLoggingPreference(LogType.Server, LogLevel.Severe);
+            chromeOptions.AddArgument("log-level=3");
+            chromeOptions.AddArgument("silent");
             chromeOptions.Proxy = new Proxy { HttpProxy = "localhost:" + _proxyPort, SslProxy = "localhost:" + _proxyPort };
             crawlerSetup.WebDriver = new ChromeDriver(driverService, chromeOptions);
 
@@ -279,6 +281,10 @@ namespace ByrneLabs.TestoRoboto.Crawler
                         if (Regex.IsMatch(exception.Message, "stale element reference: element is not attached to the page document"))
                         {
                             actionChainToCrawl.TerminationReason = "Stale Element Reference";
+                        }
+                        else if (Regex.IsMatch(exception.Message, "The HTTP request to the remote WebDriver server for URL"))
+                        {
+                            actionChainToCrawl.TerminationReason = "WebDriver Server Not Responding";
                         }
                         else
                         {
