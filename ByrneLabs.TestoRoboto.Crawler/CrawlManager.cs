@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using ByrneLabs.Commons;
 using ByrneLabs.TestoRoboto.Crawler.PageItems;
@@ -38,19 +39,95 @@ namespace ByrneLabs.TestoRoboto.Crawler
         private readonly IList<ActionChainItem> _crawledActionChainItems = new List<ActionChainItem>();
         private readonly CrawlOptions _crawlOptions;
         private readonly ConcurrentBag<RequestMessage> _requestMessages = new ConcurrentBag<RequestMessage>();
+        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private bool _initialPagesCrawled;
         private int _proxyPort;
 
-        private CrawlManager(CrawlOptions crawlOptions)
+        public CrawlManager(CrawlOptions crawlOptions)
         {
-            _crawlOptions = crawlOptions;
+            /*
+             * We clone it to make sure it doesn't get changed during the middle of the crawl being executed.
+             */
+            _crawlOptions = crawlOptions.Clone();
         }
 
-        public static IEnumerable<RequestMessage> FindServerMessages(CrawlOptions crawlOptions)
-        {
-            var crawlManager = new CrawlManager(crawlOptions);
-            crawlManager.Start();
+        public IEnumerable<RequestMessage> DiscoveredRequestMessages => _requestMessages.Distinct(new FingerprintRequestMessageComparer()).ToList();
 
-            return crawlManager._requestMessages.Distinct(new FingerprintRequestMessageComparer()).ToList();
+        private Task _crawlTask;
+
+        public void Start()
+        {
+            _crawlTask = new Task(() =>
+            {
+                SetupProxyServer();
+
+                var parallelOptions = new ParallelOptions();
+                parallelOptions.CancellationToken = _cancellationTokenSource.Token;
+                parallelOptions.MaxDegreeOfParallelism = _crawlOptions.MaximumThreads;
+
+                if (!_initialPagesCrawled)
+                {
+                    Parallel.ForEach(_crawlOptions.StartingUrls, parallelOptions, url =>
+                    {
+                        using (var initialCrawler = new Crawler(GetCrawlerSetup(_crawlOptions)))
+                        {
+                            initialCrawler.Crawl(url);
+                        }
+
+                        parallelOptions.CancellationToken.ThrowIfCancellationRequested();
+                    });
+                }
+
+                _initialPagesCrawled = true;
+                BetterParallel.While(parallelOptions, () => !_actionChainsToCrawl.IsEmpty, () =>
+                {
+                    if (_actionChainsToCrawl.TryDequeue(out var actionChainToCrawl))
+                    {
+                        try
+                        {
+                            if (ShouldBeCrawled(actionChainToCrawl))
+                            {
+                                using (var crawler = new Crawler(GetCrawlerSetup(_crawlOptions)))
+                                {
+                                    crawler.Crawl(actionChainToCrawl);
+                                }
+                            }
+                        }
+                        catch (WebDriverException exception)
+                        {
+                            actionChainToCrawl.Exception = exception;
+                            if (Regex.IsMatch(exception.Message, "stale element reference: element is not attached to the page document"))
+                            {
+                                actionChainToCrawl.TerminationReason = "Stale Element Reference";
+                            }
+                            else if (Regex.IsMatch(exception.Message, "The HTTP request to the remote WebDriver server for URL"))
+                            {
+                                actionChainToCrawl.TerminationReason = "WebDriver Server Not Responding";
+                            }
+                            else
+                            {
+                                actionChainToCrawl.TerminationReason = "Selenium Exception";
+                            }
+
+                            ReportCompletedActionChain(actionChainToCrawl);
+                        }
+                        catch (Exception exception)
+                        {
+                            actionChainToCrawl.Exception = exception;
+                            actionChainToCrawl.TerminationReason = "Exception";
+                            ReportCompletedActionChain(actionChainToCrawl);
+                        }
+                    }
+
+                    parallelOptions.CancellationToken.ThrowIfCancellationRequested();
+                });
+            }, _cancellationTokenSource.Token);
+            _crawlTask.Start();
+        }
+
+        public void Stop()
+        {
+            _cancellationTokenSource.Cancel();
         }
 
         internal void ReportCompletedActionChain(ActionChain actionChain)
@@ -244,62 +321,6 @@ namespace ByrneLabs.TestoRoboto.Crawler
             var explicitEndPoint = new ExplicitProxyEndPoint(IPAddress.Any, _proxyPort);
             proxyServer.AddEndPoint(explicitEndPoint);
             proxyServer.Start();
-        }
-
-        private void Start()
-        {
-            SetupProxyServer();
-
-            Parallel.ForEach(_crawlOptions.StartingUrls, url =>
-            {
-                using (var initialCrawler = new Crawler(GetCrawlerSetup(_crawlOptions)))
-                {
-                    initialCrawler.Crawl(url);
-                }
-            });
-
-            var parallelOptions = new ParallelOptions();
-            parallelOptions.MaxDegreeOfParallelism = _crawlOptions.MaximumThreads;
-
-            BetterParallel.While(parallelOptions, () => !_actionChainsToCrawl.IsEmpty, () =>
-            {
-                if (_actionChainsToCrawl.TryDequeue(out var actionChainToCrawl))
-                {
-                    try
-                    {
-                        if (ShouldBeCrawled(actionChainToCrawl))
-                        {
-                            using (var crawler = new Crawler(GetCrawlerSetup(_crawlOptions)))
-                            {
-                                crawler.Crawl(actionChainToCrawl);
-                            }
-                        }
-                    }
-                    catch (WebDriverException exception)
-                    {
-                        actionChainToCrawl.Exception = exception;
-                        if (Regex.IsMatch(exception.Message, "stale element reference: element is not attached to the page document"))
-                        {
-                            actionChainToCrawl.TerminationReason = "Stale Element Reference";
-                        }
-                        else if (Regex.IsMatch(exception.Message, "The HTTP request to the remote WebDriver server for URL"))
-                        {
-                            actionChainToCrawl.TerminationReason = "WebDriver Server Not Responding";
-                        }
-                        else
-                        {
-                            actionChainToCrawl.TerminationReason = "Selenium Exception";
-                        }
-                        ReportCompletedActionChain(actionChainToCrawl);
-                    }
-                    catch (Exception exception)
-                    {
-                        actionChainToCrawl.Exception = exception;
-                        actionChainToCrawl.TerminationReason = "Exception";
-                        ReportCompletedActionChain(actionChainToCrawl);
-                    }
-                }
-            });
         }
     }
 }

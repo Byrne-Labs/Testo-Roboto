@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using ByrneLabs.Serializer;
 using ByrneLabs.TestoRoboto.Crawler;
 using ByrneLabs.TestoRoboto.HttpServices;
@@ -27,8 +28,12 @@ namespace ByrneLabs.TestoRoboto.Jira
                 crawlOptions.SessionCookies.Add(new Cookie(cookie.Name, cookie.Value, cookie.Domain, cookie.Path, null));
             }
 
-            var requestMessages = CrawlManager.FindServerMessages(crawlOptions);
-            var requestMessageBytes = ByrneLabsSerializer.Serialize(requestMessages);
+            var crawlManager = new CrawlManager(crawlOptions);
+            crawlManager.Start();
+            Thread.Sleep(60000);
+            crawlManager.Stop();
+
+            var requestMessageBytes = ByrneLabsSerializer.Serialize(crawlManager.DiscoveredRequestMessages);
             File.WriteAllBytes("jira crawl request messages.bls", requestMessageBytes);
         }
 
