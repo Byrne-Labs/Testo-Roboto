@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Net.Http.Headers;
 using ByrneLabs.Commons;
-using ByrneLabs.Commons.Domain;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public class AwsSignature : AuthenticationMethod, IEntity<AwsSignature>
+    public class AwsSignature : AuthenticationMethod, ICloneable<AwsSignature>
     {
         public string AccessKey { get; set; }
 

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ByrneLabs.Commons.Domain;
+using ByrneLabs.Commons;
 
 namespace ByrneLabs.TestoRoboto.Crawler
 {
-    internal class ActionChain : Entity<ActionChain>, IEquatable<ActionChain>
+    internal class ActionChain : HandyObject<ActionChain>, IEquatable<ActionChain>
     {
         private class ActionChainLoopFinder : IEqualityComparer<ActionChainItem>
         {
@@ -41,7 +41,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
 
         public override bool Equals(object obj) => Equals(obj as ActionChain);
 
-        public new bool Equals(ActionChain other)
+        public bool Equals(ActionChain other)
         {
             if (other == null)
             {

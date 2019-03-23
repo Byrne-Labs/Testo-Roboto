@@ -7,7 +7,6 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using ByrneLabs.Commons;
-using ByrneLabs.Commons.Domain;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -15,7 +14,7 @@ using Newtonsoft.Json.Linq;
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     [PublicAPI]
-    public class RequestMessage : Item, IEntity<RequestMessage>
+    public class RequestMessage : Item, ICloneable<RequestMessage>
     {
         private ObservableCollection<QueryStringParameter> _queryStringParameters;
         private Uri _uri;

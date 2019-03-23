@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using ByrneLabs.Commons.Domain;
+using ByrneLabs.Commons;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public class SessionData : Entity<SessionData>
+    public class SessionData : HandyObject<SessionData>
     {
         public IList<Cookie> Cookies { get; } = new List<Cookie>();
 

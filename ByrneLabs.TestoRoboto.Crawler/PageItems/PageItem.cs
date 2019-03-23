@@ -5,7 +5,7 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
 {
     public class PageItem : IEquatable<PageItem>
     {
-        private PageItem(bool beginsChain,  string @class, string href, string id, string name, string onClick, string title, string tag, string type, string value, string handler)
+        private PageItem(bool beginsChain, string @class, string href, string id, string name, string onClick, string title, string tag, string type, string value, string handler)
         {
             BeginsChain = beginsChain;
             Class = @class;
@@ -20,9 +20,9 @@ namespace ByrneLabs.TestoRoboto.Crawler.PageItems
             Handler = handler;
         }
 
-        public string Class { get; }
-
         public bool BeginsChain { get; }
+
+        public string Class { get; }
 
         public string Handler { get; }
 

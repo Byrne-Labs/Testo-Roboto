@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Net.Http.Headers;
 using ByrneLabs.Commons;
-using ByrneLabs.Commons.Domain;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public class DigestAuthentication : AuthenticationMethod, IEntity<DigestAuthentication>
+    public class DigestAuthentication : AuthenticationMethod, ICloneable<DigestAuthentication>
     {
         public DigestAuthenticationAlgorithm Algorithm { get; set; }
 

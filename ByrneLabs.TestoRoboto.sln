@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByrneLabs.TestoRoboto.Deskt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByrneLabs.Commons.Presentation.Wpf", "ByrneLabs.Commons.Presentation.Wpf\ByrneLabs.Commons.Presentation.Wpf.csproj", "{4CEB9712-36B6-40FD-95EB-573203008840}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByrneLabs.TestoRoboto.Crawler", "ByrneLabs.TestoRoboto.Crawler\ByrneLabs.TestoRoboto.Crawler.csproj", "{2B4DB80C-58B4-4CEE-9983-6EF0BA8F84A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ByrneLabs.TestoRoboto.Crawler", "ByrneLabs.TestoRoboto.Crawler\ByrneLabs.TestoRoboto.Crawler.csproj", "{2B4DB80C-58B4-4CEE-9983-6EF0BA8F84A1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ByrneLabs.TestoRoboto.Jira", "ByrneLabs.TestoRoboto.Jira\ByrneLabs.TestoRoboto.Jira.csproj", "{118268D6-70F9-45B1-9089-21EF78F79441}"
 EndProject

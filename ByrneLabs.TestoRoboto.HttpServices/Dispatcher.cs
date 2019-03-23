@@ -16,6 +16,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 {
     public class Dispatcher
     {
+        private static int _errorNumber = 1;
         private readonly TestRequest _testRequest;
 
         private Dispatcher(TestRequest testRequest)
@@ -261,13 +262,12 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                 return;
             }
 
-            responseMessage.EntityId = Guid.NewGuid();
             var failedRequestMessage = requestMessage.CloneIntoFuzzedRequestMessage();
             failedRequestMessage.SourceRequestMessage = null;
             failedRequestMessage.ResponseMessages.Clear();
             failedRequestMessage.ResponseMessages.Add(responseMessage.Clone());
             var jsonFailedRequestMessage = JObject.FromObject(failedRequestMessage);
-            File.WriteAllText($"{_testRequest.LogDirectory}/error-{responseMessage.EntityId.ToString()}.json", jsonFailedRequestMessage.ToString());
+            File.WriteAllText($"{_testRequest.LogDirectory}/error-{_errorNumber++}.json", jsonFailedRequestMessage.ToString());
         }
     }
 }

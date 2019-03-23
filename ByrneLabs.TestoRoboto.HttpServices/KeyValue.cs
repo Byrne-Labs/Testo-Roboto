@@ -1,8 +1,8 @@
-﻿using ByrneLabs.Commons.Domain;
+﻿using ByrneLabs.Commons;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public class KeyValue : Entity<KeyValue>
+    public class KeyValue : HandyObject<KeyValue>
     {
         public string Description { get; set; }
 

@@ -1,9 +1,9 @@
 ﻿using System;
-using ByrneLabs.Commons.Domain;
+using ByrneLabs.Commons;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public abstract class Item : Entity
+    public abstract class Item : HandyObject<Item>
     {
         public AuthenticationMethod AuthenticationMethod { get; set; } = new NoAuthentication();
 

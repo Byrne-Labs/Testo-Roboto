@@ -1,9 +1,9 @@
 ﻿using System.Web;
-using ByrneLabs.Commons.Domain;
+using ByrneLabs.Commons;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public class QueryStringParameter : Entity<QueryStringParameter>
+    public class QueryStringParameter : HandyObject<QueryStringParameter>
     {
         public string Description { get; set; }
 

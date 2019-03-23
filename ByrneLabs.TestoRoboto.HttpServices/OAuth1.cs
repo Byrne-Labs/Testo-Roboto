@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Net.Http.Headers;
 using ByrneLabs.Commons;
-using ByrneLabs.Commons.Domain;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public class OAuth1 : AuthenticationMethod, IEntity<OAuth1>
+    public class OAuth1 : AuthenticationMethod, ICloneable<OAuth1>
     {
         public string AccessToken { get; set; }
 

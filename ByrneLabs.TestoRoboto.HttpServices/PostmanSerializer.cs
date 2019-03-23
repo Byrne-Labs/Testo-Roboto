@@ -456,7 +456,6 @@ namespace ByrneLabs.TestoRoboto.HttpServices
         {
             var json = JObject.Parse(collectionText);
             var collection = new Collection();
-            collection.EntityId = json["_postman_id"] != null ? Guid.Parse(json["_postman_id"].ToString()) : Guid.NewGuid();
             collection.Name = json["info"]["name"].ToString();
             collection.AuthenticationMethod = GetAuthenticationMethod(json);
             if (json.ContainsKey("item") && json["item"] is JArray)
@@ -481,7 +480,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             var jsonCollection = new JObject();
             var jsonCollectionInfo = new JObject
             {
-                { "_postman_id", collection.EntityId },
+                { "_postman_id", Guid.NewGuid() },
                 { "name", collection.Name },
                 { "schema", "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" }
             };

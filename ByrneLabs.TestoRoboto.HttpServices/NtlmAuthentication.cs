@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Net.Http.Headers;
 using ByrneLabs.Commons;
-using ByrneLabs.Commons.Domain;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public class NtlmAuthentication : AuthenticationMethod, IEntity<NtlmAuthentication>
+    public class NtlmAuthentication : AuthenticationMethod, ICloneable<NtlmAuthentication>
     {
         public string Domain { get; set; }
 

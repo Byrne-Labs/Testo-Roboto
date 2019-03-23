@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Net.Http.Headers;
 using ByrneLabs.Commons;
-using ByrneLabs.Commons.Domain;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public class BearerToken : AuthenticationMethod, IEntity<BearerToken>
+    public class BearerToken : AuthenticationMethod, ICloneable<BearerToken>
     {
         public string Token { get; set; }
 

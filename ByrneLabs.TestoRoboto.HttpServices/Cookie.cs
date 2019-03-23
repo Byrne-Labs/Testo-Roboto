@@ -1,8 +1,8 @@
-﻿using ByrneLabs.Commons.Domain;
+﻿using ByrneLabs.Commons;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public class Cookie : Entity<Cookie>
+    public class Cookie : HandyObject<Cookie>
     {
         public string Domain { get; set; } = string.Empty;
 

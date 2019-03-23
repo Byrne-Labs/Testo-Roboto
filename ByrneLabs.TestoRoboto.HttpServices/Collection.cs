@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using ByrneLabs.Commons;
-using ByrneLabs.Commons.Domain;
 using ByrneLabs.TestoRoboto.HttpServices.Mutators;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public class Collection : Item, IEntity<Collection>
+    public class Collection : Item, ICloneable<Collection>
     {
         public List<Item> Items { get; } = new List<Item>();
 

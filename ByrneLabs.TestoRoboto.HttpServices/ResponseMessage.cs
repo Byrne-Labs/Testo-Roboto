@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using ByrneLabs.Commons.Domain;
+using ByrneLabs.Commons;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public class ResponseMessage : Entity<ResponseMessage>
+    public class ResponseMessage : HandyObject<ResponseMessage>
     {
         public string Content { get; set; }
 

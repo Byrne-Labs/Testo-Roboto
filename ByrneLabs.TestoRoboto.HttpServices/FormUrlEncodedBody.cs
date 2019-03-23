@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using ByrneLabs.Commons;
-using ByrneLabs.Commons.Domain;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public class FormUrlEncodedBody : Body, IEntity<FormUrlEncodedBody>
+    public class FormUrlEncodedBody : Body, ICloneable<FormUrlEncodedBody>
     {
         public override string Fingerprint => string.Join(", ", FormData.Select(parameter => parameter.Key));
 

@@ -2,11 +2,10 @@
 using System.Net.Http.Headers;
 using System.Text;
 using ByrneLabs.Commons;
-using ByrneLabs.Commons.Domain;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public class BasicAuthentication : AuthenticationMethod, IEntity<BasicAuthentication>
+    public class BasicAuthentication : AuthenticationMethod, ICloneable<BasicAuthentication>
     {
         public string Password { get; set; }
 

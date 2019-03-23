@@ -1,8 +1,8 @@
-﻿using ByrneLabs.Commons.Domain;
+﻿using ByrneLabs.Commons;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public class Header : Entity<Header>
+    public class Header : HandyObject<Header>
     {
         public string Description { get; set; }
 

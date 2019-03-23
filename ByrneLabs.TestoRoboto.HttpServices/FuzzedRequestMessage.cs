@@ -1,9 +1,8 @@
 ﻿using ByrneLabs.Commons;
-using ByrneLabs.Commons.Domain;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
-    public class FuzzedRequestMessage : RequestMessage, IEntity<FuzzedRequestMessage>
+    public class FuzzedRequestMessage : RequestMessage, ICloneable<FuzzedRequestMessage>
     {
         public RequestMessage SourceRequestMessage { get; set; }
 
