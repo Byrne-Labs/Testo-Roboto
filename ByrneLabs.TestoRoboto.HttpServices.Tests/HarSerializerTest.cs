@@ -16,7 +16,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             Assert.NotEmpty(collection.Items);
             var requestMessage = (RequestMessage) collection.Items.First();
             Assert.Equal("https://www.ford.com/cmslibs/content/dam/vdm_ford/live/en_us/ford/nameplate/ranger/2019/collections/3-2/2019-Ranger-280x121.png/_jcr_content/renditions/cq5dam.web.768.768.png", requestMessage.Uri.ToString());
-            Assert.Equal(HttpMethod.Get, requestMessage.HttpMethod);
+            Assert.Equal(HttpMethod.Get.ToString(), requestMessage.HttpMethod);
             Assert.Equal(8, requestMessage.Headers.Count);
             Assert.Equal("Host", requestMessage.Headers.First().Key);
             Assert.Equal("www.ford.com", requestMessage.Headers.First().Value);
@@ -47,7 +47,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 
             Assert.NotEmpty(collection.Items);
             var requestMessage = (RequestMessage) collection.Items.First();
-            Assert.Equal(HttpMethod.Post, requestMessage.HttpMethod);
+            Assert.Equal(HttpMethod.Post.ToString(), requestMessage.HttpMethod);
             Assert.IsType<RawBody>(requestMessage.Body);
         }
 

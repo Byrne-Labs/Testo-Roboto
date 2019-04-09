@@ -20,7 +20,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             requestMessage.AuthenticationMethod = new NoAuthentication();
             requestMessage.Headers.Add(new Header { Key = "Content-Type", Value = "application/json" });
             requestMessage.Body = new RawBody { Text = message };
-            requestMessage.HttpMethod = HttpMethod.Post;
+            requestMessage.HttpMethod = HttpMethod.Post.ToString();
             requestMessage.ExpectedStatusCode = HttpStatusCode.OK;
 
             var collection = new Collection();

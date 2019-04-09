@@ -18,14 +18,14 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             requestMessage.Name = "Some Message";
             requestMessage.AuthenticationMethod = new BasicAuthentication { Username = "username2", Password = "password2" };
             requestMessage.Body = new RawBody { Text = "{ \"asdf\": 123 }" };
-            requestMessage.HttpMethod = HttpMethod.Post;
+            requestMessage.HttpMethod = HttpMethod.Post.ToString();
             requestMessage.Uri = new Uri("http://some.domain/path/resource?key=value");
             requestMessage.Headers.Add(new Header { Key = "Content-Type", Value = "application/json" });
             collection.Items.Add(requestMessage);
             var subCollection = new Collection { Name = "Sub-collection" };
             subCollection.AuthenticationMethod = new BasicAuthentication { Username = "username3", Password = "password3" };
             collection.Items.Add(subCollection);
-            subCollection.Items.Add(new RequestMessage { HttpMethod = HttpMethod.Post, Name = "Some Message", Body = new RawBody { Text = "{ \"xyz\": 456 }" } });
+            subCollection.Items.Add(new RequestMessage { HttpMethod = HttpMethod.Post.ToString(), Name = "Some Message", Body = new RawBody { Text = "{ \"xyz\": 456 }" } });
             collection.Items.Add(new Collection { Name = "Fuzzed Messages" });
 
             var json = new PostmanSerializer().WriteToString(collection);
@@ -641,7 +641,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             Assert.Equal("Key2", requestMessage.Headers[2].Key);
             Assert.Equal("Value3", requestMessage.Headers[2].Value);
             Assert.Equal("Description 3", requestMessage.Headers[2].Description);
-            Assert.Equal(HttpMethod.Post, requestMessage.HttpMethod);
+            Assert.Equal(HttpMethod.Post.ToString(), requestMessage.HttpMethod);
             Assert.Equal(3, requestMessage.QueryStringParameters.Count);
             Assert.Equal("Key1", requestMessage.QueryStringParameters[0].Key);
             Assert.Equal("Value1", requestMessage.QueryStringParameters[0].Value);
@@ -749,7 +749,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             Assert.Equal("Key2", requestMessage.Headers[2].Key);
             Assert.Equal("Value3", requestMessage.Headers[2].Value);
             Assert.Equal("Description 3", requestMessage.Headers[2].Description);
-            Assert.Equal(HttpMethod.Put, requestMessage.HttpMethod);
+            Assert.Equal(HttpMethod.Put.ToString(), requestMessage.HttpMethod);
             Assert.Equal(3, requestMessage.QueryStringParameters.Count);
             Assert.Equal("Key1", requestMessage.QueryStringParameters[0].Key);
             Assert.Equal("Value1", requestMessage.QueryStringParameters[0].Value);
@@ -859,7 +859,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             Assert.Equal("Key2", requestMessage.Headers[2].Key);
             Assert.Equal("Value3", requestMessage.Headers[2].Value);
             Assert.Equal("Description 3", requestMessage.Headers[2].Description);
-            Assert.Equal(HttpMethod.Delete, requestMessage.HttpMethod);
+            Assert.Equal(HttpMethod.Delete.ToString(), requestMessage.HttpMethod);
             Assert.Equal(3, requestMessage.QueryStringParameters.Count);
             Assert.Equal("Key1", requestMessage.QueryStringParameters[0].Key);
             Assert.Equal("Value1", requestMessage.QueryStringParameters[0].Value);
@@ -997,7 +997,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             Assert.Equal("Key2", requestMessage.Headers[2].Key);
             Assert.Equal("Value3", requestMessage.Headers[2].Value);
             Assert.Equal("Description 3", requestMessage.Headers[2].Description);
-            Assert.Equal(HttpMethod.Head, requestMessage.HttpMethod);
+            Assert.Equal(HttpMethod.Head.ToString(), requestMessage.HttpMethod);
             Assert.Equal(3, requestMessage.QueryStringParameters.Count);
             Assert.Equal("Key1", requestMessage.QueryStringParameters[0].Key);
             Assert.Equal("Value1", requestMessage.QueryStringParameters[0].Value);

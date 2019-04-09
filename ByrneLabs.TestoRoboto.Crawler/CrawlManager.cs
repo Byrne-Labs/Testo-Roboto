@@ -6,7 +6,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +13,8 @@ using ByrneLabs.Commons;
 using ByrneLabs.TestoRoboto.Crawler.PageItems;
 using ByrneLabs.TestoRoboto.HttpServices;
 using JetBrains.Annotations;
+using MessagePack;
+using MessagePack.Resolvers;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using Titanium.Web.Proxy;
@@ -35,15 +36,16 @@ namespace ByrneLabs.TestoRoboto.Crawler
 
         private static readonly object _logFileLock = new object();
         private static int _nextProxyPort = 49152;
-        private readonly ConcurrentQueue<ActionChain> _actionChainsToCrawl = new ConcurrentQueue<ActionChain>();
-        private readonly IList<ActionChainItem> _crawledActionChainItems = new List<ActionChainItem>();
-        private readonly CrawlOptions _crawlOptions;
-        private readonly ConcurrentBag<RequestMessage> _requestMessages = new ConcurrentBag<RequestMessage>();
-        private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private List<ActionChain> _actionChainsToCrawl = new List<ActionChain>();
+        private CancellationTokenSource _cancellationTokenSource;
+        private IList<ActionChainItem> _crawledActionChainItems = new List<ActionChainItem>();
+        private CrawlOptions _crawlOptions;
+        private Task _crawlTask;
         private bool _initialPagesCrawled;
         private int _proxyPort;
+        private ConcurrentBag<RequestMessage> _requestMessages = new ConcurrentBag<RequestMessage>();
 
-        public CrawlManager(CrawlOptions crawlOptions)
+        public CrawlManager(CrawlOptions crawlOptions) : this()
         {
             /*
              * We clone it to make sure it doesn't get changed during the middle of the crawl being executed.
@@ -51,16 +53,55 @@ namespace ByrneLabs.TestoRoboto.Crawler
             _crawlOptions = crawlOptions.Clone();
         }
 
+        private CrawlManager()
+        {
+            SetupProxyServer();
+        }
+
         public IEnumerable<RequestMessage> DiscoveredRequestMessages => _requestMessages.Distinct(new FingerprintRequestMessageComparer()).ToList();
 
-        private Task _crawlTask;
+        public bool Finished { get; private set; }
+
+        public static CrawlManager ResumeFromFile(string fileName)
+        {
+            var fileBytes = File.ReadAllBytes(fileName);
+
+            var resumedCrawlManager = new CrawlManager();
+
+            using (var memoryStream = new MemoryStream(fileBytes))
+            using (var binaryReader = new BinaryReader(memoryStream))
+            {
+                resumedCrawlManager._actionChainsToCrawl = new List<ActionChain>(ReadFromSerializationBytes<List<ActionChain>>(binaryReader));
+                resumedCrawlManager._crawledActionChainItems = ReadFromSerializationBytes<List<ActionChainItem>>(binaryReader);
+                resumedCrawlManager._crawlOptions = ReadFromSerializationBytes<CrawlOptions>(binaryReader);
+                resumedCrawlManager._requestMessages = new ConcurrentBag<RequestMessage>(ReadFromSerializationBytes<List<RequestMessage>>(binaryReader));
+                resumedCrawlManager._initialPagesCrawled = binaryReader.ReadBoolean();
+            }
+
+            return resumedCrawlManager;
+        }
+
+        private static T ReadFromSerializationBytes<T>(BinaryReader binaryReader)
+        {
+            var byteLength = binaryReader.ReadInt32();
+            var bytes = binaryReader.ReadBytes(byteLength);
+            var obj = MessagePackSerializer.Deserialize<T>(bytes, ContractlessStandardResolverAllowPrivate.Instance);
+
+            return obj;
+        }
+
+        private static void WriteToSerializationBytes(BinaryWriter binaryWriter, object obj)
+        {
+            var bytes = MessagePackSerializer.Serialize(obj, ContractlessStandardResolverAllowPrivate.Instance);
+            binaryWriter.Write(bytes.Length);
+            binaryWriter.Write(bytes);
+        }
 
         public void Start()
         {
+            _cancellationTokenSource = new CancellationTokenSource();
             _crawlTask = new Task(() =>
             {
-                SetupProxyServer();
-
                 var parallelOptions = new ParallelOptions();
                 parallelOptions.CancellationToken = _cancellationTokenSource.Token;
                 parallelOptions.MaxDegreeOfParallelism = _crawlOptions.MaximumThreads;
@@ -79,9 +120,19 @@ namespace ByrneLabs.TestoRoboto.Crawler
                 }
 
                 _initialPagesCrawled = true;
-                BetterParallel.While(parallelOptions, () => !_actionChainsToCrawl.IsEmpty, () =>
+                BetterParallel.While(parallelOptions, () => _actionChainsToCrawl.Any(), () =>
                 {
-                    if (_actionChainsToCrawl.TryDequeue(out var actionChainToCrawl))
+                    ActionChain actionChainToCrawl;
+                    lock (_actionChainsToCrawl)
+                    {
+                        actionChainToCrawl = _actionChainsToCrawl.OrderBy(actionChain => actionChain.Priority).FirstOrDefault();
+                        if (actionChainToCrawl != null)
+                        {
+                            _actionChainsToCrawl.Remove(actionChainToCrawl);
+                        }
+                    }
+
+                    if (actionChainToCrawl != null)
                     {
                         try
                         {
@@ -121,13 +172,35 @@ namespace ByrneLabs.TestoRoboto.Crawler
 
                     parallelOptions.CancellationToken.ThrowIfCancellationRequested();
                 });
+                Finished = true;
             }, _cancellationTokenSource.Token);
             _crawlTask.Start();
         }
 
+        public void Stop(string saveToFileName)
+        {
+            Stop();
+
+            using (var memoryStream = new MemoryStream())
+            using (var binaryWriter = new BinaryWriter(memoryStream))
+            {
+                WriteToSerializationBytes(binaryWriter, _actionChainsToCrawl);
+                WriteToSerializationBytes(binaryWriter, _crawledActionChainItems.ToList());
+                WriteToSerializationBytes(binaryWriter, _crawlOptions);
+                WriteToSerializationBytes(binaryWriter, _requestMessages.ToList());
+                binaryWriter.Write(_initialPagesCrawled);
+
+                File.WriteAllBytes(saveToFileName, memoryStream.ToArray());
+            }
+        }
+
         public void Stop()
         {
-            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Cancel(false);
+            while (!_crawlTask.IsCompleted)
+            {
+                Thread.Sleep(100);
+            }
         }
 
         internal void ReportCompletedActionChain(ActionChain actionChain)
@@ -146,7 +219,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
                 {
                     if (!discoveredActionChain.Items.Last().Crawled && !discoveredActionChain.IsLooped)
                     {
-                        _actionChainsToCrawl.Enqueue(discoveredActionChain);
+                        _actionChainsToCrawl.Add(discoveredActionChain);
                     }
                 }
             }
@@ -275,7 +348,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
                     requestMessage.Cookies.Add(new Cookie { Name = name, Value = value });
                 }
 
-                requestMessage.Encoding = e.HttpClient.Request.Encoding;
+                requestMessage.Encoding = e.HttpClient.Request.Encoding.WebName;
 
                 var contentType = e.HttpClient.Request.Headers.HeaderExists("Content-Type") ? e.HttpClient.Request.Headers.GetFirstHeader("Content-Type").Value : string.Empty;
 
@@ -300,7 +373,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
                     }
                 }
 
-                requestMessage.HttpMethod = new HttpMethod(e.HttpClient.Request.Method);
+                requestMessage.HttpMethod = e.HttpClient.Request.Method;
 
                 _requestMessages.Add(requestMessage);
             });

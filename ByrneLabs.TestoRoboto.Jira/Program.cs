@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -30,11 +29,13 @@ namespace ByrneLabs.TestoRoboto.Jira
 
             var crawlManager = new CrawlManager(crawlOptions);
             crawlManager.Start();
-            Thread.Sleep(60000);
-            crawlManager.Stop();
+            while (!crawlManager.Finished)
+            {
+                Thread.Sleep(60000);
 
-            var requestMessageBytes = ByrneLabsSerializer.Serialize(crawlManager.DiscoveredRequestMessages);
-            File.WriteAllBytes("jira crawl request messages.bls", requestMessageBytes);
+                var requestMessageBytes = ByrneLabsSerializer.Serialize(crawlManager.DiscoveredRequestMessages);
+                File.WriteAllBytes("jira crawl request messages.bls", requestMessageBytes);
+            }
         }
 
         private static void FuzzTestHarFile()
@@ -52,7 +53,7 @@ namespace ByrneLabs.TestoRoboto.Jira
             testRequest.Items.Add(collection);
             testRequest.SessionData = GetSessionData();
             testRequest.LogDirectory = "server-errors";
-            testRequest.ResponseErrorsToIgnore = new List<string>
+            testRequest.ResponseErrorsToIgnore.AddRange(new[]
             {
                 @"Can not deserialize instance of java\.util\.HashSet out of VALUE_STRING token.*com\.atlassian\.greenhopper\.web\.rapid\.view\.CreatePresetsRequest\[\\""\w+\\""\]",
                 @"Can not construct instance of boolean from String value .*: only \\""true\\"" or \\""false\\"" recognized",
@@ -70,7 +71,7 @@ namespace ByrneLabs.TestoRoboto.Jira
                 @"java.lang.IllegalArgumentException: A resolution with the &#39;.+&#39; does not exist.\r\n\tat com.atlassian.jira.config.DefaultResolutionManager.checkResolutionExists",
                 @"java.lang.NullPointerException\r\n\tat com.atlassian.jira.bc.config.DefaultStatusService.validateRemoveStatus",
                 @"com.google.template.soy.tofu.SoyTofuException: In &#39;\w+&#39; tag, expression &quot;.+&quot; evaluates to undefined"
-            };
+            });
 
             Dispatcher.Dispatch(testRequest);
         }
@@ -79,7 +80,7 @@ namespace ByrneLabs.TestoRoboto.Jira
         {
             var loginRequestMessage = new RequestMessage();
             loginRequestMessage.Uri = new Uri("http://" + Environment.MachineName + ":8080/login.jsp");
-            loginRequestMessage.HttpMethod = HttpMethod.Post;
+            loginRequestMessage.HttpMethod = HttpMethod.Post.ToString();
             loginRequestMessage.Headers.Add(new Header { Key = "Content-Type", Value = "application/x-www-form-urlencoded" });
 
             var loginBody = new FormUrlEncodedBody();

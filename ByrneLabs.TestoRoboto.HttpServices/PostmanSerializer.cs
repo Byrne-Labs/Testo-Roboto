@@ -90,7 +90,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
             if (requestMessage.HttpMethod != null)
             {
-                jsonRequestMessage.Add("method", requestMessage.HttpMethod.ToString());
+                jsonRequestMessage.Add("method", requestMessage.HttpMethod);
             }
 
             var jsonHeaders = new JArray();
@@ -373,7 +373,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             request.Name = jsonRequest["name"].ToString();
             request.AuthenticationMethod = GetAuthenticationMethod(jsonRequest);
             var httpMethod = jsonRequest["request"]["method"].ToString();
-            request.HttpMethod = HttpTools.HttpMethodFromString(httpMethod);
+            request.HttpMethod = httpMethod;
             if (jsonRequest["request"]["header"] is JArray)
             {
                 foreach (var jsonHeader in ((JArray) jsonRequest["request"]["header"]).OfType<JObject>())

@@ -33,6 +33,45 @@ namespace ByrneLabs.TestoRoboto.Crawler
 
         public IList<ActionChainItem> Items { get; } = new List<ActionChainItem>();
 
+        public int Priority
+        {
+            get
+            {
+                var lastChainItem = Items.Last();
+                if (lastChainItem.ChosenActionItem.Tag == "input" && lastChainItem.ChosenActionItem.Type == "submit")
+                {
+                    return 2;
+                }
+
+                if (lastChainItem.ChosenActionItem.Tag == "input" && lastChainItem.ChosenActionItem.Type == "button")
+                {
+                    return 3;
+                }
+
+                if (lastChainItem.ChosenActionItem.Tag == "a" && !string.IsNullOrWhiteSpace(lastChainItem.ChosenActionItem.Href) && lastChainItem.Url.SubstringBeforeLast("?").StartsWith(lastChainItem.ChosenActionItem.Href.SubstringBeforeLast("?"), StringComparison.Ordinal))
+                {
+                    return 4;
+                }
+
+                if (lastChainItem.ChosenActionItem.Tag == "a" && !string.IsNullOrWhiteSpace(lastChainItem.ChosenActionItem.Href) && lastChainItem.Url.StartsWith(lastChainItem.ChosenActionItem.Href, StringComparison.Ordinal))
+                {
+                    return 5;
+                }
+
+                if (lastChainItem.ChosenActionItem.Tag == "a" && string.IsNullOrWhiteSpace(lastChainItem.ChosenActionItem.Href))
+                {
+                    return 6;
+                }
+
+                if (lastChainItem.ChosenActionItem.Tag == "input")
+                {
+                    return 7;
+                }
+
+                return 1;
+            }
+        }
+
         public string TerminationReason { get; set; }
 
         public static bool operator ==(ActionChain left, ActionChain right) => Equals(left, right);

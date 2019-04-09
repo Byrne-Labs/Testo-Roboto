@@ -1,6 +1,4 @@
-﻿using System.Windows.Controls;
-
-namespace ByrneLabs.TestoRoboto.Desktop
+﻿namespace ByrneLabs.TestoRoboto.Desktop
 {
     /// <summary>
     ///     Interaction logic for KeyValue.xaml

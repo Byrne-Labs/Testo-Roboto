@@ -24,7 +24,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             foreach (var harEntry in entries.Cast<JObject>())
             {
                 var requestMessage = new RequestMessage();
-                requestMessage.HttpMethod = HttpTools.HttpMethodFromString(harEntry["request"]["method"].ToString());
+                requestMessage.HttpMethod = harEntry["request"]["method"].ToString();
                 requestMessage.Uri = new Uri(harEntry["request"]["url"].ToString());
 
                 foreach (var harHeader in harEntry["request"]["headers"].Cast<JObject>())

@@ -5,8 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ByrneLabs.Commons" Version="1.0.0.113-alpha" />
+    <PackageReference Include="ByrneLabs.Commons" Version="1.0.0.115-alpha" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.0" />
+    <PackageReference Include="MessagePack" Version="1.7.3.4" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="3.0.0-preview3.19153.1" />
     <PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
     <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="73.0.3683.68" />

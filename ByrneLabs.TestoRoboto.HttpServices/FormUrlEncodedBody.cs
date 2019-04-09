@@ -2,13 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using ByrneLabs.Commons;
+using JetBrains.Annotations;
+using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
+    [MessagePackObject]
+    [PublicAPI]
     public class FormUrlEncodedBody : Body, ICloneable<FormUrlEncodedBody>
     {
+        [Key(0)]
         public override string Fingerprint => string.Join(", ", FormData.Select(parameter => parameter.Key));
 
+        [Key(1)]
         public IList<KeyValue> FormData { get; } = new List<KeyValue>();
 
         public static FormUrlEncodedBody GetFromBodyText(string bodyText)

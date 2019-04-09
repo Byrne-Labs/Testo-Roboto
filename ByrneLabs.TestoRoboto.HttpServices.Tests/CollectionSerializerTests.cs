@@ -30,14 +30,14 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             requestMessage.Name = "Some Message";
             requestMessage.AuthenticationMethod = new BasicAuthentication { Username = "username2", Password = "password2" };
             requestMessage.Body = new RawBody { Text = "{ \"asdf\": 123 }" };
-            requestMessage.HttpMethod = HttpMethod.Post;
+            requestMessage.HttpMethod = HttpMethod.Post.ToString();
             requestMessage.Uri = new Uri("http://some.domain/path/resource?key=value");
             requestMessage.Headers.Add(new Header { Key = "Content-Type", Value = "application/json" });
             collection.Items.Add(requestMessage);
             var subCollection = new Collection { Name = "Sub-collection" };
             subCollection.AuthenticationMethod = new BasicAuthentication { Username = "username3", Password = "password3" };
             collection.Items.Add(subCollection);
-            subCollection.Items.Add(new RequestMessage { HttpMethod = HttpMethod.Post, Name = "Some Message", Body = new RawBody { Text = "{ \"xyz\": 456 }" } });
+            subCollection.Items.Add(new RequestMessage { HttpMethod = HttpMethod.Post.ToString(), Name = "Some Message", Body = new RawBody { Text = "{ \"xyz\": 456 }" } });
             collection.Items.Add(new Collection { Name = "Fuzzed Messages" });
 
             return collection;

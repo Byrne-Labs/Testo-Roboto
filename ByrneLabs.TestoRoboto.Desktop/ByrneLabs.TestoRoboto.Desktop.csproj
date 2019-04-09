@@ -130,6 +130,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="ByrneLabs.Commons">
+      <Version>1.0.0.115-alpha</Version>
+    </PackageReference>
     <PackageReference Include="Fluent.Ribbon">
       <Version>7.0.0-alpha0624</Version>
     </PackageReference>

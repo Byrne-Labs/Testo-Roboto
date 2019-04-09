@@ -157,7 +157,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                 if (requestMessage.Body is RawBody rawBody)
                 {
                     var contentType = requestMessage.Headers.SingleOrDefault(header => header.Key == "Content-Type")?.Value ?? "text/plain";
-                    httpContent = new StringContent(rawBody.Text, requestMessage.Encoding, contentType);
+                    httpContent = new StringContent(rawBody.Text, Encoding.GetEncoding(requestMessage.Encoding), contentType);
                 }
                 else if (requestMessage.Body is FormUrlEncodedBody formUrlEncodedBody)
                 {
@@ -183,7 +183,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                 var httpRequestMessage = new HttpRequestMessage
                 {
                     Content = httpContent,
-                    Method = requestMessage.HttpMethod,
+                    Method = HttpTools.HttpMethodFromString(requestMessage.HttpMethod),
                     RequestUri = uri
                 };
 

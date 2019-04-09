@@ -10,7 +10,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
         public void TestFormUrlEncodedPostRequestFingerprint()
         {
             var requestMessage = new RequestMessage();
-            requestMessage.HttpMethod = HttpMethod.Get;
+            requestMessage.HttpMethod = HttpMethod.Get.ToString();
             requestMessage.Uri = new Uri("https://some.domain/path1/path2/resource?Key1=Value%201");
             requestMessage.Cookies.Add(new Cookie { Name = "Key1", Value = "Value 1" });
             requestMessage.Headers.Add(new Header { Key = "Key1", Value = "Value 1" });
@@ -36,7 +36,7 @@ body: Key1, Key2, Key2
         public void TestGetRequestFingerprint()
         {
             var requestMessage = new RequestMessage();
-            requestMessage.HttpMethod = HttpMethod.Get;
+            requestMessage.HttpMethod = HttpMethod.Get.ToString();
             requestMessage.Uri = new Uri("https://some.domain/path1/path2/resource?Key1=Value%201");
             requestMessage.Cookies.Add(new Cookie { Name = "Key1", Value = "Value 1" });
             requestMessage.Headers.Add(new Header { Key = "Key1", Value = "Value 1" });
@@ -58,7 +58,7 @@ cookies: Key1
         public void TestJsonPostRequestFingerprint()
         {
             var requestMessage = new RequestMessage();
-            requestMessage.HttpMethod = HttpMethod.Post;
+            requestMessage.HttpMethod = HttpMethod.Post.ToString();
             requestMessage.Uri = new Uri("https://some.domain/path1/path2/resource?Key1=Value%201");
             requestMessage.Cookies.Add(new Cookie { Name = "Key1", Value = "Value 1" });
             requestMessage.Headers.Add(new Header { Key = "Key1", Value = "Value 1" });

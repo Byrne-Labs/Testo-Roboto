@@ -2,21 +2,27 @@
 using System.Linq;
 using ByrneLabs.Commons;
 using ByrneLabs.TestoRoboto.HttpServices.Mutators;
+using JetBrains.Annotations;
+using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
+    [MessagePackObject]
+    [PublicAPI]
     public class Collection : Item, ICloneable<Collection>
     {
-        public List<Item> Items { get; } = new List<Item>();
+        [Key(4)]
+        public bool FuzzedMessageCollection { get; private set; }
 
-        private bool FuzzedMessageCollection { get; set; }
+        [Key(3)]
+        public List<Item> Items { get; } = new List<Item>();
 
         public void AddFuzzedMessages(IEnumerable<Mutator> mutators, bool includeSubCollections)
         {
             if (Items.OfType<RequestMessage>().Any())
             {
                 Collection fuzzedMessages;
-                if (Items.OfType<Collection>().All(collection => collection.FuzzedMessageCollection))
+                if (Items.OfType<Collection>().All(collection => !collection.FuzzedMessageCollection))
                 {
                     Items.Add(fuzzedMessages = new Collection { FuzzedMessageCollection = true, Description = "Fuzzed messages", Name = "Fuzzed Messages" });
                 }

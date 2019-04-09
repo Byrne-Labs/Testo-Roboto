@@ -1,16 +1,24 @@
 ﻿using System.Web;
 using ByrneLabs.Commons;
+using JetBrains.Annotations;
+using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
+    [MessagePackObject]
+    [PublicAPI]
     public class QueryStringParameter : HandyObject<QueryStringParameter>
     {
+        [Key(0)]
         public string Description { get; set; }
 
+        [Key(1)]
         public string Key { get; set; }
 
+        [Key(2)]
         public string UriEncodedValue { get; set; }
 
+        [IgnoreMember]
         public string Value
         {
             get => HttpUtility.UrlDecode(UriEncodedValue);

@@ -4,19 +4,22 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Text;
 using ByrneLabs.Commons;
 using JetBrains.Annotations;
+using MessagePack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
+    [MessagePackObject]
     [PublicAPI]
     public class RequestMessage : Item, ICloneable<RequestMessage>
     {
+        [Key(3)]
         private ObservableCollection<QueryStringParameter> _queryStringParameters;
+        [Key(4)]
         private Uri _uri;
 
         public RequestMessage()
@@ -24,14 +27,19 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             InitializeQueryStringParameters(Enumerable.Empty<QueryStringParameter>());
         }
 
+        [Key(5)]
         public Body Body { get; set; }
 
+        [Key(6)]
         public IList<Cookie> Cookies { get; } = new List<Cookie>();
 
-        public Encoding Encoding { get; set; } = Encoding.UTF8;
+        [Key(7)]
+        public string Encoding { get; set; } = System.Text.Encoding.UTF8.WebName;
 
+        [Key(8)]
         public HttpStatusCode? ExpectedStatusCode { get; set; }
 
+        [IgnoreMember]
         public string Fingerprint
         {
             get
@@ -39,7 +47,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                 var fingerprint = new StringBuilder();
                 if (HttpMethod != null)
                 {
-                    fingerprint.Append("method: ").AppendLine(HttpMethod.ToString());
+                    fingerprint.Append("method: ").AppendLine(HttpMethod);
                 }
 
                 if (Uri != null)
@@ -75,10 +83,13 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             }
         }
 
+        [Key(9)]
         public IList<Header> Headers { get; } = new List<Header>();
 
-        public HttpMethod HttpMethod { get; set; }
+        [Key(10)]
+        public string HttpMethod { get; set; }
 
+        [IgnoreMember]
         public bool IsBodyContentJson
         {
             get
@@ -87,6 +98,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             }
         }
 
+        [IgnoreMember]
         public bool IsBodyContentXml
         {
             get
@@ -95,10 +107,13 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             }
         }
 
+        [IgnoreMember]
         public IList<QueryStringParameter> QueryStringParameters => _queryStringParameters;
 
-        public IList<ResponseMessage> ResponseMessages { get; } = new List<ResponseMessage>();
+        [Key(11)]
+        public List<ResponseMessage> ResponseMessages { get; } = new List<ResponseMessage>();
 
+        [IgnoreMember]
         public Uri Uri
         {
             get => _uri;

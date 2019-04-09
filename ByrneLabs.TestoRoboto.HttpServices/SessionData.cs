@@ -1,16 +1,24 @@
 ﻿using System.Collections.Generic;
 using ByrneLabs.Commons;
+using JetBrains.Annotations;
+using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
+    [MessagePackObject]
+    [PublicAPI]
     public class SessionData : HandyObject<SessionData>
     {
-        public IList<Cookie> Cookies { get; } = new List<Cookie>();
+        [Key(0)]
+        public List<Cookie> Cookies { get; } = new List<Cookie>();
 
-        public IList<KeyValue> FormParameters { get; } = new List<KeyValue>();
+        [Key(1)]
+        public List<KeyValue> FormParameters { get; } = new List<KeyValue>();
 
-        public IList<Header> Headers { get; } = new List<Header>();
+        [Key(2)]
+        public List<Header> Headers { get; } = new List<Header>();
 
-        public IList<QueryStringParameter> QueryStringParameters { get; } = new List<QueryStringParameter>();
+        [Key(3)]
+        public List<QueryStringParameter> QueryStringParameters { get; } = new List<QueryStringParameter>();
     }
 }

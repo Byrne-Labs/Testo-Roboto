@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using ByrneLabs.Serializer;
+using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
@@ -8,13 +8,13 @@ namespace ByrneLabs.TestoRoboto.HttpServices
     {
         public bool BinaryOnly => true;
 
-        public Collection Read(byte[] bytes) => ByrneLabsSerializer.Deserialize<Collection>(bytes);
+        public Collection Read(byte[] bytes) => MessagePackSerializer.Deserialize<Collection>(bytes);
 
         public Collection ReadFromFile(string fileName) => Read(File.ReadAllBytes(fileName));
 
         public Collection ReadFromString(string collectionText) => throw new NotSupportedException();
 
-        public byte[] Write(Collection collection) => ByrneLabsSerializer.Serialize(collection);
+        public byte[] Write(Collection collection) => MessagePackSerializer.Serialize(collection);
 
         public void WriteToFile(Collection collection, string fileName)
         {

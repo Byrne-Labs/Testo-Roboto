@@ -1,11 +1,17 @@
 ﻿using ByrneLabs.Commons;
+using JetBrains.Annotations;
+using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
+    [MessagePackObject]
+    [PublicAPI]
     public class RawBody : Body, ICloneable<RawBody>
     {
+        [IgnoreMember]
         public override string Fingerprint => Text;
 
+        [Key(0)]
         public string Text { get; set; }
 
         public static RawBody GetFromBodyText(string body) => new RawBody { Text = body };
