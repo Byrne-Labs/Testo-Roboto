@@ -137,19 +137,19 @@ namespace ByrneLabs.TestoRoboto.HttpServices
         }
 
         [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
-        private static void ClearValues(JObject json)
+        private static void ClearJsonValues(JObject json)
         {
             foreach (var child in json.Children().OfType<JProperty>())
             {
                 switch (child.Value)
                 {
                     case JObject jObject:
-                        ClearValues(jObject);
+                        ClearJsonValues(jObject);
                         break;
                     case JArray jArray:
                         foreach (var item in jArray.OfType<JObject>())
                         {
-                            ClearValues(item);
+                            ClearJsonValues(item);
                         }
 
                         var itemStrings = new List<string>();
@@ -195,7 +195,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                 return jsonText;
             }
 
-            ClearValues(json);
+            ClearJsonValues(json);
 
             return json.ToString(Formatting.None);
         }

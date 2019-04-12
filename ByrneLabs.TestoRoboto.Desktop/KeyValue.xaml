@@ -6,7 +6,6 @@
              xmlns:local="clr-namespace:ByrneLabs.TestoRoboto.Desktop"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             xmlns:viewModels="clr-namespace:ByrneLabs.TestoRoboto.Desktop.ViewModels"
              d:DataContext="{d:DesignInstance viewModels:KeyValueViewModel, IsDesignTimeCreatable=true }">
     <Grid />
 </UserControl>

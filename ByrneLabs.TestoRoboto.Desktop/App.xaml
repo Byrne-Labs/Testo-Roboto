@@ -4,6 +4,9 @@
              xmlns:local="clr-namespace:ByrneLabs.TestoRoboto.Desktop"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+        <!--
         <ResourceDictionary Source="pack://application:,,,/Fluent;Component/Themes/Generic.xaml" />
+        -->
+        <ResourceDictionary Source="/PresentationFramework.Aero;component/themes/aero.normalcolor.xaml" />
     </Application.Resources>
 </Application>

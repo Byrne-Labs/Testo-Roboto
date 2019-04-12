@@ -5,10 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:ByrneLabs.TestoRoboto.Desktop"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:viewModels="clr-namespace:ByrneLabs.TestoRoboto.Desktop.ViewModels"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             xmlns:viewModels="clr-namespace:ByrneLabs.TestoRoboto.Desktop.ViewModels"
              d:DataContext="{d:DesignInstance viewModels:RequestMessageViewModel, IsDesignTimeCreatable=true }">
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -16,12 +17,37 @@
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
             <xctk:WatermarkTextBox Margin="5" MinWidth="200" Watermark="Name" KeepWatermarkOnGotFocus="False" Text="{Binding Name}" />
-
-
+            <xctk:WatermarkTextBox Margin="5" MinWidth="200" Watermark="URL" KeepWatermarkOnGotFocus="False" Text="{Binding Url}" />
         </StackPanel>
         <TabControl Grid.Row="1">
-            <TabItem Header="Parameters">
-                <DataGrid ItemsSource="{Binding QueryParameters}" />
+            <TabItem Header="Query Parameters">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Row="0">
+                        <Button Margin="8" Command="{Binding AddQueryStringParameterCommand}">Add</Button>
+                        <Button Margin="8" Command="{Binding DeleteSelectedQueryStringParameterCommand}">Delete</Button>
+                    </StackPanel>
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding QueryStringParameters}" SelectedItem="{Binding SelectedQueryStringParameter}" SelectionMode="Single" AutoGenerateColumns="False">
+                        <DataGrid.Resources>
+                            <ContextMenu x:Key="DataRowContextMenu">
+                                <MenuItem Header="Delete" Command="{Binding DeleteSelectedQueryStringParameterCommand}" />
+                            </ContextMenu>
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Key" Binding="{Binding Key}" MinWidth="100"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Value" Binding="{Binding Value}" MinWidth="150"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" MinWidth="400"></DataGridTextColumn>
+                        </DataGrid.Columns>
+                        <DataGrid.RowStyle>
+                            <Style TargetType="{x:Type DataGridRow}">
+                                <Setter Property="ContextMenu" Value="{StaticResource DataRowContextMenu}" />
+                            </Style>
+                        </DataGrid.RowStyle>
+                    </DataGrid>
+                </Grid>
             </TabItem>
             <TabItem Header="Authentication" />
             <TabItem Header="Headers" />

@@ -36,8 +36,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationFramework.Aero">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PresentationFramework.Aero2">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Controls.Ribbon" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -79,6 +86,7 @@
     <Compile Include="ViewModels\NtlmAuthenticationViewModel.cs" />
     <Compile Include="ViewModels\Oath1AuthenticationViewModel.cs" />
     <Compile Include="ViewModels\Oath2AuthenticationViewModel.cs" />
+    <Compile Include="ViewModels\QueryStringParameterViewModel.cs" />
     <Compile Include="ViewModels\RawBodyViewModel.cs" />
     <Compile Include="ViewModels\RequestMessageViewModel.cs" />
     <Page Include="KeyValue.xaml">
@@ -124,12 +132,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ByrneLabs.Commons.Presentation.Wpf\ByrneLabs.Commons.Presentation.Wpf.csproj">
-      <Project>{4ceb9712-36b6-40fd-95eb-573203008840}</Project>
-      <Name>ByrneLabs.Commons.Presentation.Wpf</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="ByrneLabs.Commons">
       <Version>1.0.0.115-alpha</Version>
     </PackageReference>
@@ -139,6 +141,12 @@
     <PackageReference Include="Xceed.Products.Wpf.Toolkit.Full">
       <Version>3.8.19076.18510</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ByrneLabs.Commons.Presentation.Wpf\ByrneLabs.Commons.Presentation.Wpf.csproj">
+      <Project>{4ceb9712-36b6-40fd-95eb-573203008840}</Project>
+      <Name>ByrneLabs.Commons.Presentation.Wpf</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

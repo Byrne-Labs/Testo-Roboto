@@ -15,13 +15,17 @@ namespace ByrneLabs.TestoRoboto.Jira
     {
         private static void CrawlJira()
         {
-            var sessionData = GetSessionData();
             var crawlOptions = new CrawlOptions();
             crawlOptions.AllowedUrlPatterns.Add("^http://" + Environment.MachineName + ":8080");
             crawlOptions.MaximumChainLength = 12;
-            crawlOptions.MaximumThreads = 12;
+            crawlOptions.MaximumThreads = 4;
             crawlOptions.HeadlessBrowsing = true;
             crawlOptions.StartingUrls.Add("http://" + Environment.MachineName + ":8080");
+            crawlOptions.StartingUrls.Add("http://" + Environment.MachineName + ":8080/admin/user/UserBrowser.jspa");
+            crawlOptions.StartingUrls.Add("http://" + Environment.MachineName + ":8080/secure/admin/ViewApplicationProperties.jspa");
+            crawlOptions.StartingUrls.Add("http://" + Environment.MachineName + ":8080/secure/admin/ViewIssueTypes.jspa");
+            crawlOptions.StartingUrls.Add("http://" + Environment.MachineName + ":8080/secure/project/BrowseProjects.jspa?s=view_projects");
+            var sessionData = GetSessionData();
             foreach (var cookie in sessionData.Cookies)
             {
                 crawlOptions.SessionCookies.Add(new Cookie(cookie.Name, cookie.Value, cookie.Domain, cookie.Path, null));

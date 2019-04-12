@@ -85,14 +85,14 @@ namespace ByrneLabs.TestoRoboto.Crawler
         {
             var byteLength = binaryReader.ReadInt32();
             var bytes = binaryReader.ReadBytes(byteLength);
-            var obj = MessagePackSerializer.Deserialize<T>(bytes, ContractlessStandardResolverAllowPrivate.Instance);
+            var obj = MessagePackSerializer.Deserialize<T>(bytes);
 
             return obj;
         }
 
         private static void WriteToSerializationBytes(BinaryWriter binaryWriter, object obj)
         {
-            var bytes = MessagePackSerializer.Serialize(obj, ContractlessStandardResolverAllowPrivate.Instance);
+            var bytes = MessagePackSerializer.Serialize(obj);
             binaryWriter.Write(bytes.Length);
             binaryWriter.Write(bytes);
         }
@@ -110,9 +110,16 @@ namespace ByrneLabs.TestoRoboto.Crawler
                 {
                     Parallel.ForEach(_crawlOptions.StartingUrls, parallelOptions, url =>
                     {
-                        using (var initialCrawler = new Crawler(GetCrawlerSetup(_crawlOptions)))
+                        try
                         {
-                            initialCrawler.Crawl(url);
+                            using (var initialCrawler = new Crawler(GetCrawlerSetup(_crawlOptions)))
+                            {
+                                initialCrawler.Crawl(url);
+                            }
+                        }
+                        catch (Exception exception)
+                        {
+                            Console.WriteLine(exception);
                         }
 
                         parallelOptions.CancellationToken.ThrowIfCancellationRequested();
@@ -125,7 +132,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
                     ActionChain actionChainToCrawl;
                     lock (_actionChainsToCrawl)
                     {
-                        actionChainToCrawl = _actionChainsToCrawl.OrderBy(actionChain => actionChain.Priority).FirstOrDefault();
+                        actionChainToCrawl = _actionChainsToCrawl.OrderBy(actionChain => actionChain.Priority).ThenBy(x => BetterRandom.Next()).FirstOrDefault();
                         if (actionChainToCrawl != null)
                         {
                             _actionChainsToCrawl.Remove(actionChainToCrawl);
@@ -157,7 +164,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
                             }
                             else
                             {
-                                actionChainToCrawl.TerminationReason = "Selenium Exception";
+                                actionChainToCrawl.TerminationReason = "Selenium Exception - " + exception.Message;
                             }
 
                             ReportCompletedActionChain(actionChainToCrawl);
@@ -165,7 +172,7 @@ namespace ByrneLabs.TestoRoboto.Crawler
                         catch (Exception exception)
                         {
                             actionChainToCrawl.Exception = exception;
-                            actionChainToCrawl.TerminationReason = "Exception";
+                            actionChainToCrawl.TerminationReason = "Exception - " + exception.Message;
                             ReportCompletedActionChain(actionChainToCrawl);
                         }
                     }

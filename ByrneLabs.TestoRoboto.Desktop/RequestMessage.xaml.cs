@@ -1,4 +1,5 @@
-﻿using ByrneLabs.TestoRoboto.Desktop.ViewModels;
+﻿using System.Windows.Input;
+using ByrneLabs.TestoRoboto.Desktop.ViewModels;
 
 namespace ByrneLabs.TestoRoboto.Desktop
 {
@@ -9,10 +10,12 @@ namespace ByrneLabs.TestoRoboto.Desktop
             InitializeComponent();
 
             var requestMessageViewModel = new RequestMessageViewModel();
-            requestMessageViewModel.Name = "name";
-            requestMessageViewModel.QueryParameters.Add(new KeyValueViewModel { Key = "key1", Value = "value1", Description = "description" });
-
             DataContext = requestMessageViewModel;
+        }
+
+        private void CommandBinding_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
