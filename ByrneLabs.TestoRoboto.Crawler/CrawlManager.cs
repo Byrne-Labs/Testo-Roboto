@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using ByrneLabs.Commons;
 using ByrneLabs.TestoRoboto.Crawler.PageItems;
 using ByrneLabs.TestoRoboto.HttpServices;
-using JetBrains.Annotations;
+//using JetBrains.Annotations;
 using MessagePack;
 using MessagePack.Resolvers;
 using OpenQA.Selenium;
@@ -24,7 +24,7 @@ using Cookie = ByrneLabs.TestoRoboto.HttpServices.Cookie;
 
 namespace ByrneLabs.TestoRoboto.Crawler
 {
-    [PublicAPI]
+    
     public class CrawlManager
     {
         private class FingerprintRequestMessageComparer : IEqualityComparer<RequestMessage>

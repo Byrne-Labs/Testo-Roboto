@@ -1,13 +1,16 @@
 ﻿using ByrneLabs.Commons;
-using JetBrains.Annotations;
+//using JetBrains.Annotations;
 using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     [MessagePackObject]
-    [PublicAPI]
+    
     public class Cookie : HandyObject<Cookie>
     {
+        [Key(4)]
+        public string Description { get; set; } = string.Empty;
+
         [Key(0)]
         public string Domain { get; set; } = string.Empty;
 

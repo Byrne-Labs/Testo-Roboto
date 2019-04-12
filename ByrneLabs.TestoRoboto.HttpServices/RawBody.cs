@@ -1,11 +1,11 @@
 ﻿using ByrneLabs.Commons;
-using JetBrains.Annotations;
+//using JetBrains.Annotations;
 using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     [MessagePackObject]
-    [PublicAPI]
+    
     public class RawBody : Body, ICloneable<RawBody>
     {
         [IgnoreMember]

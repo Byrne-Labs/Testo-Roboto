@@ -2,7 +2,7 @@
 
 namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    public class Oath2AuthenticationViewModel
+    public class Oauth2AuthenticationViewModel
     {
         public string AccessToken { get; set; }
 

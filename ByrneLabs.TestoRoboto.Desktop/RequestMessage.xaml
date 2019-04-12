@@ -17,7 +17,10 @@
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0">
             <xctk:WatermarkTextBox Margin="5" MinWidth="200" Watermark="Name" KeepWatermarkOnGotFocus="False" Text="{Binding Name}" />
-            <xctk:WatermarkTextBox Margin="5" MinWidth="200" Watermark="URL" KeepWatermarkOnGotFocus="False" Text="{Binding Url}" />
+            <StackPanel Orientation="Horizontal">
+                <xctk:DropDownButton></xctk:DropDownButton>
+                <xctk:WatermarkTextBox Margin="5" MinWidth="200" Watermark="URL" KeepWatermarkOnGotFocus="False" Text="{Binding Url}" />
+            </StackPanel>
         </StackPanel>
         <TabControl Grid.Row="1">
             <TabItem Header="Query Parameters">
@@ -49,9 +52,78 @@
                     </DataGrid>
                 </Grid>
             </TabItem>
-            <TabItem Header="Authentication" />
-            <TabItem Header="Headers" />
-            <TabItem Header="Cookies" />
+            <TabItem Header="Authentication">
+                <StackPanel>
+                    <ListBox ItemsSource="{Binding AuthenticationTypesToChooseFrom}" SelectedItem="{Binding SelectedAuthenticationType}" Style="{StaticResource HorizontalRadioButtonList}"></ListBox>
+                    <ContentControl Content="{Binding AuthenticationViewModel}">
+                        <ContentControl.Resources>
+                            <DataTemplate DataType="{x:Type viewModels:AwsSignatureAuthenticationViewModel}">
+                                <local:AwsSignatureAuthentication />
+                            </DataTemplate>
+                        </ContentControl.Resources>
+                    </ContentControl>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="Headers">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.ColumnSpan="2">
+                        <Button Margin="8" Command="{Binding AddHeaderCommand}">Add</Button>
+                        <Button Margin="8" Command="{Binding DeleteSelectedHeaderCommand}">Delete</Button>
+                    </StackPanel>
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Headers}" SelectedItem="{Binding SelectedHeader}" SelectionMode="Single" AutoGenerateColumns="False" Grid.ColumnSpan="2" Margin="0,0,0,0.333">
+                        <DataGrid.Resources>
+                            <ContextMenu x:Key="DataRowContextMenu">
+                                <MenuItem Header="Delete" Command="{Binding DeleteSelectedHeaderCommand}" />
+                            </ContextMenu>
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Key" Binding="{Binding Key}" MinWidth="100"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Value" Binding="{Binding Value}" MinWidth="150"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" MinWidth="400"></DataGridTextColumn>
+                        </DataGrid.Columns>
+                        <DataGrid.RowStyle>
+                            <Style TargetType="{x:Type DataGridRow}">
+                                <Setter Property="ContextMenu" Value="{StaticResource DataRowContextMenu}" />
+                            </Style>
+                        </DataGrid.RowStyle>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Cookies">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" Grid.Row="0">
+                        <Button Margin="8" Command="{Binding AddCookieCommand}">Add</Button>
+                        <Button Margin="8" Command="{Binding DeleteSelectedCookieCommand}">Delete</Button>
+                    </StackPanel>
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Cookies}" SelectedItem="{Binding SelectedCookie}" SelectionMode="Single" AutoGenerateColumns="False">
+                        <DataGrid.Resources>
+                            <ContextMenu x:Key="DataRowContextMenu">
+                                <MenuItem Header="Delete" Command="{Binding DeleteSelectedCookieCommand}" />
+                            </ContextMenu>
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" MinWidth="100"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Value" Binding="{Binding Value}" MinWidth="150"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Domain" Binding="{Binding Domain}" MinWidth="150"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Path" Binding="{Binding Path}" MinWidth="150"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" MinWidth="400"></DataGridTextColumn>
+                        </DataGrid.Columns>
+                        <DataGrid.RowStyle>
+                            <Style TargetType="{x:Type DataGridRow}">
+                                <Setter Property="ContextMenu" Value="{StaticResource DataRowContextMenu}" />
+                            </Style>
+                        </DataGrid.RowStyle>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
             <TabItem Header="Body" />
         </TabControl>
 

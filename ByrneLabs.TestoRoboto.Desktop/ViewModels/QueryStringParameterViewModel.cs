@@ -1,10 +1,10 @@
 ﻿using System.Web;
 using ByrneLabs.Commons.Presentation.Wpf;
-using JetBrains.Annotations;
+//using JetBrains.Annotations;
 
 namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    [PublicAPI]
+    //[PublicAPI]
     public class QueryStringParameterViewModel : ViewModelBase
     {
         public string Description { get; set; }

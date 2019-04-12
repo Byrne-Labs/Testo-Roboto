@@ -1,12 +1,12 @@
 ﻿using System.Net.Http.Headers;
 using ByrneLabs.Commons;
-using JetBrains.Annotations;
+//using JetBrains.Annotations;
 using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     [MessagePackObject]
-    [PublicAPI]
+    
     [Union(0, typeof(AwsSignature))]
     [Union(1, typeof(BasicAuthentication))]
     [Union(2, typeof(BearerToken))]

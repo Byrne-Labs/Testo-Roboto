@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Net;
 using ByrneLabs.Commons;
-using JetBrains.Annotations;
+//using JetBrains.Annotations;
 using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     [MessagePackObject]
-    [PublicAPI]
+    
     public class ResponseMessage : HandyObject<ResponseMessage>
     {
         [Key(0)]

@@ -2,13 +2,13 @@
 using System.Linq;
 using ByrneLabs.Commons;
 using ByrneLabs.TestoRoboto.HttpServices.Mutators;
-using JetBrains.Annotations;
+//using JetBrains.Annotations;
 using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     [MessagePackObject]
-    [PublicAPI]
+    
     public class Collection : Item, ICloneable<Collection>
     {
         [Key(4)]

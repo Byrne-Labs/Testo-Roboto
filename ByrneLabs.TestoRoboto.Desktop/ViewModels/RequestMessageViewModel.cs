@@ -16,6 +16,10 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
         {
             AddQueryStringParameterCommand = new RelayCommand(param => AddQueryStringParameter());
             DeleteSelectedQueryStringParameterCommand = new RelayCommand(param => DeleteSelectedQueryStringParameter(), param => CanDeleteSelectedQueryStringParameter());
+            AddHeaderCommand = new RelayCommand(param => AddHeader());
+            DeleteSelectedHeaderCommand = new RelayCommand(param => DeleteSelectedHeader(), param => CanDeleteSelectedHeader());
+            AddCookieCommand = new RelayCommand(param => AddCookie());
+            DeleteSelectedCookieCommand = new RelayCommand(param => DeleteSelectedCookie(), param => CanDeleteSelectedCookie());
             QueryStringParameters.CollectionChanged += (sender, args) =>
             {
                 if (_url != null)
@@ -33,11 +37,13 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
             };
         }
 
+        public RelayCommand AddCookieCommand { get; }
+
+        public RelayCommand AddHeaderCommand { get; }
+
         public RelayCommand AddQueryStringParameterCommand { get; }
 
-        public string AuthenticationType { get; set; }
-
-        public IEnumerable<string> AuthenticationTypesToChooseFrom { get; set; }
+        public IEnumerable<string> AuthenticationTypesToChooseFrom { get; } = new[] { "AWS Signature", "Basic", "Bearer Token", "Digest", "Hawk", "NTLM", "OAUTH v1", "OAUTH v2" };
 
         public object AuthenticationViewModel { get; set; }
 
@@ -51,9 +57,15 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public IEnumerable<string> ContentTypesToChooseFrom { get; } = new List<string>();
 
+        public ObservableCollection<CookieViewModel> Cookies { get; } = new ObservableCollection<CookieViewModel>();
+
+        public RelayCommand DeleteSelectedCookieCommand { get; }
+
+        public RelayCommand DeleteSelectedHeaderCommand { get; }
+
         public RelayCommand DeleteSelectedQueryStringParameterCommand { get; }
 
-        public ObservableCollection<QueryStringParameterViewModel> Headers { get; } = new ObservableCollection<QueryStringParameterViewModel>();
+        public ObservableCollection<HeaderViewModel> Headers { get; } = new ObservableCollection<HeaderViewModel>();
 
         public string HttpMethod { get; set; }
 
@@ -61,7 +73,13 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public string Name { get; set; }
 
-        public ObservableCollection<QueryStringParameterViewModel> QueryStringParameters { get; private set; }
+        public ObservableCollection<QueryStringParameterViewModel> QueryStringParameters { get; } = new ObservableCollection<QueryStringParameterViewModel>();
+
+        public string SelectedAuthenticationType { get; set; }
+
+        public CookieViewModel SelectedCookie { get; set; }
+
+        public HeaderViewModel SelectedHeader { get; set; }
 
         public QueryStringParameterViewModel SelectedQueryStringParameter { get; set; }
 
@@ -111,12 +129,36 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
             }
         }
 
+        public void AddCookie()
+        {
+            Cookies.Add(new CookieViewModel());
+        }
+
+        public void AddHeader()
+        {
+            Headers.Add(new HeaderViewModel());
+        }
+
         public void AddQueryStringParameter()
         {
             QueryStringParameters.Add(new QueryStringParameterViewModel());
         }
 
+        public bool CanDeleteSelectedCookie() => SelectedCookie != null;
+
+        public bool CanDeleteSelectedHeader() => SelectedHeader != null;
+
         public bool CanDeleteSelectedQueryStringParameter() => SelectedQueryStringParameter != null;
+
+        public void DeleteSelectedCookie()
+        {
+            Cookies.Remove(SelectedCookie);
+        }
+
+        public void DeleteSelectedHeader()
+        {
+            Headers.Remove(SelectedHeader);
+        }
 
         public void DeleteSelectedQueryStringParameter()
         {

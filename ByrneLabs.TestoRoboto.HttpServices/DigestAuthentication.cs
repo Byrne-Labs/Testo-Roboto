@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Net.Http.Headers;
 using ByrneLabs.Commons;
-using JetBrains.Annotations;
+//using JetBrains.Annotations;
 using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     [MessagePackObject]
-    [PublicAPI]
+    
     public class DigestAuthentication : AuthenticationMethod, ICloneable<DigestAuthentication>
     {
         [Key(0)]

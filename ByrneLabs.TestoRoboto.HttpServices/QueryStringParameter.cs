@@ -1,12 +1,12 @@
 ﻿using System.Web;
 using ByrneLabs.Commons;
-using JetBrains.Annotations;
+//using JetBrains.Annotations;
 using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     [MessagePackObject]
-    [PublicAPI]
+    
     public class QueryStringParameter : HandyObject<QueryStringParameter>
     {
         [Key(0)]

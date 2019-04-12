@@ -1,12 +1,12 @@
 ﻿using System;
 using ByrneLabs.Commons;
-using JetBrains.Annotations;
+//using JetBrains.Annotations;
 using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     [MessagePackObject]
-    [PublicAPI]
+    
     [Union(0, typeof(Collection))]
     [Union(1, typeof(FuzzedRequestMessage))]
     [Union(2, typeof(RequestMessage))]
