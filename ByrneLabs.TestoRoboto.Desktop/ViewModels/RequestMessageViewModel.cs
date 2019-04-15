@@ -35,6 +35,8 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
                     _url = new Uri(uriBuilder.Length <= 2083 ? uriBuilder.ToString() : uriBuilder.ToString().Substring(0, 2083));
                 }
             };
+
+            PropertyChanged += (sender, args) => { };
         }
 
         public RelayCommand AddCookieCommand { get; }
@@ -43,9 +45,9 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public RelayCommand AddQueryStringParameterCommand { get; }
 
-        public IEnumerable<string> AuthenticationTypesToChooseFrom { get; } = new[] { "AWS Signature", "Basic", "Bearer Token", "Digest", "Hawk", "NTLM", "OAUTH v1", "OAUTH v2" };
+        public IEnumerable<AuthenticationViewModel> AuthenticationTypesToChooseFrom { get; } = new AuthenticationViewModel[] { new InheritedAuthenticationViewModel(), new NoAuthenticationViewModel(), new AwsSignatureAuthenticationViewModel(), new BasicAuthenticationViewModel(), new BearerTokenAuthenticationViewModel(), new DigestAuthenticationViewModel(), new HawkAuthenticationViewModel(), new NtlmAuthenticationViewModel(), new Oauth1AuthenticationViewModel(), new Oauth2AuthenticationViewModel() };
 
-        public object AuthenticationViewModel { get; set; }
+        public AuthenticationViewModel AuthenticationViewModel { get; set; }
 
         public string BodyType { get; set; }
 
@@ -69,13 +71,11 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public string HttpMethod { get; set; }
 
-        public IEnumerable<string> HttpMethodsToChooseFrom { get; } = new List<string>();
+        public IEnumerable<string> HttpMethodsToChooseFrom { get; } = new[] { "GET", "POST", "PUT", "PATCH", "DELETE", "COPY", "HEAD", "OPTIONS", "LINK", "UNLINK", "PURGE", "LOCK", "UNLOCK", "PROPFIND", "VIEW" };
 
         public string Name { get; set; }
 
         public ObservableCollection<QueryStringParameterViewModel> QueryStringParameters { get; } = new ObservableCollection<QueryStringParameterViewModel>();
-
-        public string SelectedAuthenticationType { get; set; }
 
         public CookieViewModel SelectedCookie { get; set; }
 

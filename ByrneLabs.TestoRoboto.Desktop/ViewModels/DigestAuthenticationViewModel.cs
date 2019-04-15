@@ -2,7 +2,7 @@
 
 namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    public class DigestAuthenticationViewModel
+    public class DigestAuthenticationViewModel: AuthenticationViewModel
     {
         public string Algorithm { get; set; }
 
@@ -23,5 +23,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
         public string Realm { get; set; }
 
         public string Username { get; set; }
+
+        public override string Name => "Digest";
     }
 }

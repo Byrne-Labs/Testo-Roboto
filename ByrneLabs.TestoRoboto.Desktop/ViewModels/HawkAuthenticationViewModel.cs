@@ -2,7 +2,7 @@
 
 namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    public class HawkAuthenticationViewModel
+    public class HawkAuthenticationViewModel : AuthenticationViewModel
     {
         public string Algorithm { get; set; }
 
@@ -17,6 +17,8 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
         public string Delegation { get; set; }
 
         public string ExtraData { get; set; }
+
+        public override string Name => "Hawk";
 
         public string Nonce { get; set; }
 

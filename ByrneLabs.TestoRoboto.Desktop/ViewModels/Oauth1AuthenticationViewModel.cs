@@ -2,7 +2,7 @@
 
 namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    public class Oauth1AuthenticationViewModel
+    public class Oauth1AuthenticationViewModel : AuthenticationViewModel
     {
         public string AccessToken { get; set; }
 
@@ -11,6 +11,8 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
         public string ConsumerKey { get; set; }
 
         public string ConsumerSecret { get; set; }
+
+        public override string Name => "OAuth V1";
 
         public string Nonce { get; set; }
 

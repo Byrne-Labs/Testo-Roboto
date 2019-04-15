@@ -1,8 +1,10 @@
 ﻿namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    public class AwsSignatureAuthenticationViewModel
+    public class AwsSignatureAuthenticationViewModel : AuthenticationViewModel
     {
         public string AccessKey { get; set; }
+
+        public override string Name => "AWS Signature";
 
         public string Region { get; set; }
 
