@@ -55,19 +55,13 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public RelayCommand AddQueryStringParameterCommand { get; }
 
-        public IEnumerable<AuthenticationViewModel> AuthenticationTypesToChooseFrom { get; } = new AuthenticationViewModel[] { new InheritedAuthenticationViewModel(), new NoAuthenticationViewModel(), new AwsSignatureAuthenticationViewModel(), new BasicAuthenticationViewModel(), new BearerTokenAuthenticationViewModel(), new DigestAuthenticationViewModel(), new HawkAuthenticationViewModel(), new NtlmAuthenticationViewModel(), new Oauth1AuthenticationViewModel(), new Oauth2AuthenticationViewModel() };
+        public IEnumerable<AuthenticationViewModel> AuthenticationTypes { get; } = new AuthenticationViewModel[] { new InheritedAuthenticationViewModel(), new NoAuthenticationViewModel(), new AwsSignatureAuthenticationViewModel(), new BasicAuthenticationViewModel(), new BearerTokenAuthenticationViewModel(), new DigestAuthenticationViewModel(), new HawkAuthenticationViewModel(), new NtlmAuthenticationViewModel(), new Oauth1AuthenticationViewModel(), new Oauth2AuthenticationViewModel() };
 
         public AuthenticationViewModel AuthenticationViewModel { get; set; }
 
-        public string BodyType { get; set; }
+        public IEnumerable<BodyViewModel> BodyTypes { get; } = new BodyViewModel[] { new NoBodyViewModel(), new FormDataBodyViewModel(), new RawBodyViewModel(), new UrlEncodedBodyViewModel() };
 
-        public IEnumerable<string> BodyTypes { get; } = new List<string>();
-
-        public object BodyViewModel { get; set; }
-
-        public string ContentType { get; set; }
-
-        public IEnumerable<string> ContentTypesToChooseFrom { get; } = new List<string>();
+        public BodyViewModel BodyViewModel { get; set; }
 
         public ObservableCollection<CookieViewModel> Cookies { get; } = new FullyObservableCollection<CookieViewModel>();
 
@@ -77,11 +71,13 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public RelayCommand DeleteSelectedQueryStringParameterCommand { get; }
 
+        public string Description { get; set; }
+
         public ObservableCollection<HeaderViewModel> Headers { get; } = new FullyObservableCollection<HeaderViewModel>();
 
-        public string HttpMethod { get; set; }
+        public string HttpMethod { get; set; } = "POST";
 
-        public IEnumerable<string> HttpMethodsToChooseFrom { get; } = new[] { "GET", "POST", "PUT", "PATCH", "DELETE", "COPY", "HEAD", "OPTIONS", "LINK", "UNLINK", "PURGE", "LOCK", "UNLOCK", "PROPFIND", "VIEW" };
+        public IEnumerable<string> HttpMethods { get; } = new[] { "GET", "POST", "PUT", "PATCH", "DELETE", "COPY", "HEAD", "OPTIONS", "LINK", "UNLINK", "PURGE", "LOCK", "UNLOCK", "PROPFIND", "VIEW" };
 
         public string Name { get; set; }
 

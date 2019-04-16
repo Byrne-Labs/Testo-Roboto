@@ -2,8 +2,10 @@
 
 namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    public class KeyValueViewModel : INotifyPropertyChanged
+    public class BodyParameterViewModel : INotifyPropertyChanged
     {
+        public string ContentType { get; set; }
+
         public string Description { get; set; }
 
         public string Key { get; set; }

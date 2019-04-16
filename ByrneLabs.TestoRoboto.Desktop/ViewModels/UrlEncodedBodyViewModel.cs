@@ -5,9 +5,9 @@ using ByrneLabs.Commons.Presentation.Wpf;
 
 namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    public class FormDataBodyViewModel : BodyViewModel
+    public class UrlEncodedBodyViewModel : BodyViewModel
     {
-        public FormDataBodyViewModel()
+        public UrlEncodedBodyViewModel()
         {
             AddParameterCommand = new RelayCommand(param => AddParameter());
             DeleteSelectedParameterCommand = new RelayCommand(param => DeleteSelectedParameter(), param => CanDeleteSelectedParameter());
@@ -17,15 +17,15 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public RelayCommand DeleteSelectedParameterCommand { get; }
 
-        public override string Name => "Form Data";
+        public override string Name => "URL Encoded";
 
-        public ObservableCollection<BodyParameterViewModel> Parameters { get; } = new FullyObservableCollection<BodyParameterViewModel>();
+        public ObservableCollection<KeyValueViewModel> Parameters { get; } = new FullyObservableCollection<KeyValueViewModel>();
 
-        public BodyParameterViewModel SelectedParameter { get; set; }
+        public KeyValueViewModel SelectedParameter { get; set; }
 
         public void AddParameter()
         {
-            Parameters.Add(new BodyParameterViewModel());
+            Parameters.Add(new KeyValueViewModel());
         }
 
         public bool CanDeleteSelectedParameter() => SelectedParameter != null;
