@@ -6,7 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using ByrneLabs.Commons;
-//using JetBrains.Annotations;
+using JetBrains.Annotations;
 using MessagePack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

@@ -18,7 +18,7 @@
         <StackPanel Grid.Row="0">
             <xctk:WatermarkTextBox Margin="5" MinWidth="200" Watermark="Name" KeepWatermarkOnGotFocus="False" Text="{Binding Name}" />
             <StackPanel Orientation="Horizontal">
-                <ComboBox Margin="5" ItemsSource="{Binding HttpMethodsToChooseFrom}" SelectedValue="{Binding HttpMethod}" IsEditable="True" MinWidth="100"/>
+                <ComboBox Margin="5" ItemsSource="{Binding HttpMethodsToChooseFrom}" SelectedValue="{Binding HttpMethod}" IsEditable="True" MinWidth="100" />
                 <xctk:WatermarkTextBox Margin="5" MinWidth="400" Watermark="URL" KeepWatermarkOnGotFocus="False" Text="{Binding Url}" />
             </StackPanel>
         </StackPanel>
@@ -33,16 +33,16 @@
                         <Button Margin="8" Command="{Binding AddQueryStringParameterCommand}">Add</Button>
                         <Button Margin="8" Command="{Binding DeleteSelectedQueryStringParameterCommand}">Delete</Button>
                     </StackPanel>
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding QueryStringParameters}" SelectedItem="{Binding SelectedQueryStringParameter}" SelectionMode="Single" AutoGenerateColumns="False">
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding QueryStringParameters}" SelectedItem="{Binding SelectedQueryStringParameter}" SelectionMode="Single" AutoGenerateColumns="False" CanUserAddRows="False">
                         <DataGrid.Resources>
                             <ContextMenu x:Key="DataRowContextMenu">
                                 <MenuItem Header="Delete" Command="{Binding DeleteSelectedQueryStringParameterCommand}" />
                             </ContextMenu>
                         </DataGrid.Resources>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Key" Binding="{Binding Key}" MinWidth="100"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Value" Binding="{Binding Value}" MinWidth="150"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" MinWidth="400"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Key" Binding="{Binding Key}" MinWidth="100" />
+                            <DataGridTextColumn Header="Value" Binding="{Binding Value}" MinWidth="150" />
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" MinWidth="400" />
                         </DataGrid.Columns>
                         <DataGrid.RowStyle>
                             <Style TargetType="{x:Type DataGridRow}">
@@ -53,8 +53,8 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Authentication">
-                <StackPanel Orientation="Horizontal">
-                    <StackPanel Width="200">
+                <DockPanel Margin="10">
+                    <StackPanel Width="150">
                         <ComboBox ItemsSource="{Binding AuthenticationTypesToChooseFrom}" SelectedItem="{Binding AuthenticationViewModel}" IsEditable="False">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
@@ -62,50 +62,235 @@
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
-                        <TextBlock Text="The authorization header will be automatically generated when you send the request." />
+                        <TextBlock Margin="0,10,0,0" Text="The authorization header will be automatically generated when you send the request." TextWrapping="Wrap" />
                     </StackPanel>
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Access Key" />
-                            <TextBox Text="{Binding AuthenticationViewModel.Name}" />
-                        </StackPanel>
-
+                    <DockPanel Margin="20,0,0,0">
                         <ContentControl Content="{Binding AuthenticationViewModel}">
                             <ContentControl.Resources>
                                 <DataTemplate DataType="{x:Type viewModels:InheritedAuthenticationViewModel}">
                                     <TextBlock TextAlignment="Center" Text="This request inherits the authentication method from a parent." />
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type viewModels:NoAuthenticationViewModel}">
-                                    <TextBlock TextAlignment="Center" Text="This uses no authentication." />
+                                    <TextBlock TextAlignment="Center" Text="This request uses no authentication." />
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type viewModels:AwsSignatureAuthenticationViewModel}">
-                                    <StackPanel>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Access Key" />
-                                            <TextBox Text="{Binding AccessKey}" />
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Secret Key" />
-                                            <TextBox Text="{Binding SecretKey}" />
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Region" />
-                                            <TextBox Text="{Binding Region}" />
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Service Name" />
-                                            <TextBox Text="{Binding ServiceName}" />
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Session Token" />
-                                            <TextBox Text="{Binding SessionToken}" />
-                                        </StackPanel>
-                                    </StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition MinWidth="100" MaxWidth="150" />
+                                            <ColumnDefinition MinWidth="100" Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Access Key" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding AccessKey}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="1" Text="Secret Key" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding SecretKey}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="2" Text="Region" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding Region}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="3" Text="Service Name" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding ServiceName}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="4" Text="Session Token" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding SessionToken}" Margin="0,10,0,0" />
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type viewModels:BasicAuthenticationViewModel}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition MinWidth="100" MaxWidth="150" />
+                                            <ColumnDefinition MinWidth="100" Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Username" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Username}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="1" Text="Password" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding Password}" Margin="0,10,0,0" />
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type viewModels:BearerTokenAuthenticationViewModel}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition MinWidth="100" MaxWidth="150" />
+                                            <ColumnDefinition MinWidth="100" Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Token" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Token}" Margin="0,10,0,0" />
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type viewModels:DigestAuthenticationViewModel}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition MinWidth="100" MaxWidth="150" />
+                                            <ColumnDefinition MinWidth="100" Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Username" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Username}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="1" Text="Password" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding Password}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="2" Text="Realm" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding Realm}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="3" Text="Nonce" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding Nonce}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="4" Text="Algorithm" Margin="0,10,0,0" />
+                                        <ComboBox Grid.Column="1" Grid.Row="4" ItemsSource="{Binding Algorithms}" SelectedItem="{Binding Algorithm}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="5" Text="Quality of Protection" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding QualityOfProtection}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="6" Text="Nonce Count" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding NonceCount}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="7" Text="Client Nonce" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="7" Text="{Binding ClientNonce}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="8" Text="Opaque" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="8" Text="{Binding Opaque}" Margin="0,10,0,0" />
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type viewModels:HawkAuthenticationViewModel}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition MinWidth="100" MaxWidth="150" />
+                                            <ColumnDefinition MinWidth="100" Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Authentication ID" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding AuthenticationId}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="1" Text="Authentication Key" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding AuthenticationKey}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="2" Text="Algorithm" Margin="0,10,0,0" />
+                                        <ComboBox Grid.Column="1" Grid.Row="2" ItemsSource="{Binding Algorithms}" SelectedItem="{Binding Algorithm}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="3" Text="User" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding User}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="4" Text="Nonce" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="4" Text="{Binding Nonce}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="5" Text="Extra Data" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="5" Text="{Binding ExtraData}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="6" Text="Application ID" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding ApplicationId}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="7" Text="Delegation" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="7" Text="{Binding Delegation}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="8" Text="Timestamp" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="8" Text="{Binding Timestamp}" Margin="0,10,0,0" />
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type viewModels:NtlmAuthenticationViewModel}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition MinWidth="100" MaxWidth="150" />
+                                            <ColumnDefinition MinWidth="100" Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Username" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding Username}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="1" Text="Password" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding Password}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="2" Text="Domain" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding Domain}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="3" Text="Workstation" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding Workstation}" Margin="0,10,0,0" />
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type viewModels:Oauth1AuthenticationViewModel}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition MinWidth="100" MaxWidth="150" />
+                                            <ColumnDefinition MinWidth="100" Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Consumer Key" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding ConsumerKey}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="1" Text="Consumer Secret" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding ConsumerSecret}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="2" Text="Access Token" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding AccessToken}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="3" Text="Token Secret" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding TokenSecret}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="4" Text="Token Location" Margin="0,10,0,0" />
+                                        <ComboBox Grid.Column="1" Grid.Row="4" ItemsSource="{Binding TokenLocations}" SelectedItem="{Binding TokenLocation}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="5" Text="Signature Method" Margin="0,10,0,0" />
+                                        <ComboBox Grid.Column="1" Grid.Row="5" ItemsSource="{Binding SignatureMethods}" SelectedItem="{Binding SignatureMethod}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="6" Text="Timestamp" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="6" Text="{Binding Timestamp}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="7" Text="Nonce" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="7" Text="{Binding Nonce}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="8" Text="Version" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="8" Text="{Binding Version}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="9" Text="Realm" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="9" Text="{Binding Realm}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="10" Text="Add Empty Parameters" Margin="0,10,0,0" />
+                                        <CheckBox Grid.Column="1" Grid.Row="10" IsChecked="{Binding AddEmptyParametersToSignature}" Margin="0,10,0,0" />
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type viewModels:Oauth2AuthenticationViewModel}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition MinWidth="100" MaxWidth="150" />
+                                            <ColumnDefinition MinWidth="100" Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Access Token" Margin="0,10,0,0" />
+                                        <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding AccessToken}" Margin="0,10,0,0" />
+                                        <TextBlock Grid.Column="0" Grid.Row="1" Text="Token Location" Margin="0,10,0,0" />
+                                        <ComboBox Grid.Column="1" Grid.Row="1" ItemsSource="{Binding TokenLocations}" SelectedItem="{Binding TokenLocation}" Margin="0,10,0,0" />
+                                    </Grid>
                                 </DataTemplate>
                             </ContentControl.Resources>
                         </ContentControl>
-                    </StackPanel>
-                </StackPanel>
+                    </DockPanel>
+                </DockPanel>
             </TabItem>
             <TabItem Header="Headers">
                 <Grid>
@@ -117,16 +302,16 @@
                         <Button Margin="8" Command="{Binding AddHeaderCommand}">Add</Button>
                         <Button Margin="8" Command="{Binding DeleteSelectedHeaderCommand}">Delete</Button>
                     </StackPanel>
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding Headers}" SelectedItem="{Binding SelectedHeader}" SelectionMode="Single" AutoGenerateColumns="False" Grid.ColumnSpan="2" Margin="0,0,0,0.333">
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Headers}" SelectedItem="{Binding SelectedHeader}" SelectionMode="Single" AutoGenerateColumns="False" CanUserAddRows="False">
                         <DataGrid.Resources>
                             <ContextMenu x:Key="DataRowContextMenu">
                                 <MenuItem Header="Delete" Command="{Binding DeleteSelectedHeaderCommand}" />
                             </ContextMenu>
                         </DataGrid.Resources>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Key" Binding="{Binding Key}" MinWidth="100"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Value" Binding="{Binding Value}" MinWidth="150"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" MinWidth="400"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Key" Binding="{Binding Key}" MinWidth="100" />
+                            <DataGridTextColumn Header="Value" Binding="{Binding Value}" MinWidth="150" />
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" MinWidth="400" />
                         </DataGrid.Columns>
                         <DataGrid.RowStyle>
                             <Style TargetType="{x:Type DataGridRow}">
@@ -146,18 +331,18 @@
                         <Button Margin="8" Command="{Binding AddCookieCommand}">Add</Button>
                         <Button Margin="8" Command="{Binding DeleteSelectedCookieCommand}">Delete</Button>
                     </StackPanel>
-                    <DataGrid Grid.Row="1" ItemsSource="{Binding Cookies}" SelectedItem="{Binding SelectedCookie}" SelectionMode="Single" AutoGenerateColumns="False">
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding Cookies}" SelectedItem="{Binding SelectedCookie}" SelectionMode="Single" AutoGenerateColumns="False" CanUserAddRows="False">
                         <DataGrid.Resources>
                             <ContextMenu x:Key="DataRowContextMenu">
                                 <MenuItem Header="Delete" Command="{Binding DeleteSelectedCookieCommand}" />
                             </ContextMenu>
                         </DataGrid.Resources>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" MinWidth="100"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Value" Binding="{Binding Value}" MinWidth="150"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Domain" Binding="{Binding Domain}" MinWidth="150"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Path" Binding="{Binding Path}" MinWidth="150"></DataGridTextColumn>
-                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" MinWidth="400"></DataGridTextColumn>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" MinWidth="100" />
+                            <DataGridTextColumn Header="Value" Binding="{Binding Value}" MinWidth="150" />
+                            <DataGridTextColumn Header="Domain" Binding="{Binding Domain}" MinWidth="150" />
+                            <DataGridTextColumn Header="Path" Binding="{Binding Path}" MinWidth="150" />
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" MinWidth="400" />
                         </DataGrid.Columns>
                         <DataGrid.RowStyle>
                             <Style TargetType="{x:Type DataGridRow}">

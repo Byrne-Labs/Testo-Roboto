@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ByrneLabs.Commons;
-//using JetBrains.Annotations;
+using JetBrains.Annotations;
 using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices

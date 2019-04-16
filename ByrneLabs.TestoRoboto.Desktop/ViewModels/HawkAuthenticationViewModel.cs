@@ -6,7 +6,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
     {
         public string Algorithm { get; set; }
 
-        public IEnumerable<string> Algorithms { get; set; }
+        public IEnumerable<string> Algorithms { get; } = new[] { "SHA256", "SHA1" };
 
         public string ApplicationId { get; set; }
 

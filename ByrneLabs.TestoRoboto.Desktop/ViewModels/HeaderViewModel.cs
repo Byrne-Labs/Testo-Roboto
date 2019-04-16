@@ -1,8 +1,8 @@
-﻿using ByrneLabs.Commons.Presentation.Wpf;
+﻿using System.ComponentModel;
 
 namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    public class HeaderViewModel : ViewModelBase
+    public class HeaderViewModel : INotifyPropertyChanged
     {
         public string Description { get; set; }
 
@@ -10,5 +10,6 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public string Value { get; set; }
 
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

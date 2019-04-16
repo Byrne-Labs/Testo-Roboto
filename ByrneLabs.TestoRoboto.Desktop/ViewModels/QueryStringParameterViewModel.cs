@@ -1,11 +1,12 @@
-﻿using System.Web;
-using ByrneLabs.Commons.Presentation.Wpf;
-//using JetBrains.Annotations;
+﻿using System.ComponentModel;
+using System.Web;
+
+using JetBrains.Annotations;
 
 namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    //[PublicAPI]
-    public class QueryStringParameterViewModel : ViewModelBase
+    [PublicAPI]
+    public class QueryStringParameterViewModel : INotifyPropertyChanged
     {
         public string Description { get; set; }
 
@@ -18,5 +19,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
             get => HttpUtility.UrlDecode(UriEncodedValue);
             set => UriEncodedValue = HttpUtility.UrlEncode(value);
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

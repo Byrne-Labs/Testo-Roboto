@@ -2,7 +2,7 @@
 using System.Net.Http.Headers;
 using System.Text;
 using ByrneLabs.Commons;
-//using JetBrains.Annotations;
+using JetBrains.Annotations;
 using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices

@@ -8,8 +8,8 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public override string Name => "OAuth V2";
 
-        public string TokenLocation { get; set; }
+        public string TokenLocation { get; set; } = "Headers";
 
-        public IEnumerable<string> TokenLocations { get; set; }
+        public IEnumerable<string> TokenLocations { get; } = new[] { "Headers", "Body/URL" };
     }
 }

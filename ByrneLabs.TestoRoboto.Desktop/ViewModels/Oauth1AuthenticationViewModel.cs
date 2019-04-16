@@ -20,13 +20,13 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public string SignatureMethod { get; set; }
 
-        public IEnumerable<string> SignatureMethods { get; set; }
+        public IEnumerable<string> SignatureMethods { get; } = new[] { "HMAC-SHA1", "HMAC-SHA256", "Plain Text" };
 
         public string Timestamp { get; set; }
 
-        public string TokenLocation { get; set; }
+        public string TokenLocation { get; set; } = "Headers";
 
-        public IEnumerable<string> TokenLocations { get; set; }
+        public IEnumerable<string> TokenLocations { get; } = new[] { "Headers", "Body/URL" };
 
         public string TokenSecret { get; set; }
 

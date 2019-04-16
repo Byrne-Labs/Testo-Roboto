@@ -6,7 +6,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
     {
         public string Algorithm { get; set; }
 
-        public IEnumerable<string> Algorithms { get; set; }
+        public IEnumerable<string> Algorithms { get; } = new[] { "MD5", "MD5-sess" };
 
         public string ClientNonce { get; set; }
 
@@ -18,7 +18,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public string Password { get; set; }
 
-        public string Qop { get; set; }
+        public string QualityOfProtection { get; set; }
 
         public string Realm { get; set; }
 

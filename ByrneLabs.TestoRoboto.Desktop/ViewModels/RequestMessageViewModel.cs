@@ -1,15 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using ByrneLabs.Commons;
+using ByrneLabs.Commons.Collections;
 using ByrneLabs.Commons.Presentation.Wpf;
+using JetBrains.Annotations;
+using PropertyChanged;
 
 namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    public class RequestMessageViewModel : ViewModelBase
+    public class RequestMessageViewModel : INotifyPropertyChanged
     {
+
+        private bool _urlChanging;
         private Uri _url;
 
         public RequestMessageViewModel()
@@ -22,7 +29,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
             DeleteSelectedCookieCommand = new RelayCommand(param => DeleteSelectedCookie(), param => CanDeleteSelectedCookie());
             QueryStringParameters.CollectionChanged += (sender, args) =>
             {
-                if (_url != null)
+                if (_url != null && !_urlChanging)
                 {
                     var uriBuilder = new StringBuilder(Url.ToString().Contains("?") ? Url.ToString().SubstringBeforeLast("?") : Url.ToString()).Append('?');
                     foreach (var queryStringParameter in QueryStringParameters)
@@ -32,11 +39,14 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
                     uriBuilder.Remove(uriBuilder.Length - 1, 1);
 
-                    _url = new Uri(uriBuilder.Length <= 2083 ? uriBuilder.ToString() : uriBuilder.ToString().Substring(0, 2083));
+                    var newUrl = new Uri(uriBuilder.Length <= 2083 ? uriBuilder.ToString() : uriBuilder.ToString().Substring(0, 2083));
+                    if (newUrl.ToString() != _url.ToString())
+                    {
+                        _url = newUrl;
+                        OnPropertyChanged(nameof(Url));
+                    }
                 }
             };
-
-            PropertyChanged += (sender, args) => { };
         }
 
         public RelayCommand AddCookieCommand { get; }
@@ -59,7 +69,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public IEnumerable<string> ContentTypesToChooseFrom { get; } = new List<string>();
 
-        public ObservableCollection<CookieViewModel> Cookies { get; } = new ObservableCollection<CookieViewModel>();
+        public ObservableCollection<CookieViewModel> Cookies { get; } = new FullyObservableCollection<CookieViewModel>();
 
         public RelayCommand DeleteSelectedCookieCommand { get; }
 
@@ -67,7 +77,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public RelayCommand DeleteSelectedQueryStringParameterCommand { get; }
 
-        public ObservableCollection<HeaderViewModel> Headers { get; } = new ObservableCollection<HeaderViewModel>();
+        public ObservableCollection<HeaderViewModel> Headers { get; } = new FullyObservableCollection<HeaderViewModel>();
 
         public string HttpMethod { get; set; }
 
@@ -75,7 +85,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public string Name { get; set; }
 
-        public ObservableCollection<QueryStringParameterViewModel> QueryStringParameters { get; } = new ObservableCollection<QueryStringParameterViewModel>();
+        public ObservableCollection<QueryStringParameterViewModel> QueryStringParameters { get; } = new FullyObservableCollection<QueryStringParameterViewModel>();
 
         public CookieViewModel SelectedCookie { get; set; }
 
@@ -88,43 +98,49 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
             get => _url;
             set
             {
-                var queryStringParameters = new List<QueryStringParameterViewModel>();
-                _url = value;
-                if (_url.Query != string.Empty)
+                if (_url != value)
                 {
-                    foreach (var parameter in _url.Query.SubstringAfterLast("?").Split('&').Where(p => p != string.Empty))
+                    _urlChanging = true;
+                    var queryStringParameters = new List<QueryStringParameterViewModel>();
+                    _url = value;
+                    if (_url.Query != string.Empty)
                     {
-                        var queryStringParameter = new QueryStringParameterViewModel();
-                        queryStringParameter.Key = parameter.SubstringBeforeLast("=");
-                        queryStringParameter.Value = parameter.SubstringAfterLast("=");
-                        queryStringParameters.Add(queryStringParameter);
+                        foreach (var parameter in _url.Query.SubstringAfterLast("?").Split('&').Where(p => p != string.Empty))
+                        {
+                            var queryStringParameter = new QueryStringParameterViewModel();
+                            queryStringParameter.Key = parameter.SubstringBeforeLast("=");
+                            queryStringParameter.Value = parameter.SubstringAfterLast("=");
+                            queryStringParameters.Add(queryStringParameter);
+                        }
                     }
-                }
 
-                foreach (var newQueryStringParameter in queryStringParameters.Where(qsp => !QueryStringParameters.Any(qsp2 => qsp.Key == qsp2.Key && qsp.Value == qsp2.Value)))
-                {
-                    if (QueryStringParameters.Count(qsp => qsp.Key == newQueryStringParameter.Key) == 1)
+                    foreach (var newQueryStringParameter in queryStringParameters.Where(qsp => !QueryStringParameters.Any(qsp2 => qsp.Key == qsp2.Key && qsp.Value == qsp2.Value)))
                     {
-                        QueryStringParameters.Single(qsp => qsp.Key == newQueryStringParameter.Key).Value = newQueryStringParameter.Value;
+                        if (QueryStringParameters.Count(qsp => qsp.Key == newQueryStringParameter.Key) == 1)
+                        {
+                            QueryStringParameters.Single(qsp => qsp.Key == newQueryStringParameter.Key).Value = newQueryStringParameter.Value;
+                        }
+                        else
+                        {
+                            QueryStringParameters.Add(newQueryStringParameter);
+                        }
                     }
-                    else
-                    {
-                        QueryStringParameters.Add(newQueryStringParameter);
-                    }
-                }
 
-                var queryStringParametersToRemove = new List<QueryStringParameterViewModel>();
-                foreach (var existingQueryStringParameter in QueryStringParameters)
-                {
-                    if (!queryStringParameters.Exists(qsp => qsp.Key == existingQueryStringParameter.Key && qsp.Value == existingQueryStringParameter.Value))
+                    var queryStringParametersToRemove = new List<QueryStringParameterViewModel>();
+                    foreach (var existingQueryStringParameter in QueryStringParameters)
                     {
-                        queryStringParametersToRemove.Add(existingQueryStringParameter);
+                        if (!queryStringParameters.Exists(qsp => qsp.Key == existingQueryStringParameter.Key && qsp.Value == existingQueryStringParameter.Value))
+                        {
+                            queryStringParametersToRemove.Add(existingQueryStringParameter);
+                        }
                     }
-                }
 
-                foreach (var queryStringParameterToRemove in queryStringParametersToRemove)
-                {
-                    QueryStringParameters.Remove(queryStringParameterToRemove);
+                    foreach (var queryStringParameterToRemove in queryStringParametersToRemove)
+                    {
+                        QueryStringParameters.Remove(queryStringParameterToRemove);
+                    }
+                    _urlChanging = false;
+                    OnPropertyChanged(nameof(Url));
                 }
             }
         }
@@ -163,6 +179,14 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
         public void DeleteSelectedQueryStringParameter()
         {
             QueryStringParameters.Remove(SelectedQueryStringParameter);
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

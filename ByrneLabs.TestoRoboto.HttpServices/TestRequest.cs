@@ -2,7 +2,7 @@
 using System.Linq;
 using ByrneLabs.Commons;
 using ByrneLabs.TestoRoboto.HttpServices.Mutators;
-//using JetBrains.Annotations;
+using JetBrains.Annotations;
 using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
