@@ -16,7 +16,7 @@
         Loaded="Window_Loaded">
 
 
-    <xcad:DockingManager AllowMixedOrientation="True" BorderBrush="{DynamicResource {x:Static SystemColors.AppWorkspaceBrush}}" BorderThickness="5" DocumentsSource="{Binding OpenRequestMessages}" >
+    <xcad:DockingManager AllowMixedOrientation="True" BorderBrush="{DynamicResource {x:Static SystemColors.AppWorkspaceBrush}}" BorderThickness="5" DocumentsSource="{Binding OpenRequestMessages}">
         <xcad:DockingManager.Resources>
             <DataTemplate DataType="{x:Type viewModels:RequestMessageViewModel}">
                 <local:RequestMessage />
@@ -39,7 +39,7 @@
                 </xcad:LayoutAnchorablePane>
 
                 <xcad:LayoutDocumentPaneGroup>
-                    <xcad:LayoutDocumentPane/>
+                    <xcad:LayoutDocumentPane />
                 </xcad:LayoutDocumentPaneGroup>
             </xcad:LayoutPanel>
         </xcad:LayoutRoot>

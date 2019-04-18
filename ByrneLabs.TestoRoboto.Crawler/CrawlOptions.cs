@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using ByrneLabs.Commons;
-using JetBrains.Annotations;
 using OpenQA.Selenium;
 
 namespace ByrneLabs.TestoRoboto.Crawler
 {
-    
     public class CrawlOptions : HandyObject<CrawlOptions>
     {
         public IList<string> AllowedUrlPatterns { get; } = new List<string>();

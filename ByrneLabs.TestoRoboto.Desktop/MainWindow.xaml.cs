@@ -14,6 +14,5 @@ namespace ByrneLabs.TestoRoboto.Desktop
         {
             DataContext = new MainWindowViewModel();
         }
-
     }
 }

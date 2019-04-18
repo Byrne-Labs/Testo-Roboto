@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using ByrneLabs.TestoRoboto.Desktop.ViewModels;
 using Xunit;

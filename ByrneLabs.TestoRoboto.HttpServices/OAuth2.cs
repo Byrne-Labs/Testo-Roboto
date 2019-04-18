@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Net.Http.Headers;
 using ByrneLabs.Commons;
-using JetBrains.Annotations;
 using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     [MessagePackObject]
-    
     public class OAuth2 : AuthenticationMethod, ICloneable<OAuth2>
     {
         [Key(0)]

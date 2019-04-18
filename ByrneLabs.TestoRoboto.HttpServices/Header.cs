@@ -1,11 +1,9 @@
 ﻿using ByrneLabs.Commons;
-using JetBrains.Annotations;
 using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     [MessagePackObject]
-    
     public class Header : HandyObject<Header>
     {
         [Key(0)]

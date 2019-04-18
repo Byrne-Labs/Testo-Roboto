@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Net.Http.Headers;
 using ByrneLabs.Commons;
-using JetBrains.Annotations;
 using MessagePack;
 
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     [MessagePackObject]
-    
     public class NtlmAuthentication : AuthenticationMethod, ICloneable<NtlmAuthentication>
     {
         [Key(0)]

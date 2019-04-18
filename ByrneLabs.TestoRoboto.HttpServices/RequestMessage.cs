@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using ByrneLabs.Commons;
-using JetBrains.Annotations;
 using MessagePack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -14,7 +13,6 @@ using Newtonsoft.Json.Linq;
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     [MessagePackObject]
-    
     public class RequestMessage : Item, ICloneable<RequestMessage>
     {
         [Key(3)]
