@@ -12,7 +12,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.Tests
         {
             var viewModel = new RequestMessageViewModel();
             Assert.Empty(viewModel.QueryStringParameters);
-            viewModel.AddQueryStringParameter();
+            viewModel.OnAddQueryStringParameter();
             Assert.NotEmpty(viewModel.QueryStringParameters);
         }
 
@@ -20,11 +20,11 @@ namespace ByrneLabs.TestoRoboto.Desktop.Tests
         public void TestDeleteQueryStringParameter()
         {
             var viewModel = new RequestMessageViewModel();
-            viewModel.AddQueryStringParameter();
+            viewModel.OnAddQueryStringParameter();
             var parameter = viewModel.QueryStringParameters.Single();
-            viewModel.AddQueryStringParameter();
+            viewModel.OnAddQueryStringParameter();
             viewModel.SelectedQueryStringParameter = parameter;
-            viewModel.DeleteSelectedQueryStringParameter();
+            viewModel.OnDeleteSelectedQueryStringParameter();
             Assert.DoesNotContain(parameter, viewModel.QueryStringParameters);
             Assert.Single(viewModel.QueryStringParameters);
         }

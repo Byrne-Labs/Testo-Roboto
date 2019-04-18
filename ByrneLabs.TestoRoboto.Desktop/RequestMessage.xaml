@@ -23,7 +23,7 @@
             </Grid.ColumnDefinitions>
             <Expander Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3">
                 <Expander.Header>
-                    <xctk:WatermarkTextBox Margin="5"  Watermark="Name" KeepWatermarkOnGotFocus="False" FontSize="14" FontWeight="Bold" Text="{Binding Name}" HorizontalAlignment="{Binding Path=HorizontalAlignment, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}, Mode=OneWayToSource}"/>
+                    <xctk:WatermarkTextBox Margin="5" Watermark="Name" KeepWatermarkOnGotFocus="False" FontSize="14" FontWeight="Bold" Text="{Binding Name}" HorizontalAlignment="{Binding Path=HorizontalAlignment, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContentPresenter}}, Mode=OneWayToSource}" />
                 </Expander.Header>
                 <xctk:WatermarkTextBox Watermark="Description" Margin="5" Text="{Binding Description}" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" MinLines="2" MaxLines="10" />
             </Expander>

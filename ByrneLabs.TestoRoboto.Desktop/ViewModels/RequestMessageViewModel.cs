@@ -9,24 +9,23 @@ using ByrneLabs.Commons;
 using ByrneLabs.Commons.Collections;
 using ByrneLabs.Commons.Presentation.Wpf;
 using JetBrains.Annotations;
-using PropertyChanged;
 
 namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
     public class RequestMessageViewModel : INotifyPropertyChanged
     {
-
-        private bool _urlChanging;
         private Uri _url;
+        private bool _urlChanging;
 
         public RequestMessageViewModel()
         {
-            AddQueryStringParameterCommand = new RelayCommand(param => AddQueryStringParameter());
-            DeleteSelectedQueryStringParameterCommand = new RelayCommand(param => DeleteSelectedQueryStringParameter(), param => CanDeleteSelectedQueryStringParameter());
-            AddHeaderCommand = new RelayCommand(param => AddHeader());
-            DeleteSelectedHeaderCommand = new RelayCommand(param => DeleteSelectedHeader(), param => CanDeleteSelectedHeader());
-            AddCookieCommand = new RelayCommand(param => AddCookie());
-            DeleteSelectedCookieCommand = new RelayCommand(param => DeleteSelectedCookie(), param => CanDeleteSelectedCookie());
+            AddQueryStringParameterCommand = new RelayCommand(param => OnAddQueryStringParameter());
+            DeleteSelectedQueryStringParameterCommand = new RelayCommand(param => OnDeleteSelectedQueryStringParameter(), param => CanDeleteSelectedQueryStringParameter());
+            AddHeaderCommand = new RelayCommand(param => OnAddHeader());
+            DeleteSelectedHeaderCommand = new RelayCommand(param => OnDeleteSelectedHeader(), param => CanDeleteSelectedHeader());
+            AddCookieCommand = new RelayCommand(param => OnAddCookie());
+            CloseCommand = new RelayCommand(param => OnClose());
+            DeleteSelectedCookieCommand = new RelayCommand(param => OnDeleteSelectedCookie(), param => CanDeleteSelectedCookie());
             QueryStringParameters.CollectionChanged += (sender, args) =>
             {
                 if (_url != null && !_urlChanging)
@@ -63,6 +62,8 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public BodyViewModel BodyViewModel { get; set; }
 
+        public RelayCommand CloseCommand { get; }
+
         public ObservableCollection<CookieViewModel> Cookies { get; } = new FullyObservableCollection<CookieViewModel>();
 
         public RelayCommand DeleteSelectedCookieCommand { get; }
@@ -78,6 +79,8 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
         public string HttpMethod { get; set; } = "POST";
 
         public IEnumerable<string> HttpMethods { get; } = new[] { "GET", "POST", "PUT", "PATCH", "DELETE", "COPY", "HEAD", "OPTIONS", "LINK", "UNLINK", "PURGE", "LOCK", "UNLOCK", "PROPFIND", "VIEW" };
+
+        public bool IsClosed { get; private set; }
 
         public string Name { get; set; }
 
@@ -135,25 +138,11 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
                     {
                         QueryStringParameters.Remove(queryStringParameterToRemove);
                     }
+
                     _urlChanging = false;
                     OnPropertyChanged(nameof(Url));
                 }
             }
-        }
-
-        public void AddCookie()
-        {
-            Cookies.Add(new CookieViewModel());
-        }
-
-        public void AddHeader()
-        {
-            Headers.Add(new HeaderViewModel());
-        }
-
-        public void AddQueryStringParameter()
-        {
-            QueryStringParameters.Add(new QueryStringParameterViewModel());
         }
 
         public bool CanDeleteSelectedCookie() => SelectedCookie != null;
@@ -162,27 +151,47 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public bool CanDeleteSelectedQueryStringParameter() => SelectedQueryStringParameter != null;
 
-        public void DeleteSelectedCookie()
+        public void OnAddCookie()
+        {
+            Cookies.Add(new CookieViewModel());
+        }
+
+        public void OnAddHeader()
+        {
+            Headers.Add(new HeaderViewModel());
+        }
+
+        public void OnAddQueryStringParameter()
+        {
+            QueryStringParameters.Add(new QueryStringParameterViewModel());
+        }
+
+        public void OnClose()
+        {
+            IsClosed = true;
+        }
+
+        public void OnDeleteSelectedCookie()
         {
             Cookies.Remove(SelectedCookie);
         }
 
-        public void DeleteSelectedHeader()
+        public void OnDeleteSelectedHeader()
         {
             Headers.Remove(SelectedHeader);
         }
 
-        public void DeleteSelectedQueryStringParameter()
+        public void OnDeleteSelectedQueryStringParameter()
         {
             QueryStringParameters.Remove(SelectedQueryStringParameter);
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }
