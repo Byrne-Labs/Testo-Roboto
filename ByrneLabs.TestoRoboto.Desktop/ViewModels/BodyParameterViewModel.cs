@@ -1,8 +1,6 @@
-﻿using System.ComponentModel;
-
-namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
+﻿namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    public class BodyParameterViewModel : INotifyPropertyChanged
+    public class BodyParameterViewModel : BaseViewModel
     {
         public string ContentType { get; set; }
 
@@ -11,7 +9,5 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
         public string Key { get; set; }
 
         public string Value { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

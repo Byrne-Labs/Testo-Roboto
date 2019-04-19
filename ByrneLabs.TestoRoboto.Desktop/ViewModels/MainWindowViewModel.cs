@@ -1,11 +1,10 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    public class MainWindowViewModel : INotifyPropertyChanged
+    public class MainWindowViewModel : BaseViewModel
     {
         public MainWindowViewModel()
         {
@@ -41,11 +40,6 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public bool StartScreenVisible { get; set; } = true;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
         private void RequestMessageOnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(RequestMessageViewModel.IsClosed))
@@ -57,7 +51,5 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
                 }
             }
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

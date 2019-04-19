@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using ByrneLabs.Commons;
 using ByrneLabs.Commons.Collections;
 using ByrneLabs.Commons.Presentation.Wpf;
-using JetBrains.Annotations;
 
 namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    public class RequestMessageViewModel : INotifyPropertyChanged
+    public class RequestMessageViewModel : BaseViewModel
     {
         private Uri _url;
         private bool _urlChanging;
@@ -185,13 +182,5 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
         {
             QueryStringParameters.Remove(SelectedQueryStringParameter);
         }
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 }
