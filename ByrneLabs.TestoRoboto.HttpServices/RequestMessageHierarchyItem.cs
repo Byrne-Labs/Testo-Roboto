@@ -8,7 +8,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
     [Union(0, typeof(RequestMessageCollection))]
     [Union(1, typeof(FuzzedRequestMessage))]
     [Union(2, typeof(RequestMessage))]
-    public abstract class Item : HandyObject<Item>
+    public abstract class RequestMessageHierarchyItem : HandyObject<RequestMessageHierarchyItem>
     {
         [Key(0)]
         public AuthenticationMethod AuthenticationMethod { get; set; } = new NoAuthentication();

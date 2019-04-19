@@ -13,7 +13,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
         public bool ExcludeUnfuzzableRequests { get; set; } = true;
 
         [Key(1)]
-        public List<Item> Items { get; } = new List<Item>();
+        public List<RequestMessageHierarchyItem> Items { get; } = new List<RequestMessageHierarchyItem>();
 
         [Key(2)]
         public string LogDirectory { get; set; }

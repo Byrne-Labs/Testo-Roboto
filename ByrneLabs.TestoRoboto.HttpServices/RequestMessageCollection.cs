@@ -7,13 +7,13 @@ using MessagePack;
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     [MessagePackObject]
-    public class RequestMessageCollection : Item, ICloneable<RequestMessageCollection>
+    public class RequestMessageCollection : RequestMessageHierarchyItem, ICloneable<RequestMessageCollection>
     {
         [Key(4)]
         public bool FuzzedMessageCollection { get; private set; }
 
         [Key(3)]
-        public List<Item> Items { get; } = new List<Item>();
+        public List<RequestMessageHierarchyItem> Items { get; } = new List<RequestMessageHierarchyItem>();
 
         public void AddFuzzedMessages(IEnumerable<Mutator> mutators, bool includeSubCollections)
         {

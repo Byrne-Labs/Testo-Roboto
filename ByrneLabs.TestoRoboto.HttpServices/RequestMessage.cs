@@ -13,7 +13,7 @@ using Newtonsoft.Json.Linq;
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     [MessagePackObject]
-    public class RequestMessage : Item, ICloneable<RequestMessage>
+    public class RequestMessage : RequestMessageHierarchyItem, ICloneable<RequestMessage>
     {
         [Key(3)]
         private ObservableCollection<QueryStringParameter> _queryStringParameters;

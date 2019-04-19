@@ -23,11 +23,11 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             return jsonParameter;
         }
 
-        private static JObject ExportToPostman(Item item)
+        private static JObject ExportToPostman(RequestMessageHierarchyItem requestMessageHierarchyItem)
         {
             var jsonItem = new JObject();
-            jsonItem.Add("name", item.Name);
-            if (item is RequestMessageCollection collection)
+            jsonItem.Add("name", requestMessageHierarchyItem.Name);
+            if (requestMessageHierarchyItem is RequestMessageCollection collection)
             {
                 var jsonItems = new JArray();
                 foreach (var childItem in collection.Items.OfType<RequestMessageCollection>())
@@ -37,17 +37,17 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
                 foreach (var childItem in collection.Items.OfType<RequestMessage>())
                 {
-                    jsonItems.Add(ExportToPostman((Item) childItem));
+                    jsonItems.Add(ExportToPostman((RequestMessageHierarchyItem) childItem));
                 }
 
                 jsonItem.Add("item", jsonItems);
 
-                if (item.AuthenticationMethod != null && !(item.AuthenticationMethod is NoAuthentication))
+                if (requestMessageHierarchyItem.AuthenticationMethod != null && !(requestMessageHierarchyItem.AuthenticationMethod is NoAuthentication))
                 {
-                    jsonItem.Add("auth", ExportToPostman(item.AuthenticationMethod));
+                    jsonItem.Add("auth", ExportToPostman(requestMessageHierarchyItem.AuthenticationMethod));
                 }
             }
-            else if (item is RequestMessage message)
+            else if (requestMessageHierarchyItem is RequestMessage message)
             {
                 jsonItem.Add("request", ExportToPostman(message));
             }
@@ -348,9 +348,9 @@ namespace ByrneLabs.TestoRoboto.HttpServices
         }
 
         [SuppressMessage("ReSharper", "SuggestBaseTypeForParameter")]
-        private static IEnumerable<Item> LoadItems(JArray jsonItems)
+        private static IEnumerable<RequestMessageHierarchyItem> LoadItems(JArray jsonItems)
         {
-            var items = new List<Item>();
+            var items = new List<RequestMessageHierarchyItem>();
             foreach (var jsonItem in jsonItems.OfType<JObject>())
             {
                 if (jsonItem.ContainsKey("item") && jsonItem["item"] is JArray)
@@ -494,7 +494,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
             foreach (var childItem in requestMessageCollection.Items.OfType<RequestMessage>())
             {
-                jsonCollectionItems.Add(ExportToPostman((Item) childItem));
+                jsonCollectionItems.Add(ExportToPostman((RequestMessageHierarchyItem) childItem));
             }
 
             jsonCollection.Add("item", jsonCollectionItems);
