@@ -27,10 +27,10 @@ namespace ByrneLabs.TestoRoboto.HttpServices
         {
             var jsonItem = new JObject();
             jsonItem.Add("name", item.Name);
-            if (item is Collection collection)
+            if (item is RequestMessageCollection collection)
             {
                 var jsonItems = new JArray();
-                foreach (var childItem in collection.Items.OfType<Collection>())
+                foreach (var childItem in collection.Items.OfType<RequestMessageCollection>())
                 {
                     jsonItems.Add(ExportToPostman(childItem));
                 }
@@ -334,9 +334,9 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
         private static T GetPostmanKeyValue<T>(JArray properties, string key) => (T) ((JValue) properties.SingleOrDefault(property => property["key"].ToString() == key)?["value"])?.Value;
 
-        private static Collection LoadCollection(JObject jsonCollection)
+        private static RequestMessageCollection LoadCollection(JObject jsonCollection)
         {
-            var collection = new Collection();
+            var collection = new RequestMessageCollection();
             collection.Name = jsonCollection["name"].ToString();
             collection.AuthenticationMethod = GetAuthenticationMethod(jsonCollection);
             foreach (var item in LoadItems(jsonCollection["item"] as JArray))
@@ -448,14 +448,14 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             return request;
         }
 
-        public Collection Read(byte[] bytes) => ReadFromString(Encoding.Unicode.GetString(bytes));
+        public RequestMessageCollection Read(byte[] bytes) => ReadFromString(Encoding.Unicode.GetString(bytes));
 
-        public Collection ReadFromFile(string fileName) => ReadFromString(File.ReadAllText(fileName));
+        public RequestMessageCollection ReadFromFile(string fileName) => ReadFromString(File.ReadAllText(fileName));
 
-        public Collection ReadFromString(string collectionText)
+        public RequestMessageCollection ReadFromString(string collectionText)
         {
             var json = JObject.Parse(collectionText);
-            var collection = new Collection();
+            var collection = new RequestMessageCollection();
             collection.Name = json["info"]["name"].ToString();
             collection.AuthenticationMethod = GetAuthenticationMethod(json);
             if (json.ContainsKey("item") && json["item"] is JArray)
@@ -469,39 +469,39 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             return collection;
         }
 
-        public byte[] Write(Collection collection) => Encoding.Unicode.GetBytes(WriteToString(collection));
+        public byte[] Write(RequestMessageCollection requestMessageCollection) => Encoding.Unicode.GetBytes(WriteToString(requestMessageCollection));
 
-        public void WriteToFile(Collection collection, string fileName) => File.WriteAllText(fileName, WriteToString(collection), Encoding.Unicode);
+        public void WriteToFile(RequestMessageCollection requestMessageCollection, string fileName) => File.WriteAllText(fileName, WriteToString(requestMessageCollection), Encoding.Unicode);
 
-        public string WriteToString(Collection collection)
+        public string WriteToString(RequestMessageCollection requestMessageCollection)
         {
-            collection.AssertValid();
+            requestMessageCollection.AssertValid();
 
             var jsonCollection = new JObject();
             var jsonCollectionInfo = new JObject
             {
                 { "_postman_id", Guid.NewGuid() },
-                { "name", collection.Name },
-                { "schema", "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" }
+                { "name", requestMessageCollection.Name },
+                { "schema", "https://schema.getpostman.com/json/requestMessageCollection/v2.1.0/requestMessageCollection.json" }
             };
             jsonCollection.Add("info", jsonCollectionInfo);
 
             var jsonCollectionItems = new JArray();
-            foreach (var childItem in collection.Items.OfType<Collection>())
+            foreach (var childItem in requestMessageCollection.Items.OfType<RequestMessageCollection>())
             {
                 jsonCollectionItems.Add(ExportToPostman(childItem));
             }
 
-            foreach (var childItem in collection.Items.OfType<RequestMessage>())
+            foreach (var childItem in requestMessageCollection.Items.OfType<RequestMessage>())
             {
                 jsonCollectionItems.Add(ExportToPostman((Item) childItem));
             }
 
             jsonCollection.Add("item", jsonCollectionItems);
 
-            if (collection.AuthenticationMethod != null && !(collection.AuthenticationMethod is NoAuthentication))
+            if (requestMessageCollection.AuthenticationMethod != null && !(requestMessageCollection.AuthenticationMethod is NoAuthentication))
             {
-                jsonCollection.Add("auth", ExportToPostman(collection.AuthenticationMethod));
+                jsonCollection.Add("auth", ExportToPostman(requestMessageCollection.AuthenticationMethod));
             }
 
             var stringBuilder = new StringBuilder();

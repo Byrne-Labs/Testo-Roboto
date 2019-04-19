@@ -7,7 +7,7 @@ using MessagePack;
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     [MessagePackObject]
-    public class Collection : Item, ICloneable<Collection>
+    public class RequestMessageCollection : Item, ICloneable<RequestMessageCollection>
     {
         [Key(4)]
         public bool FuzzedMessageCollection { get; private set; }
@@ -19,14 +19,14 @@ namespace ByrneLabs.TestoRoboto.HttpServices
         {
             if (Items.OfType<RequestMessage>().Any())
             {
-                Collection fuzzedMessages;
-                if (Items.OfType<Collection>().All(collection => !collection.FuzzedMessageCollection))
+                RequestMessageCollection fuzzedMessages;
+                if (Items.OfType<RequestMessageCollection>().All(collection => !collection.FuzzedMessageCollection))
                 {
-                    Items.Add(fuzzedMessages = new Collection { FuzzedMessageCollection = true, Description = "Fuzzed messages", Name = "Fuzzed Messages" });
+                    Items.Add(fuzzedMessages = new RequestMessageCollection { FuzzedMessageCollection = true, Description = "Fuzzed messages", Name = "Fuzzed Messages" });
                 }
                 else
                 {
-                    fuzzedMessages = Items.OfType<Collection>().Single(collection => collection.FuzzedMessageCollection);
+                    fuzzedMessages = Items.OfType<RequestMessageCollection>().Single(collection => collection.FuzzedMessageCollection);
                 }
 
                 foreach (var nonFuzzedMessage in Items.OfType<RequestMessage>().Where(message => !(message is FuzzedRequestMessage)))
@@ -39,7 +39,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
                 if (includeSubCollections)
                 {
-                    foreach (var subCollection in Items.OfType<Collection>().Where(c => !c.FuzzedMessageCollection))
+                    foreach (var subCollection in Items.OfType<RequestMessageCollection>().Where(c => !c.FuzzedMessageCollection))
                     {
                         subCollection.AddFuzzedMessages(mutators, true);
                     }
@@ -56,9 +56,9 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             }
         }
 
-        public new Collection Clone(CloneDepth depth = CloneDepth.Deep) => (Collection) base.Clone(depth);
+        public new RequestMessageCollection Clone(CloneDepth depth = CloneDepth.Deep) => (RequestMessageCollection) base.Clone(depth);
 
-        public IEnumerable<RequestMessage> DescendentRequestMessages() => Items.OfType<RequestMessage>().Union(Items.OfType<Collection>().SelectMany(collection => collection.DescendentRequestMessages()));
+        public IEnumerable<RequestMessage> DescendentRequestMessages() => Items.OfType<RequestMessage>().Union(Items.OfType<RequestMessageCollection>().SelectMany(collection => collection.DescendentRequestMessages()));
 
         public void RemoveDuplicateFingerprints(bool includeSubCollections)
         {
@@ -81,7 +81,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
                 Items.Remove(duplicateRequestMessage);
             }
 
-            var fuzzedMessages = Items.OfType<Collection>().SingleOrDefault(collection => collection.FuzzedMessageCollection);
+            var fuzzedMessages = Items.OfType<RequestMessageCollection>().SingleOrDefault(collection => collection.FuzzedMessageCollection);
             if (fuzzedMessages != null)
             {
                 var duplicatedFuzzedRequestMessages = new List<FuzzedRequestMessage>();
@@ -101,7 +101,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices
 
             if (includeSubCollections)
             {
-                foreach (var subCollection in Items.OfType<Collection>().Where(sc => !sc.FuzzedMessageCollection))
+                foreach (var subCollection in Items.OfType<RequestMessageCollection>().Where(sc => !sc.FuzzedMessageCollection))
                 {
                     subCollection.RemoveDuplicateFingerprints(includeSubCollections);
                 }

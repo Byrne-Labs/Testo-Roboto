@@ -4,16 +4,16 @@
     {
         bool BinaryOnly { get; }
 
-        Collection Read(byte[] bytes);
+        RequestMessageCollection Read(byte[] bytes);
 
-        Collection ReadFromFile(string fileName);
+        RequestMessageCollection ReadFromFile(string fileName);
 
-        Collection ReadFromString(string collectionText);
+        RequestMessageCollection ReadFromString(string collectionText);
 
-        byte[] Write(Collection collection);
+        byte[] Write(RequestMessageCollection requestMessageCollection);
 
-        void WriteToFile(Collection collection, string fileName);
+        void WriteToFile(RequestMessageCollection requestMessageCollection, string fileName);
 
-        string WriteToString(Collection collection);
+        string WriteToString(RequestMessageCollection requestMessageCollection);
     }
 }

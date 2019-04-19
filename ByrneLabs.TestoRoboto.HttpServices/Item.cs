@@ -5,7 +5,7 @@ using MessagePack;
 namespace ByrneLabs.TestoRoboto.HttpServices
 {
     [MessagePackObject]
-    [Union(0, typeof(Collection))]
+    [Union(0, typeof(RequestMessageCollection))]
     [Union(1, typeof(FuzzedRequestMessage))]
     [Union(2, typeof(RequestMessage))]
     public abstract class Item : HandyObject<Item>

@@ -11,7 +11,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
         [Fact]
         public void TestExportToPostmanBasicAuthentication()
         {
-            var collection = new Collection();
+            var collection = new RequestMessageCollection();
             collection.Name = "Some Messages";
             collection.AuthenticationMethod = new BasicAuthentication { Username = "username1", Password = "password1" };
             var requestMessage = new RequestMessage();
@@ -22,11 +22,11 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             requestMessage.Uri = new Uri("http://some.domain/path/resource?key=value");
             requestMessage.Headers.Add(new Header { Key = "Content-Type", Value = "application/json" });
             collection.Items.Add(requestMessage);
-            var subCollection = new Collection { Name = "Sub-collection" };
+            var subCollection = new RequestMessageCollection { Name = "Sub-collection" };
             subCollection.AuthenticationMethod = new BasicAuthentication { Username = "username3", Password = "password3" };
             collection.Items.Add(subCollection);
             subCollection.Items.Add(new RequestMessage { HttpMethod = HttpMethod.Post.ToString(), Name = "Some Message", Body = new RawBody { Text = "{ \"xyz\": 456 }" } });
-            collection.Items.Add(new Collection { Name = "Fuzzed Messages" });
+            collection.Items.Add(new RequestMessageCollection { Name = "Fuzzed Messages" });
 
             var json = new PostmanSerializer().WriteToString(collection);
 
@@ -1539,9 +1539,9 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 
             var collection = new PostmanSerializer().ReadFromString(json);
             Assert.Single(collection.Items);
-            Assert.IsType<Collection>(collection.Items[0]);
-            Assert.Single(collection.Items.OfType<Collection>().Single().Items);
-            Assert.IsType<RequestMessage>(collection.Items.OfType<Collection>().Single().Items.Single());
+            Assert.IsType<RequestMessageCollection>(collection.Items[0]);
+            Assert.Single(collection.Items.OfType<RequestMessageCollection>().Single().Items);
+            Assert.IsType<RequestMessage>(collection.Items.OfType<RequestMessageCollection>().Single().Items.Single());
         }
     }
 }

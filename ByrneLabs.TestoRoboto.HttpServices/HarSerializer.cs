@@ -11,14 +11,14 @@ namespace ByrneLabs.TestoRoboto.HttpServices
     {
         public bool BinaryOnly => false;
 
-        public Collection Read(byte[] bytes) => ReadFromString(Encoding.Unicode.GetString(bytes));
+        public RequestMessageCollection Read(byte[] bytes) => ReadFromString(Encoding.Unicode.GetString(bytes));
 
-        public Collection ReadFromFile(string fileName) => ReadFromString(File.ReadAllText(fileName));
+        public RequestMessageCollection ReadFromFile(string fileName) => ReadFromString(File.ReadAllText(fileName));
 
-        public Collection ReadFromString(string collectionText)
+        public RequestMessageCollection ReadFromString(string collectionText)
         {
             var json = JObject.Parse(collectionText);
-            var collection = new Collection();
+            var collection = new RequestMessageCollection();
             collection.Name = "Import from HTTP archive";
             var entries = (JArray) json["log"]["entries"];
             foreach (var harEntry in entries.Cast<JObject>())
@@ -104,10 +104,10 @@ namespace ByrneLabs.TestoRoboto.HttpServices
             return collection;
         }
 
-        public byte[] Write(Collection collection) => Encoding.Unicode.GetBytes(WriteToString(collection));
+        public byte[] Write(RequestMessageCollection requestMessageCollection) => Encoding.Unicode.GetBytes(WriteToString(requestMessageCollection));
 
-        public void WriteToFile(Collection collection, string fileName) => File.WriteAllText(fileName, WriteToString(collection), Encoding.Unicode);
+        public void WriteToFile(RequestMessageCollection requestMessageCollection, string fileName) => File.WriteAllText(fileName, WriteToString(requestMessageCollection), Encoding.Unicode);
 
-        public string WriteToString(Collection collection) => throw new NotSupportedException();
+        public string WriteToString(RequestMessageCollection requestMessageCollection) => throw new NotSupportedException();
     }
 }

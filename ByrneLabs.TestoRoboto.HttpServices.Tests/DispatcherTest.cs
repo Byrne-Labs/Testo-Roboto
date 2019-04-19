@@ -23,7 +23,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             requestMessage.HttpMethod = HttpMethod.Post.ToString();
             requestMessage.ExpectedStatusCode = HttpStatusCode.OK;
 
-            var collection = new Collection();
+            var collection = new RequestMessageCollection();
             collection.Items.Add(requestMessage);
 
             var mutator = new Mock<Mutator>();
@@ -45,7 +45,7 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
             Assert.Single(requestMessage.ResponseMessages);
             Assert.Equal(HttpStatusCode.OK, requestMessage.ResponseMessages.Single().StatusCode);
 
-            var fuzzedRequest = collection.Items.OfType<Collection>().Single().Items.OfType<RequestMessage>().Single();
+            var fuzzedRequest = collection.Items.OfType<RequestMessageCollection>().Single().Items.OfType<RequestMessage>().Single();
 
             Assert.Single(fuzzedRequest.ResponseMessages);
         }

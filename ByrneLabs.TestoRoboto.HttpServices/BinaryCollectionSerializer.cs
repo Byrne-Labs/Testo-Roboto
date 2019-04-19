@@ -8,19 +8,19 @@ namespace ByrneLabs.TestoRoboto.HttpServices
     {
         public bool BinaryOnly => true;
 
-        public Collection Read(byte[] bytes) => MessagePackSerializer.Deserialize<Collection>(bytes);
+        public RequestMessageCollection Read(byte[] bytes) => MessagePackSerializer.Deserialize<RequestMessageCollection>(bytes);
 
-        public Collection ReadFromFile(string fileName) => Read(File.ReadAllBytes(fileName));
+        public RequestMessageCollection ReadFromFile(string fileName) => Read(File.ReadAllBytes(fileName));
 
-        public Collection ReadFromString(string collectionText) => throw new NotSupportedException();
+        public RequestMessageCollection ReadFromString(string collectionText) => throw new NotSupportedException();
 
-        public byte[] Write(Collection collection) => MessagePackSerializer.Serialize(collection);
+        public byte[] Write(RequestMessageCollection requestMessageCollection) => MessagePackSerializer.Serialize(requestMessageCollection);
 
-        public void WriteToFile(Collection collection, string fileName)
+        public void WriteToFile(RequestMessageCollection requestMessageCollection, string fileName)
         {
-            File.WriteAllBytes(fileName, Write(collection));
+            File.WriteAllBytes(fileName, Write(requestMessageCollection));
         }
 
-        public string WriteToString(Collection collection) => throw new NotSupportedException();
+        public string WriteToString(RequestMessageCollection requestMessageCollection) => throw new NotSupportedException();
     }
 }

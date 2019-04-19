@@ -14,13 +14,13 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
         [Fact]
         public void TestCreateCollectionFuzzedMessages()
         {
-            var collection = new Collection();
+            var collection = new RequestMessageCollection();
             var requestMessage = new RequestMessage();
             requestMessage.Body = new RawBody { Text = "{ \"asdf\": 123 }" };
             requestMessage.HttpMethod = HttpMethod.Post.ToString();
             requestMessage.Uri = new Uri("http://some.domain/path/resource?key=value");
             collection.Items.Add(requestMessage);
-            var subCollection = new Collection { Name = "Sub-collection" };
+            var subCollection = new RequestMessageCollection { Name = "Sub-collection" };
             collection.Items.Add(subCollection);
             subCollection.Items.Add(new RequestMessage { Body = new RawBody { Text = "{ \"xyz\": 456 }" } });
 
@@ -42,17 +42,17 @@ namespace ByrneLabs.TestoRoboto.HttpServices.Tests
 
             Assert.Equal(3, collection.Items.Count);
             Assert.Single(collection.Items.OfType<RequestMessage>());
-            Assert.Equal(2, collection.Items.OfType<Collection>().Count());
-            Assert.Single(collection.Items.OfType<Collection>().First().Items.OfType<RequestMessage>());
-            Assert.IsType<FuzzedRequestMessage>(collection.Items.OfType<Collection>().Single(sc => sc.FuzzedMessageCollection).Items.OfType<RequestMessage>().Single());
-            Assert.Equal("{\"asdf\":\"asdf\"}", ((RawBody) collection.Items.OfType<Collection>().Single(sc => sc.FuzzedMessageCollection).Items.OfType<RequestMessage>().Single().Body).Text);
+            Assert.Equal(2, collection.Items.OfType<RequestMessageCollection>().Count());
+            Assert.Single(collection.Items.OfType<RequestMessageCollection>().First().Items.OfType<RequestMessage>());
+            Assert.IsType<FuzzedRequestMessage>(collection.Items.OfType<RequestMessageCollection>().Single(sc => sc.FuzzedMessageCollection).Items.OfType<RequestMessage>().Single());
+            Assert.Equal("{\"asdf\":\"asdf\"}", ((RawBody) collection.Items.OfType<RequestMessageCollection>().Single(sc => sc.FuzzedMessageCollection).Items.OfType<RequestMessage>().Single().Body).Text);
 
             Assert.Equal(2, subCollection.Items.Count);
             Assert.Single(subCollection.Items.OfType<RequestMessage>());
-            Assert.Single(subCollection.Items.OfType<Collection>());
-            Assert.Single(subCollection.Items.OfType<Collection>().First().Items.OfType<RequestMessage>());
-            Assert.IsType<FuzzedRequestMessage>(subCollection.Items.OfType<Collection>().Single().Items.OfType<RequestMessage>().Single());
-            Assert.Equal("{\"xyz\":\"asdf\"}", ((RawBody) subCollection.Items.OfType<Collection>().Single().Items.OfType<RequestMessage>().Single().Body).Text);
+            Assert.Single(subCollection.Items.OfType<RequestMessageCollection>());
+            Assert.Single(subCollection.Items.OfType<RequestMessageCollection>().First().Items.OfType<RequestMessage>());
+            Assert.IsType<FuzzedRequestMessage>(subCollection.Items.OfType<RequestMessageCollection>().Single().Items.OfType<RequestMessage>().Single());
+            Assert.Equal("{\"xyz\":\"asdf\"}", ((RawBody) subCollection.Items.OfType<RequestMessageCollection>().Single().Items.OfType<RequestMessage>().Single().Body).Text);
         }
     }
 }

@@ -36,6 +36,6 @@ namespace ByrneLabs.TestoRoboto.HttpServices
         [Key(8)]
         public int TimeBetweenRequests { get; set; }
 
-        public IEnumerable<RequestMessage> GetAllRequestMessages() => Items.OfType<RequestMessage>().Union(Items.OfType<Collection>().SelectMany(collection => collection.DescendentRequestMessages())).ToList();
+        public IEnumerable<RequestMessage> GetAllRequestMessages() => Items.OfType<RequestMessage>().Union(Items.OfType<RequestMessageCollection>().SelectMany(collection => collection.DescendentRequestMessages())).ToList();
     }
 }
