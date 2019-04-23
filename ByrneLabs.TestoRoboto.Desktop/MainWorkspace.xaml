@@ -1,0 +1,99 @@
+﻿<commons:UserControlBase
+    x:Class="ByrneLabs.TestoRoboto.Desktop.MainWorkspace"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ByrneLabs.TestoRoboto.Desktop"
+    xmlns:commons="clr-namespace:ByrneLabs.Commons.Presentation.Wpf;assembly=ByrneLabs.Commons.Presentation.Wpf"
+    xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
+    xmlns:viewModels="clr-namespace:ByrneLabs.TestoRoboto.Desktop.ViewModels"
+    xmlns:Interactions="http://schemas.microsoft.com/xaml/behaviors"
+    commons:ViewModelCommandBinding.CommandHandler="{Binding}"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance viewModels:MainWorkspaceViewModel, IsDesignTimeCreatable=true }"
+    d:DesignHeight="600"
+    d:DesignWidth="800">
+
+    <commons:UserControlBase.CommandBindings>
+        <commons:ViewModelCommandBinding Command="local:TestoRobotoCommands.NewRequestMessageCollection" />
+        <commons:ViewModelCommandBinding Command="local:TestoRobotoCommands.NewRequestMessage" />
+        <commons:ViewModelCommandBinding Command="ApplicationCommands.Open" />
+    </commons:UserControlBase.CommandBindings>
+
+
+    <xcad:DockingManager AllowMixedOrientation="True" BorderBrush="{x:Static SystemColors.AppWorkspaceBrush}" Background="{x:Static SystemColors.AppWorkspaceBrush}" BorderThickness="5" DocumentsSource="{Binding OpenRequestMessages}">
+        <xcad:DockingManager.Resources>
+            <DataTemplate DataType="{x:Type viewModels:RequestMessageViewModel}">
+                <local:RequestMessage />
+            </DataTemplate>
+        </xcad:DockingManager.Resources>
+        <xcad:DockingManager.DocumentHeaderTemplate>
+            <DataTemplate>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Content.Name}" />
+                </StackPanel>
+            </DataTemplate>
+        </xcad:DockingManager.DocumentHeaderTemplate>
+
+        <xcad:LayoutRoot>
+            <xcad:LayoutPanel Orientation="Horizontal">
+                <xcad:LayoutAnchorablePane DockWidth="200">
+                    <xcad:LayoutAnchorable Title="Project Explorer" CanHide="False" CanClose="False" AutoHideWidth="240">
+                        <DockPanel>
+                            <ToolBarTray DockPanel.Dock="Top">
+                                <ToolBar>
+                                    <Button Style="{StaticResource ButtonSupportingDisabledImage}" Command="local:TestoRobotoCommands.NewRequestMessage" ToolTip="New Message Request" CommandParameter="{Binding ElementName=RequestMessageTreeView, Path=SelectedItem}">
+                                        <Image Source="Images/AddFile_16x.png" />
+                                    </Button>
+                                    <Button Style="{StaticResource ButtonSupportingDisabledImage}" Command="local:TestoRobotoCommands.NewRequestMessageCollection" ToolTip="New Message Request Collection" CommandParameter="{Binding ElementName=RequestMessageTreeView, Path=SelectedItem}">
+                                        <Image Source="Images/AddFolder_16x.png" />
+                                    </Button>
+                                    <Button Style="{StaticResource ButtonSupportingDisabledImage}" Command="Open" ToolTip="Open" CommandParameter="{Binding ElementName=RequestMessageTreeView, Path=SelectedItem}">
+                                        <Image Source="Images/OpenFile_16x.png" />
+                                    </Button>
+                                </ToolBar>
+                            </ToolBarTray>
+                            <TreeView x:Name="RequestMessageTreeView" ItemsSource="{Binding RequestMessageHierarchyItemViewModels}" PreviewMouseRightButtonDown="TreeViewItem_OnPreviewMouseRightButtonDown">
+                                <Interactions:Interaction.Behaviors>
+                                    <commons:BindableSelectedItemBehavior SelectedItem="{Binding SelectedRequestMessageHierarchyItem, Mode=TwoWay}" />
+                                </Interactions:Interaction.Behaviors>
+                                <TreeView.Resources>
+                                    <HierarchicalDataTemplate DataType="{x:Type viewModels:RequestMessageCollectionViewModel}" ItemsSource="{Binding Items}">
+                                        <StackPanel>
+                                            <Image Source="Images/Folder_16x.png" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </HierarchicalDataTemplate>
+                                    <DataTemplate DataType="{x:Type viewModels:RequestMessageViewModel}">
+                                        <StackPanel>
+                                            <Image Source="Images/Document_16x.png" />
+                                            <TextBlock Text="{Binding Name}" MouseDown="TreeViewItem_OnMouseDown" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </TreeView.Resources>
+                                <TreeView.ItemContainerStyle>
+                                    <Style TargetType="TreeViewItem" d:DataContext="{d:DesignInstance viewModels:RequestMessageCollectionViewModel, IsDesignTimeCreatable=true }">
+                                        <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                                        <Setter Property="IsExpanded" Value="{Binding IsExpanded}" />
+                                    </Style>
+                                </TreeView.ItemContainerStyle>
+                                <TreeView.ContextMenu>
+                                    <ContextMenu StaysOpen="True">
+                                        <MenuItem Header="Open" Command="local:TestoRobotoCommands.NewRequestMessage" CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ContextMenu}}}" />
+                                        <MenuItem Header="New Request Message" Command="local:TestoRobotoCommands.NewRequestMessage" CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ContextMenu}}}" />
+                                        <MenuItem Header="New Collection" Command="local:TestoRobotoCommands.NewRequestMessageCollection" CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ContextMenu}}}" />
+                                    </ContextMenu>
+                                </TreeView.ContextMenu>
+                            </TreeView>
+                        </DockPanel>
+                    </xcad:LayoutAnchorable>
+                </xcad:LayoutAnchorablePane>
+
+                <xcad:LayoutDocumentPaneGroup>
+                    <xcad:LayoutDocumentPane />
+                </xcad:LayoutDocumentPaneGroup>
+            </xcad:LayoutPanel>
+        </xcad:LayoutRoot>
+    </xcad:DockingManager>
+</commons:UserControlBase>

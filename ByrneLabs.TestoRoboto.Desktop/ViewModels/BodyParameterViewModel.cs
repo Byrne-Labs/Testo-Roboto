@@ -1,6 +1,8 @@
-﻿namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
+﻿using ByrneLabs.Commons.Presentation.Wpf;
+
+namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    public class BodyParameterViewModel : BaseViewModel
+    public class BodyParameterViewModel : ViewModelBase
     {
         public string ContentType { get; set; }
 

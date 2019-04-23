@@ -61,7 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ByrneLabs.Commons">
-      <Version>1.0.0.117-alpha</Version>
+      <Version>1.0.0.118-alpha</Version>
     </PackageReference>
     <PackageReference Include="ByrneLabs.Serializer">
       <Version>1.0.0.19-alpha</Version>

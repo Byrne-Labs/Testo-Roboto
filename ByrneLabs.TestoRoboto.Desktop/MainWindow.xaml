@@ -9,40 +9,12 @@
         xmlns:system="clr-namespace:System;assembly=System.Runtime"
         xmlns:viewModels="clr-namespace:ByrneLabs.TestoRoboto.Desktop.ViewModels"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel, IsDesignTimeCreatable=true }"
+        d:DataContext="{d:DesignInstance viewModels:MainWorkspaceViewModel, IsDesignTimeCreatable=true }"
         Title="Testo Roboto"
         Width="800"
         Height="600"
         Loaded="Window_Loaded">
 
-
-    <xcad:DockingManager AllowMixedOrientation="True" BorderBrush="{DynamicResource {x:Static SystemColors.AppWorkspaceBrush}}" BorderThickness="5" DocumentsSource="{Binding OpenRequestMessages}">
-        <xcad:DockingManager.Resources>
-            <DataTemplate DataType="{x:Type viewModels:RequestMessageViewModel}">
-                <local:RequestMessage />
-            </DataTemplate>
-        </xcad:DockingManager.Resources>
-        <xcad:DockingManager.DocumentHeaderTemplate>
-            <DataTemplate>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding Content.Name}" />
-                </StackPanel>
-            </DataTemplate>
-        </xcad:DockingManager.DocumentHeaderTemplate>
-
-        <xcad:LayoutRoot>
-            <xcad:LayoutPanel Orientation="Horizontal">
-                <xcad:LayoutAnchorablePane DockWidth="200">
-                    <xcad:LayoutAnchorable Title="Project Explorer" CanHide="False" CanClose="False" AutoHideWidth="240">
-                        <TextBlock Text="Project Explorer Content" Margin="10" FontSize="18" FontWeight="Black" TextWrapping="Wrap" />
-                    </xcad:LayoutAnchorable>
-                </xcad:LayoutAnchorablePane>
-
-                <xcad:LayoutDocumentPaneGroup>
-                    <xcad:LayoutDocumentPane />
-                </xcad:LayoutDocumentPaneGroup>
-            </xcad:LayoutPanel>
-        </xcad:LayoutRoot>
-    </xcad:DockingManager>
+    <local:MainWorkspace x:Name="MainWorkspace" />
 
 </Window>

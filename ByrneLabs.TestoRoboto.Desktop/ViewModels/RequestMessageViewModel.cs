@@ -9,7 +9,7 @@ using ByrneLabs.Commons.Presentation.Wpf;
 
 namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    public class RequestMessageViewModel : BaseViewModel
+    public class RequestMessageViewModel : RequestMessageHierarchyItemViewModel
     {
         private Uri _url;
         private bool _urlChanging;
@@ -53,8 +53,6 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public IEnumerable<AuthenticationViewModel> AuthenticationTypes { get; } = new AuthenticationViewModel[] { new InheritedAuthenticationViewModel(), new NoAuthenticationViewModel(), new AwsSignatureAuthenticationViewModel(), new BasicAuthenticationViewModel(), new BearerTokenAuthenticationViewModel(), new DigestAuthenticationViewModel(), new HawkAuthenticationViewModel(), new NtlmAuthenticationViewModel(), new Oauth1AuthenticationViewModel(), new Oauth2AuthenticationViewModel() };
 
-        public AuthenticationViewModel AuthenticationViewModel { get; set; }
-
         public IEnumerable<BodyViewModel> BodyTypes { get; } = new BodyViewModel[] { new NoBodyViewModel(), new FormDataBodyViewModel(), new RawBodyViewModel(), new UrlEncodedBodyViewModel() };
 
         public BodyViewModel BodyViewModel { get; set; }
@@ -69,8 +67,6 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public RelayCommand DeleteSelectedQueryStringParameterCommand { get; }
 
-        public string Description { get; set; }
-
         public ObservableCollection<HeaderViewModel> Headers { get; } = new FullyObservableCollection<HeaderViewModel>();
 
         public string HttpMethod { get; set; } = "POST";
@@ -78,8 +74,6 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
         public IEnumerable<string> HttpMethods { get; } = new[] { "GET", "POST", "PUT", "PATCH", "DELETE", "COPY", "HEAD", "OPTIONS", "LINK", "UNLINK", "PURGE", "LOCK", "UNLOCK", "PROPFIND", "VIEW" };
 
         public bool IsClosed { get; private set; }
-
-        public string Name { get; set; }
 
         public ObservableCollection<QueryStringParameterViewModel> QueryStringParameters { get; } = new FullyObservableCollection<QueryStringParameterViewModel>();
 

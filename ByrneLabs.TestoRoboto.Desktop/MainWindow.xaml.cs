@@ -12,7 +12,7 @@ namespace ByrneLabs.TestoRoboto.Desktop
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            DataContext = new MainWindowViewModel();
+            MainWorkspace.DataContext = new MainWorkspaceViewModel();
         }
     }
 }

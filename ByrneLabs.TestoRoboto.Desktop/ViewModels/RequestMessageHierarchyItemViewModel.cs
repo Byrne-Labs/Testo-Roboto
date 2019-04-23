@@ -2,16 +2,14 @@
 
 namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    public class CookieViewModel : ViewModelBase
+    public class RequestMessageHierarchyItemViewModel : ViewModelBase
     {
+        public AuthenticationViewModel AuthenticationViewModel { get; set; }
+
         public string Description { get; set; }
 
-        public string Domain { get; set; }
+        public bool IsSelected { get; set; }
 
         public string Name { get; set; }
-
-        public string Path { get; set; }
-
-        public string Value { get; set; }
     }
 }

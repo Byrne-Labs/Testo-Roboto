@@ -5,6 +5,18 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
+            <Style x:Key="ButtonSupportingDisabledImage" TargetType="Button">
+                <Style.Resources>
+                    <Style TargetType="Image">
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.25" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Style.Resources>
+            </Style>
+
             <Style x:Key="RadioButtonListItem" TargetType="{x:Type ListBoxItem}">
 
                 <Setter Property="Template">

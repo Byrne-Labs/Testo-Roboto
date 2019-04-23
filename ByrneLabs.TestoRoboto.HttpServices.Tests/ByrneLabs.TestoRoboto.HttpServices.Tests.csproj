@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ByrneLabs.Commons" Version="1.0.0.117-alpha" />
+    <PackageReference Include="ByrneLabs.Commons" Version="1.0.0.118-alpha" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
     <PackageReference Include="Moq" Version="4.10.1" />
     <PackageReference Include="Moq.Analyzers" Version="0.0.4.43043">

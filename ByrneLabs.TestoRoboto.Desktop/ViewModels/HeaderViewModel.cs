@@ -1,6 +1,8 @@
-﻿namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
+﻿using ByrneLabs.Commons.Presentation.Wpf;
+
+namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    public class HeaderViewModel : BaseViewModel
+    public class HeaderViewModel : ViewModelBase
     {
         public string Description { get; set; }
 

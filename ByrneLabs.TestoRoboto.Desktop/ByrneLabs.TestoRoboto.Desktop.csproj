@@ -8,6 +8,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\AddFile_16x.png" />
+    <None Remove="Images\AddFolder_16x.png" />
+    <None Remove="Images\Document_16x.png" />
+    <None Remove="Images\Folder_16x.png" />
+    <None Remove="Images\OpenFile_16x.png" />
+    <None Remove="MainWorkspace.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\Document_16x.png" />
+    <Resource Include="Images\Folder_16x.png" />
+    <Resource Include="Images\OpenFile_16x.png">
+      <CopyToOutputDirectory></CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Extended.Wpf.Toolkit" Version="3.5.0" />
     <PackageReference Include="Fody" Version="5.0.0-beta.11">
       <PrivateAssets>all</PrivateAssets>
@@ -19,6 +36,19 @@
   <ItemGroup>
     <ProjectReference Include="..\ByrneLabs.Commons.Presentation.Wpf\ByrneLabs.Commons.Presentation.Wpf.csproj" />
     <ProjectReference Include="..\ByrneLabs.TestoRoboto.HttpServices\ByrneLabs.TestoRoboto.HttpServices.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\AddFile_16x.png">
+      <CopyToOutputDirectory></CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\AddFolder_16x.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="MainWorkspace.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
 
 </Project>

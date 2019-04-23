@@ -1,6 +1,8 @@
-﻿namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
+﻿using ByrneLabs.Commons.Presentation.Wpf;
+
+namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 {
-    public class KeyValueViewModel : BaseViewModel
+    public class KeyValueViewModel : ViewModelBase
     {
         public string Description { get; set; }
 
