@@ -49,12 +49,16 @@ namespace ByrneLabs.Commons.Presentation.Wpf
 
         void ICommandHandler.InvokeCanExecuteCommandDelegate(object sender, CanExecuteRoutedEventArgs eventArgs)
         {
-            if (_commandToCallbacksMap.ContainsKey(eventArgs.Command))
+            if (_commandToCallbacksMap.ContainsKey(eventArgs.Command) && _commandToCallbacksMap[eventArgs.Command].Any(commandCallbackCheck => commandCallbackCheck.CanExecute != null))
             {
                 foreach (var commandCallback in _commandToCallbacksMap[eventArgs.Command].Where(commandCallbackCheck => commandCallbackCheck.CanExecute != null))
                 {
                     commandCallback.CanExecute(sender, eventArgs);
                 }
+            }
+            else
+            {
+               eventArgs.CanExecute = true;
             }
         }
 

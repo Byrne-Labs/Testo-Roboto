@@ -32,8 +32,8 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
             };
 
             RegisterCommand(ApplicationCommands.Open, null, null, OpenCommandCanExecute, OpenCommandExecuted);
-            RegisterCommand(TestoRobotoCommands.NewRequestMessageCollection, null, null, NewRequestMessageCollectionCommandCanExecute, NewRequestMessageCollectionCommandExecuted);
-            RegisterCommand(TestoRobotoCommands.NewRequestMessage, null, null, NewRequestMessageCommandCanExecute, NewRequestMessageCommandExecuted);
+            RegisterCommand(TestoRobotoCommands.NewRequestMessageCollection, null, null, null, NewRequestMessageCollectionCommandExecuted);
+            RegisterCommand(TestoRobotoCommands.NewRequestMessage, null, null, null, NewRequestMessageCommandExecuted);
         }
 
         public bool BackStageVisible { get; set; } = false;
@@ -48,52 +48,69 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public bool StartScreenVisible { get; set; } = true;
 
-        private void NewRequestMessageCollectionCommandCanExecute(object sender, CanExecuteRoutedEventArgs eventArgs)
-        {
-            eventArgs.CanExecute = eventArgs.Parameter == null || eventArgs.Parameter is RequestMessageCollectionViewModel;
-        }
-
         private void NewRequestMessageCollectionCommandExecuted(object sender, ExecutedRoutedEventArgs eventArgs)
         {
-            if (eventArgs.Parameter == null)
+            RequestMessageCollectionViewModel selectedCollectionViewModel;
+            if (eventArgs.Parameter is RequestMessageViewModel requestMessageViewModel)
             {
-                RequestMessageHierarchyItemViewModels.Add(new RequestMessageCollectionViewModel { Name = "New Collection", IsSelected = true });
+                selectedCollectionViewModel = requestMessageViewModel.ParentCollection;
+            }
+            else if (eventArgs.Parameter is RequestMessageCollectionViewModel requestMessageCollectionViewModel)
+            {
+                selectedCollectionViewModel = requestMessageCollectionViewModel;
+            }
+            else if (eventArgs.Parameter == null)
+            {
+                selectedCollectionViewModel = null;
             }
             else
             {
-                if (!(eventArgs.Parameter is RequestMessageCollectionViewModel selectedCollectionViewModel))
-                {
-                    throw new ArgumentException("The parameter must be of type " + nameof(RequestMessageCollectionViewModel), nameof(eventArgs.Parameter));
-                }
+                throw new ArgumentException($"The parameter must be null or of type {nameof(RequestMessageCollectionViewModel)} or {nameof(requestMessageViewModel)}", nameof(eventArgs.Parameter));
+            }
 
-                selectedCollectionViewModel.Items.Add(new RequestMessageCollectionViewModel { Name = "New Collection", IsSelected = true });
+            var newRequestMessageCollection = new RequestMessageCollectionViewModel { Name = "New Request Message Collection", IsSelected = true, ParentCollection = selectedCollectionViewModel };
+            if (selectedCollectionViewModel == null)
+            {
+                RequestMessageHierarchyItemViewModels.Add(newRequestMessageCollection);
+            }
+            else
+            {
+                selectedCollectionViewModel.Items.Add(newRequestMessageCollection);
                 selectedCollectionViewModel.IsExpanded = true;
             }
-        }
-
-        private void NewRequestMessageCommandCanExecute(object sender, CanExecuteRoutedEventArgs eventArgs)
-        {
-            eventArgs.CanExecute = eventArgs.Parameter == null || eventArgs.Parameter is RequestMessageCollectionViewModel;
         }
 
         private void NewRequestMessageCommandExecuted(object sender, ExecutedRoutedEventArgs eventArgs)
         {
-            if (eventArgs.Parameter == null)
+            RequestMessageCollectionViewModel selectedCollectionViewModel;
+            if (eventArgs.Parameter is RequestMessageViewModel requestMessageViewModel)
             {
-                RequestMessageHierarchyItemViewModels.Add(new RequestMessageViewModel { Name = "New Request Message", IsSelected = true });
+                selectedCollectionViewModel = requestMessageViewModel.ParentCollection;
+            }
+            else if (eventArgs.Parameter is RequestMessageCollectionViewModel requestMessageCollectionViewModel)
+            {
+                selectedCollectionViewModel = requestMessageCollectionViewModel;
+            }
+            else if (eventArgs.Parameter == null)
+            {
+                selectedCollectionViewModel = null;
             }
             else
             {
-                if (!(eventArgs.Parameter is RequestMessageCollectionViewModel selectedCollectionViewModel))
-                {
-                    throw new ArgumentException("The parameter must be of type " + nameof(RequestMessageCollectionViewModel), nameof(eventArgs.Parameter));
-                }
+                throw new ArgumentException($"The parameter must be null or of type {nameof(RequestMessageCollectionViewModel)} or {nameof(requestMessageViewModel)}", nameof(eventArgs.Parameter));
+            }
 
-                var newRequestMessage = new RequestMessageViewModel { Name = "New Request Message", IsSelected = true };
+            var newRequestMessage = new RequestMessageViewModel { Name = "New Request Message", IsSelected = true, ParentCollection = selectedCollectionViewModel };
+            if (selectedCollectionViewModel == null)
+            {
+                RequestMessageHierarchyItemViewModels.Add(newRequestMessage);
+            }
+            else
+            {
                 selectedCollectionViewModel.Items.Add(newRequestMessage);
                 selectedCollectionViewModel.IsExpanded = true;
-                OpenRequestMessages.Add(newRequestMessage);
             }
+            OpenRequestMessages.Add(newRequestMessage);
         }
 
         private void OpenCommandCanExecute(object sender, CanExecuteRoutedEventArgs eventArgs)
@@ -104,7 +121,14 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
         private void OpenCommandExecuted(object sender, ExecutedRoutedEventArgs eventArgs)
         {
             var requestMessage = eventArgs.Parameter as RequestMessageViewModel;
-            OpenRequestMessages.Add(requestMessage);
+            if (!OpenRequestMessages.Contains(requestMessage))
+            {
+                OpenRequestMessages.Add(requestMessage);
+            }
+            else
+            {
+                //TODO: Bring tab to foreground
+            }
         }
 
         private void RequestMessageOnPropertyChanged(object sender, PropertyChangedEventArgs e)

@@ -54,19 +54,19 @@
                                     </Button>
                                 </ToolBar>
                             </ToolBarTray>
-                            <TreeView x:Name="RequestMessageTreeView" ItemsSource="{Binding RequestMessageHierarchyItemViewModels}" PreviewMouseRightButtonDown="TreeViewItem_OnPreviewMouseRightButtonDown">
+                            <TreeView x:Name="RequestMessageTreeView" ItemsSource="{Binding RequestMessageHierarchyItemViewModels}" PreviewMouseRightButtonDown="TreeViewItem_OnPreviewMouseRightButtonDown" BorderThickness="0">
                                 <Interactions:Interaction.Behaviors>
                                     <commons:BindableSelectedItemBehavior SelectedItem="{Binding SelectedRequestMessageHierarchyItem, Mode=TwoWay}" />
                                 </Interactions:Interaction.Behaviors>
                                 <TreeView.Resources>
                                     <HierarchicalDataTemplate DataType="{x:Type viewModels:RequestMessageCollectionViewModel}" ItemsSource="{Binding Items}">
-                                        <StackPanel>
+                                        <StackPanel Orientation="Horizontal">
                                             <Image Source="Images/Folder_16x.png" />
                                             <TextBlock Text="{Binding Name}" />
                                         </StackPanel>
                                     </HierarchicalDataTemplate>
                                     <DataTemplate DataType="{x:Type viewModels:RequestMessageViewModel}">
-                                        <StackPanel>
+                                        <StackPanel Orientation="Horizontal">
                                             <Image Source="Images/Document_16x.png" />
                                             <TextBlock Text="{Binding Name}" MouseDown="TreeViewItem_OnMouseDown" />
                                         </StackPanel>

@@ -11,5 +11,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
         public bool IsSelected { get; set; }
 
         public string Name { get; set; }
+
+        public RequestMessageCollectionViewModel ParentCollection { get; set; }
     }
 }
