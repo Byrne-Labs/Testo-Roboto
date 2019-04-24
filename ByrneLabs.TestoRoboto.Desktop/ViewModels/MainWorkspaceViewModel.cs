@@ -11,12 +11,12 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
     {
         public MainWorkspaceViewModel()
         {
-            OpenRequestMessages = new ObservableCollection<RequestMessageViewModel>();
-            OpenRequestMessages.CollectionChanged += (sender, args) =>
+            OpenRequestMessageHierarchyItems = new ObservableCollection<RequestMessageHierarchyItemViewModel>();
+            OpenRequestMessageHierarchyItems.CollectionChanged += (sender, args) =>
             {
                 if (args.NewItems != null)
                 {
-                    foreach (var item in args.NewItems.Cast<RequestMessageViewModel>())
+                    foreach (var item in args.NewItems.Cast<RequestMessageHierarchyItemViewModel>())
                     {
                         item.PropertyChanged += RequestMessageOnPropertyChanged;
                     }
@@ -24,7 +24,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
                 if (args.OldItems != null)
                 {
-                    foreach (var item in args.OldItems.Cast<RequestMessageViewModel>())
+                    foreach (var item in args.OldItems.Cast<RequestMessageHierarchyItemViewModel>())
                     {
                         item.PropertyChanged -= RequestMessageOnPropertyChanged;
                     }
@@ -38,7 +38,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public bool BackStageVisible { get; set; } = false;
 
-        public ObservableCollection<RequestMessageViewModel> OpenRequestMessages { get; }
+        public ObservableCollection<RequestMessageHierarchyItemViewModel> OpenRequestMessageHierarchyItems { get; }
 
         public ObservableCollection<RequestMessageHierarchyItemViewModel> RequestMessageHierarchyItemViewModels { get; } = new ObservableCollection<RequestMessageHierarchyItemViewModel>();
 
@@ -111,7 +111,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
                 selectedCollectionViewModel.IsExpanded = true;
             }
 
-            OpenRequestMessages.Add(newRequestMessage);
+            OpenRequestMessageHierarchyItems.Add(newRequestMessage);
         }
 
         private void OpenCommandCanExecute(object sender, CanExecuteRoutedEventArgs eventArgs)
@@ -121,12 +121,12 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         private void OpenCommandExecuted(object sender, ExecutedRoutedEventArgs eventArgs)
         {
-            var requestMessage = eventArgs.Parameter as RequestMessageViewModel;
+            var requestMessage = eventArgs.Parameter as RequestMessageHierarchyItemViewModel;
 
-            if (!OpenRequestMessages.Contains(requestMessage))
+            if (!OpenRequestMessageHierarchyItems.Contains(requestMessage))
             {
                 requestMessage.IsClosed = false;
-                OpenRequestMessages.Add(requestMessage);
+                OpenRequestMessageHierarchyItems.Add(requestMessage);
             }
         }
 
@@ -137,7 +137,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
                 var requestMessageViewModel = sender as RequestMessageViewModel;
                 if (requestMessageViewModel.IsClosed)
                 {
-                    OpenRequestMessages.Remove(requestMessageViewModel);
+                    OpenRequestMessageHierarchyItems.Remove(requestMessageViewModel);
                 }
             }
         }

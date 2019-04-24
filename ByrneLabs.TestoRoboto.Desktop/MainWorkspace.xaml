@@ -22,10 +22,13 @@
     </commons:UserControlBase.CommandBindings>
 
 
-    <xcad:DockingManager AllowMixedOrientation="True" BorderBrush="{x:Static SystemColors.AppWorkspaceBrush}" Background="{x:Static SystemColors.AppWorkspaceBrush}" BorderThickness="5" DocumentsSource="{Binding OpenRequestMessages}">
+    <xcad:DockingManager AllowMixedOrientation="True" BorderBrush="{x:Static SystemColors.AppWorkspaceBrush}" Background="{x:Static SystemColors.AppWorkspaceBrush}" BorderThickness="5" DocumentsSource="{Binding OpenRequestMessageHierarchyItems}">
         <xcad:DockingManager.Resources>
             <DataTemplate DataType="{x:Type viewModels:RequestMessageViewModel}">
                 <local:RequestMessage />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewModels:RequestMessageCollectionViewModel}">
+                <local:RequestMessageCollection />
             </DataTemplate>
         </xcad:DockingManager.Resources>
         <xcad:DockingManager.LayoutItemContainerStyle>
@@ -79,7 +82,7 @@
                                 </TreeView.ItemContainerStyle>
                                 <TreeView.ContextMenu>
                                     <ContextMenu StaysOpen="True">
-                                        <MenuItem Header="Open" Command="local:TestoRobotoCommands.NewRequestMessage" CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ContextMenu}}}" />
+                                        <MenuItem Header="Open" Command="ApplicationCommands.Open" CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ContextMenu}}}" />
                                         <MenuItem Header="New Request Message" Command="local:TestoRobotoCommands.NewRequestMessage" CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ContextMenu}}}" />
                                         <MenuItem Header="New Collection" Command="local:TestoRobotoCommands.NewRequestMessageCollection" CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ContextMenu}}}" />
                                     </ContextMenu>

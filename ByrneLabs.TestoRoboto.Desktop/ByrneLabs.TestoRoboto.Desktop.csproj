@@ -15,6 +15,7 @@
     <None Remove="Images\Folder_16x.png" />
     <None Remove="Images\OpenFile_16x.png" />
     <None Remove="MainWorkspace.xaml" />
+    <None Remove="RequestMessageCollection.xaml" />
   </ItemGroup>
 
   <ItemGroup>

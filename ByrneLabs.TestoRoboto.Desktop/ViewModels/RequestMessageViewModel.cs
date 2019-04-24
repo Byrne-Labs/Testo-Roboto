@@ -21,7 +21,6 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
             AddHeaderCommand = new RelayCommand(param => OnAddHeader());
             DeleteSelectedHeaderCommand = new RelayCommand(param => OnDeleteSelectedHeader(), param => CanDeleteSelectedHeader());
             AddCookieCommand = new RelayCommand(param => OnAddCookie());
-            CloseCommand = new RelayCommand(param => OnClose());
             DeleteSelectedCookieCommand = new RelayCommand(param => OnDeleteSelectedCookie(), param => CanDeleteSelectedCookie());
             QueryStringParameters.CollectionChanged += (sender, args) =>
             {
@@ -55,8 +54,6 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public BodyViewModel BodyViewModel { get; set; }
 
-        public RelayCommand CloseCommand { get; }
-
         public ObservableCollection<CookieViewModel> Cookies { get; } = new FullyObservableCollection<CookieViewModel>();
 
         public RelayCommand DeleteSelectedCookieCommand { get; }
@@ -70,8 +67,6 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
         public string HttpMethod { get; set; } = "POST";
 
         public IEnumerable<string> HttpMethods { get; } = new[] { "GET", "POST", "PUT", "PATCH", "DELETE", "COPY", "HEAD", "OPTIONS", "LINK", "UNLINK", "PURGE", "LOCK", "UNLOCK", "PROPFIND", "VIEW" };
-
-        public bool IsClosed { get; set; }
 
         public ObservableCollection<QueryStringParameterViewModel> QueryStringParameters { get; } = new FullyObservableCollection<QueryStringParameterViewModel>();
 
@@ -153,11 +148,6 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
         public void OnAddQueryStringParameter()
         {
             QueryStringParameters.Add(new QueryStringParameterViewModel());
-        }
-
-        public void OnClose()
-        {
-            IsClosed = true;
         }
 
         public void OnDeleteSelectedCookie()
