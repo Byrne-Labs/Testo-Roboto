@@ -110,6 +110,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
                 selectedCollectionViewModel.Items.Add(newRequestMessage);
                 selectedCollectionViewModel.IsExpanded = true;
             }
+
             OpenRequestMessages.Add(newRequestMessage);
         }
 
@@ -123,11 +124,8 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
             var requestMessage = eventArgs.Parameter as RequestMessageViewModel;
             if (!OpenRequestMessages.Contains(requestMessage))
             {
+                requestMessage.IsClosed = false;
                 OpenRequestMessages.Add(requestMessage);
-            }
-            else
-            {
-                //TODO: Bring tab to foreground
             }
         }
 

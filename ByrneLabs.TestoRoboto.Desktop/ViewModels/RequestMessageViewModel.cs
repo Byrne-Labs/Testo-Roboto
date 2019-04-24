@@ -73,7 +73,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public IEnumerable<string> HttpMethods { get; } = new[] { "GET", "POST", "PUT", "PATCH", "DELETE", "COPY", "HEAD", "OPTIONS", "LINK", "UNLINK", "PURGE", "LOCK", "UNLOCK", "PROPFIND", "VIEW" };
 
-        public bool IsClosed { get; private set; }
+        public bool IsClosed { get; set; }
 
         public ObservableCollection<QueryStringParameterViewModel> QueryStringParameters { get; } = new FullyObservableCollection<QueryStringParameterViewModel>();
 

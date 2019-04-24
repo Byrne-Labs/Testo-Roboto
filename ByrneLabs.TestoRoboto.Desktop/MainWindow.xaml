@@ -11,8 +11,8 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance viewModels:MainWorkspaceViewModel, IsDesignTimeCreatable=true }"
         Title="Testo Roboto"
-        Width="800"
-        Height="600"
+        Width="1200"
+        Height="800"
         Loaded="Window_Loaded">
 
     <local:MainWorkspace x:Name="MainWorkspace" />

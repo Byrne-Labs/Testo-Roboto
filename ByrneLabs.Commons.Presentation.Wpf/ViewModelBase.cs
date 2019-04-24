@@ -58,7 +58,7 @@ namespace ByrneLabs.Commons.Presentation.Wpf
             }
             else
             {
-               eventArgs.CanExecute = true;
+                eventArgs.CanExecute = true;
             }
         }
 

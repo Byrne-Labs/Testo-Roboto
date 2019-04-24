@@ -8,12 +8,12 @@
     xmlns:commons="clr-namespace:ByrneLabs.Commons.Presentation.Wpf;assembly=ByrneLabs.Commons.Presentation.Wpf"
     xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
     xmlns:viewModels="clr-namespace:ByrneLabs.TestoRoboto.Desktop.ViewModels"
-    xmlns:Interactions="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:interactions="http://schemas.microsoft.com/xaml/behaviors"
     commons:ViewModelCommandBinding.CommandHandler="{Binding}"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance viewModels:MainWorkspaceViewModel, IsDesignTimeCreatable=true }"
-    d:DesignHeight="600"
-    d:DesignWidth="800">
+    d:DesignHeight="800"
+    d:DesignWidth="1200">
 
     <commons:UserControlBase.CommandBindings>
         <commons:ViewModelCommandBinding Command="local:TestoRobotoCommands.NewRequestMessageCollection" />
@@ -28,18 +28,17 @@
                 <local:RequestMessage />
             </DataTemplate>
         </xcad:DockingManager.Resources>
-        <xcad:DockingManager.DocumentHeaderTemplate>
-            <DataTemplate>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding Content.Name}" />
-                </StackPanel>
-            </DataTemplate>
-        </xcad:DockingManager.DocumentHeaderTemplate>
-
+        <xcad:DockingManager.LayoutItemContainerStyle>
+            <Style TargetType="{x:Type xcad:LayoutItem}">
+                <Setter Property="Title" Value="{Binding Model.Name}" />
+                <Setter Property="CloseCommand" Value="{Binding Model.CloseCommand}" />
+                <Setter Property="IsActive" Value="{Binding Model.IsSelected}" />
+            </Style>
+        </xcad:DockingManager.LayoutItemContainerStyle>
         <xcad:LayoutRoot>
             <xcad:LayoutPanel Orientation="Horizontal">
-                <xcad:LayoutAnchorablePane DockWidth="200">
-                    <xcad:LayoutAnchorable Title="Project Explorer" CanHide="False" CanClose="False" AutoHideWidth="240">
+                <xcad:LayoutAnchorablePane DockWidth="400">
+                    <xcad:LayoutAnchorable Title="Project Explorer" CanHide="False" CanClose="False" AutoHideWidth="400">
                         <DockPanel>
                             <ToolBarTray DockPanel.Dock="Top">
                                 <ToolBar>
@@ -55,9 +54,9 @@
                                 </ToolBar>
                             </ToolBarTray>
                             <TreeView x:Name="RequestMessageTreeView" ItemsSource="{Binding RequestMessageHierarchyItemViewModels}" PreviewMouseRightButtonDown="TreeViewItem_OnPreviewMouseRightButtonDown" BorderThickness="0">
-                                <Interactions:Interaction.Behaviors>
+                                <interactions:Interaction.Behaviors>
                                     <commons:BindableSelectedItemBehavior SelectedItem="{Binding SelectedRequestMessageHierarchyItem, Mode=TwoWay}" />
-                                </Interactions:Interaction.Behaviors>
+                                </interactions:Interaction.Behaviors>
                                 <TreeView.Resources>
                                     <HierarchicalDataTemplate DataType="{x:Type viewModels:RequestMessageCollectionViewModel}" ItemsSource="{Binding Items}">
                                         <StackPanel Orientation="Horizontal">
