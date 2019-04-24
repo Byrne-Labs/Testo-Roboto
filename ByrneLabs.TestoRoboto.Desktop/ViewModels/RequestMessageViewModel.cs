@@ -51,8 +51,6 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public RelayCommand AddQueryStringParameterCommand { get; }
 
-        public IEnumerable<AuthenticationViewModel> AuthenticationTypes { get; } = new AuthenticationViewModel[] { new InheritedAuthenticationViewModel(), new NoAuthenticationViewModel(), new AwsSignatureAuthenticationViewModel(), new BasicAuthenticationViewModel(), new BearerTokenAuthenticationViewModel(), new DigestAuthenticationViewModel(), new HawkAuthenticationViewModel(), new NtlmAuthenticationViewModel(), new Oauth1AuthenticationViewModel(), new Oauth2AuthenticationViewModel() };
-
         public IEnumerable<BodyViewModel> BodyTypes { get; } = new BodyViewModel[] { new NoBodyViewModel(), new FormDataBodyViewModel(), new RawBodyViewModel(), new UrlEncodedBodyViewModel() };
 
         public BodyViewModel BodyViewModel { get; set; }

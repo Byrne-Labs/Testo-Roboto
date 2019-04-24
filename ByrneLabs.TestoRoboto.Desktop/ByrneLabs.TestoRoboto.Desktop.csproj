@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Authentication.xaml" />
     <None Remove="Images\AddFile_16x.png" />
     <None Remove="Images\AddFolder_16x.png" />
     <None Remove="Images\Document_16x.png" />
@@ -46,6 +47,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Authentication.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="MainWorkspace.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

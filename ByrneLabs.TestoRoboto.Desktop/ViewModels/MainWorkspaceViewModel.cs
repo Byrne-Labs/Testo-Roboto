@@ -122,6 +122,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
         private void OpenCommandExecuted(object sender, ExecutedRoutedEventArgs eventArgs)
         {
             var requestMessage = eventArgs.Parameter as RequestMessageViewModel;
+
             if (!OpenRequestMessages.Contains(requestMessage))
             {
                 requestMessage.IsClosed = false;
