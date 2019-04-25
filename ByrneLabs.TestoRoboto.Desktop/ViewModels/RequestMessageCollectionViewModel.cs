@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 
@@ -21,12 +22,26 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
                 if (args.OldItems != null)
                 {
-                    foreach (var oldItem in args.NewItems.Cast<RequestMessageHierarchyItemViewModel>())
+                    foreach (var oldItem in args.OldItems.Cast<RequestMessageHierarchyItemViewModel>())
                     {
                         oldItem.PropertyChanged -= ItemPropertyChanged;
                     }
                 }
             };
+        }
+
+        public IEnumerable<RequestMessageHierarchyItemViewModel> Descendents
+        {
+            get
+            {
+                var descendents = Items.ToList();
+                foreach (var childCollection in Items.OfType<RequestMessageCollectionViewModel>())
+                {
+                    descendents.AddRange(childCollection.Descendents);
+                }
+
+                return descendents.AsReadOnly();
+            }
         }
 
         public bool IsExpanded { get; set; }

@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using ByrneLabs.Commons.Presentation.Wpf;
 
@@ -44,7 +45,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
                 if (args.OldItems != null)
                 {
-                    foreach (var oldItem in args.NewItems.Cast<RequestMessageHierarchyItemViewModel>())
+                    foreach (var oldItem in args.OldItems.Cast<RequestMessageHierarchyItemViewModel>())
                     {
                         oldItem.PropertyChanged -= RequestMessageHierarchyItemPropertyChanged;
                     }
@@ -52,6 +53,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
             };
 
             RegisterCommand(ApplicationCommands.Open, null, null, OpenCommandCanExecute, OpenCommandExecuted);
+            RegisterCommand(ApplicationCommands.Delete, null, null, DeleteCommandCanExecute, DeleteCommandExecuted);
             RegisterCommand(TestoRobotoCommands.NewRequestMessageCollection, null, null, null, NewRequestMessageCollectionCommandExecuted);
             RegisterCommand(TestoRobotoCommands.NewRequestMessage, null, null, null, NewRequestMessageCommandExecuted);
         }
@@ -68,7 +70,7 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
 
         public bool StartScreenVisible { get; set; } = true;
 
-        private void NewRequestMessageCollectionCommandExecuted(object sender, ExecutedRoutedEventArgs eventArgs)
+        private static RequestMessageCollectionViewModel GetRequestMessageCollectionForEvent(ExecutedRoutedEventArgs eventArgs)
         {
             RequestMessageCollectionViewModel selectedCollectionViewModel;
             if (eventArgs.Parameter is RequestMessageViewModel requestMessageViewModel)
@@ -87,38 +89,67 @@ namespace ByrneLabs.TestoRoboto.Desktop.ViewModels
             {
                 throw new ArgumentException($"The parameter must be null or of type {nameof(RequestMessageCollectionViewModel)} or {nameof(requestMessageViewModel)}", nameof(eventArgs.Parameter));
             }
+
+            return selectedCollectionViewModel;
+        }
+
+        private void DeleteCommandCanExecute(object sender, CanExecuteRoutedEventArgs eventArgs)
+        {
+            eventArgs.CanExecute = eventArgs.Parameter != null;
+        }
+
+        private void DeleteCommandExecuted(object sender, ExecutedRoutedEventArgs eventArgs)
+        {
+            var itemToDelete = eventArgs.Parameter as RequestMessageHierarchyItemViewModel;
+            if (MessageBox.Show($"'{itemToDelete.Name}' will be deleted permanently.", "Testo Roboto", MessageBoxButton.OKCancel, MessageBoxImage.Exclamation, MessageBoxResult.Cancel) == MessageBoxResult.Cancel)
+            {
+                return;
+            }
+
+            if (itemToDelete.ParentCollection == null)
+            {
+                RequestMessageHierarchyItemViewModels.Remove(itemToDelete);
+            }
+            else
+            {
+                itemToDelete.ParentCollection.Items.Remove(itemToDelete);
+            }
+
+            if (OpenRequestMessageHierarchyItems.Contains(itemToDelete))
+            {
+                OpenRequestMessageHierarchyItems.Remove(itemToDelete);
+            }
+
+            if (itemToDelete is RequestMessageCollectionViewModel collectionToDelete)
+            {
+                foreach (var descendent in collectionToDelete.Descendents.Where(d => OpenRequestMessageHierarchyItems.Contains(d)))
+                {
+                    OpenRequestMessageHierarchyItems.Remove(descendent);
+                }
+            }
+        }
+
+        private void NewRequestMessageCollectionCommandExecuted(object sender, ExecutedRoutedEventArgs eventArgs)
+        {
+            var selectedCollectionViewModel = GetRequestMessageCollectionForEvent(eventArgs);
 
             var newRequestMessageCollection = new RequestMessageCollectionViewModel { Name = "New Request Message Collection", IsSelected = true, ParentCollection = selectedCollectionViewModel };
             if (selectedCollectionViewModel == null)
             {
                 RequestMessageHierarchyItemViewModels.Add(newRequestMessageCollection);
+                SortRequestMessageHierarchyItemViewModels();
             }
             else
             {
                 selectedCollectionViewModel.Items.Add(newRequestMessageCollection);
                 selectedCollectionViewModel.IsExpanded = true;
+                selectedCollectionViewModel.SortItems();
             }
         }
 
         private void NewRequestMessageCommandExecuted(object sender, ExecutedRoutedEventArgs eventArgs)
         {
-            RequestMessageCollectionViewModel selectedCollectionViewModel;
-            if (eventArgs.Parameter is RequestMessageViewModel requestMessageViewModel)
-            {
-                selectedCollectionViewModel = requestMessageViewModel.ParentCollection;
-            }
-            else if (eventArgs.Parameter is RequestMessageCollectionViewModel requestMessageCollectionViewModel)
-            {
-                selectedCollectionViewModel = requestMessageCollectionViewModel;
-            }
-            else if (eventArgs.Parameter == null)
-            {
-                selectedCollectionViewModel = null;
-            }
-            else
-            {
-                throw new ArgumentException($"The parameter must be null or of type {nameof(RequestMessageCollectionViewModel)} or {nameof(requestMessageViewModel)}", nameof(eventArgs.Parameter));
-            }
+            var selectedCollectionViewModel = GetRequestMessageCollectionForEvent(eventArgs);
 
             var newRequestMessage = new RequestMessageViewModel { Name = "New Request Message", IsSelected = true, ParentCollection = selectedCollectionViewModel };
             if (selectedCollectionViewModel == null)

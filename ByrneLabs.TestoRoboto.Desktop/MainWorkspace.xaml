@@ -19,6 +19,7 @@
         <commons:ViewModelCommandBinding Command="local:TestoRobotoCommands.NewRequestMessageCollection" />
         <commons:ViewModelCommandBinding Command="local:TestoRobotoCommands.NewRequestMessage" />
         <commons:ViewModelCommandBinding Command="ApplicationCommands.Open" />
+        <commons:ViewModelCommandBinding Command="ApplicationCommands.Delete" />
     </commons:UserControlBase.CommandBindings>
 
 
@@ -54,6 +55,9 @@
                                     <Button Style="{StaticResource ButtonSupportingDisabledImage}" Command="Open" ToolTip="Open" CommandParameter="{Binding ElementName=RequestMessageTreeView, Path=SelectedItem}">
                                         <Image Source="Images/OpenFile_16x.png" />
                                     </Button>
+                                    <Button Style="{StaticResource ButtonSupportingDisabledImage}" Command="Delete" ToolTip="Delete" CommandParameter="{Binding ElementName=RequestMessageTreeView, Path=SelectedItem}">
+                                        <Image Source="Images/NoResults_16x.png" />
+                                    </Button>
                                 </ToolBar>
                             </ToolBarTray>
                             <TreeView x:Name="RequestMessageTreeView" ItemsSource="{Binding RequestMessageHierarchyItemViewModels}" PreviewMouseRightButtonDown="TreeViewItem_OnPreviewMouseRightButtonDown" BorderThickness="0">
@@ -82,9 +86,10 @@
                                 </TreeView.ItemContainerStyle>
                                 <TreeView.ContextMenu>
                                     <ContextMenu StaysOpen="True">
-                                        <MenuItem Header="Open" Command="ApplicationCommands.Open" CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ContextMenu}}}" />
                                         <MenuItem Header="New Request Message" Command="local:TestoRobotoCommands.NewRequestMessage" CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ContextMenu}}}" />
                                         <MenuItem Header="New Collection" Command="local:TestoRobotoCommands.NewRequestMessageCollection" CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ContextMenu}}}" />
+                                        <MenuItem Header="Open" Command="ApplicationCommands.Open" CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ContextMenu}}}" />
+                                        <MenuItem Header="Delete" Command="ApplicationCommands.Delete" CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type ContextMenu}}}" />
                                     </ContextMenu>
                                 </TreeView.ContextMenu>
                             </TreeView>

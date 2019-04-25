@@ -13,6 +13,7 @@
     <None Remove="Images\AddFolder_16x.png" />
     <None Remove="Images\Document_16x.png" />
     <None Remove="Images\Folder_16x.png" />
+    <None Remove="Images\NoResults_16x.png" />
     <None Remove="Images\OpenFile_16x.png" />
     <None Remove="MainWorkspace.xaml" />
     <None Remove="RequestMessageCollection.xaml" />
@@ -21,6 +22,7 @@
   <ItemGroup>
     <Resource Include="Images\Document_16x.png" />
     <Resource Include="Images\Folder_16x.png" />
+    <Resource Include="Images\NoResults_16x.png" />
     <Resource Include="Images\OpenFile_16x.png">
       <CopyToOutputDirectory></CopyToOutputDirectory>
     </Resource>
